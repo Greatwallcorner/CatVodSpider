@@ -1,0 +1,29 @@
+GET https://cn-beijing-data.aliyundrive.net/EJJXnV7a%2F77318683%2F656720e1e62276ad813b472ea9b597824313153b%2F656720e124ca383fd74646d1b031a7fbdbd654db?
+    callback=eyJjYWxsYmFja1VybCI6Imh0dHA6Ly9iajI5LmFwaS1ocC5hbGl5dW5wZHMuY29tL3YyL2ZpbGUvZG93bmxvYWRfY2FsbGJhY2siLCJjYWxsYmFja0JvZHkiOiJodHRwSGVhZGVyLnJhbmdlPSR7aHR0cEhlYWRlci5yYW5nZX1cdTAwMjZidWNrZXQ9JHtidWNrZXR9XHUwMDI2b2JqZWN0PSR7b2JqZWN0fVx1MDAyNmRvbWFpbl9pZD0ke3g6ZG9tYWluX2lkfVx1MDAyNnVzZXJfaWQ9JHt4OnVzZXJfaWR9XHUwMDI2ZHJpdmVfaWQ9JHt4OmRyaXZlX2lkfVx1MDAyNmZpbGVfaWQ9JHt4OmZpbGVfaWR9IiwiY2FsbGJhY2tCb2R5VHlwZSI6ImFwcGxpY2F0aW9uL3gtd3d3LWZvcm0tdXJsZW5jb2RlZCIsImNhbGxiYWNrU3RhZ2UiOiJiZWZvcmUtZXhlY3V0ZSIsImNhbGxiYWNrRmFpbHVyZUFjdGlvbiI6Imlnbm9yZSJ9&
+    callback-var=eyJ4OmRvbWFpbl9pZCI6ImJqMjkiLCJ4OnVzZXJfaWQiOiI2NjRjODA3MDdjMDM0ZjYxOTU5NDY2YjJhNTliY2ExNSIsIng6ZHJpdmVfaWQiOiIyMjg5NDQiLCJ4OmZpbGVfaWQiOiI2NTZlZGZmMmM2MzUzM2JlNzUzZDRkOTBiNWFhYzlmMTQ0OTVjODgyIn0%3D&
+    di=bj29&dr=228944&f=656edff2c63533be753d4d90b5aac9f14495c882&pds-params=%7B%22ap%22%3A%22pJZInNHN2dZWk8qg%22%7D&
+    response-content-disposition=attachment%3B%20filename%2A%3DUTF-8%27%2735.mp4&
+    security-token=CAIS%2BgF1q6Ft5B2yfSjIr5faCvnDrqd1hImoUEXoh1RsdsV2nIiYtDz2IHFPeHJrBeAYt%2FoxmW1X5vwSlq5rR4QAXlDfNVmTMSz4qFHPWZHInuDox55m4cTXNAr%2BIhr%2F29CoEIedZdjBe%2FCrRknZnytou9XTfimjWFrXWv%2Fgy%2BQQDLItUxK%2FcCBNCfpPOwJms7V6D3bKMuu3OROY6Qi5TmgQ41Uh1jgjtPzkkpfFtkGF1GeXkLFF%2B97DRbG%2FdNRpMZtFVNO44fd7bKKp0lQLukMWr%2Fwq3PIdp2ma447NWQlLnzyCMvvJ9OVDFyN0aKEnH7J%2Bq%2FzxhTPrMnpkSlacGoABMFHWOw0J7jEdHQxsL3RrkfVNxehM5wDIp4dpmqifOYVibyYVV95IEtyml%2Bn%2Boe7nfDgEoqqz%2BWT1sjIdEn%2BmfWx7%2FlvJOJf%2FQx9%2Fg3m4QR9Wv8oRCnIxp9Mf1D5L2BRkpolcaZ1j8LtA4%2BWopLhVFz36b8LRkxsBuPJkst7AOG8gAA%3D%3D&
+    sl=yJcwweiN61T&u=664c80707c034f61959466b2a59bca15&x-oss-access-key-id=STS.NToACwCxT3KCRcYcT9zJZsM3V&
+    x-oss-expires=1702733036&x-oss-signature=ZEVK%2BvOTiLABtUxY8gCPBJ%2Brr0c9stgORya%2BhP1Mv58%3D&
+    x-oss-signature-version=OSS2
+
+###
+GET http://127.0.0.1:9978/proxy?do=ali&type=video&cate=preview&shareId=yJcwweiN61T&
+    fileId=656edff2c63533be753d4d90b5aac9f14495c882
+
+###
+GET http://api.dovx.tk/ali/search?wd=恋爱冲绳
+
+
+### 加了cf验证
+POST https://www.alipansou.com/active
+Content-Type: application/json
+
+{
+  "code": "milk"
+}
+
+###
+
+GET https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/json/alist.json
