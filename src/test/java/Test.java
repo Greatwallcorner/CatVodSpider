@@ -18,9 +18,8 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 
 public class Test {
-    public static void main(String[] args) {
-        Date date = new Date(1710314929);
-        System.out.println(DateUtils.formatDate(date));
+    public static void main(String[] args) throws Exception {
+        test();
     }
 
     public void dialogTest() {
@@ -83,7 +82,7 @@ public class Test {
         }
     }
 
-    public void test() throws Exception {
+    public static void test() throws Exception {
         AliYun aliYun = new AliYun();
         //"http://127.0.0.1:9978/proxy?do=ali&type=video&cate=open&shareId=5CNb1zzo7z9&fileId=6572dcc537aa2f73e51e499d9a14280cdcda9eaa"
         HashMap<String, String> maps = new HashMap<>();

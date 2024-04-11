@@ -1,5 +1,6 @@
 package com.github.catvod.net;
 
+import com.github.catvod.crawler.Spider;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class OkHttp {
     }
 
     public static Dns dns() {
-        return Spider1.dns;
+        return Spider.safeDns();
     }
 
     public static OkHttpClient client() {

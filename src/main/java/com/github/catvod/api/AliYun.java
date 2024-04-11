@@ -9,15 +9,12 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.net.OkResult;
 import com.github.catvod.spider.Init;
 import com.github.catvod.spider.Proxy;
-import com.github.catvod.utils.Path;
-import com.github.catvod.utils.QRCode;
-import com.github.catvod.utils.Swings;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.*;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.ktor.http.HttpStatusCode;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
@@ -318,7 +315,7 @@ public class AliYun {
 
     public String getShareDownloadUrl(String shareId, String fileId) {
         try {
-            if (shareDownloadMap.containsKey(fileId) && shareDownloadMap.get(fileId) != null && !isExpire(shareDownloadMap.get(fileId), 600))
+            if (shareDownloadMap.containsKey(fileId) && shareDownloadMap.get(fileId) != null && !isExpire(shareDownloadMap.get(fileId)))
                 return shareDownloadMap.get(fileId);
             refreshShareToken(shareId);
             SpiderDebug.log("getShareDownloadUrl..." + fileId);
@@ -338,7 +335,7 @@ public class AliYun {
 
     public String getDownloadUrl(String shareId, String fileId) {
         try {
-            if (downloadMap.containsKey(fileId) && downloadMap.get(fileId) != null && !isExpire(downloadMap.get(fileId), 900))
+            if (downloadMap.containsKey(fileId) && downloadMap.get(fileId) != null && !isExpire(downloadMap.get(fileId)))
                 return downloadMap.get(fileId);
             refreshShareToken(shareId);
             SpiderDebug.log("getDownloadUrl..." + fileId);
@@ -452,7 +449,7 @@ public class AliYun {
         return String.format(Proxy.getProxyUrl() + "?do=ali&type=video&cate=%s&shareId=%s&fileId=%s&templateId=%s&mediaId=%s", cate, shareId, fileId, templateId, mediaId);
     }
 
-    private static boolean isExpire(String url, int time) {
+    private static boolean isExpire(String url) {
         String expires = null;
         for (NameValuePair nameValuePair : URLEncodedUtils.parse(url, Charset.defaultCharset())) {
             if (nameValuePair.getName().equalsIgnoreCase("x-oss-expires")) {
@@ -460,7 +457,7 @@ public class AliYun {
             }
         }
         if (StringUtils.isEmpty(expires)) return false;
-        return Long.parseLong(expires) - getTimeStamp() <= time / 60;
+        return Long.parseLong(expires) - getTimeStamp() <= 60;
     }
 
     private static long getTimeStamp() {
@@ -474,22 +471,19 @@ public class AliYun {
         String fileId = params.get("fileId");
         String cate = params.get("cate");
         String downloadUrl = "";
-        int thread = 1;
 
         if ("preview".equals(cate)) {
-            return previewProxy(shareId, fileId, templateId);
+            return new Object[]{200, "application/vnd.apple.mpegurl", new ByteArrayInputStream(getM3u8(shareId, fileId, templateId).getBytes())};
         }
 
         if ("open".equals(cate)) {
-            thread = 10;
             downloadUrl = getDownloadUrl(shareId, fileId);
         } else if ("share".equals(cate)) {
-            thread = 10;
             downloadUrl = getShareDownloadUrl(shareId, fileId);
         } else if ("m3u8".equals(cate)) {
             lock.lock();
             String mediaUrl = m3u8MediaMap.get(fileId).get(mediaId);
-            if (isExpire(mediaUrl, 900)) {
+            if (isExpire(mediaUrl)) {
                 getM3u8(shareId, fileId, templateId);
                 mediaUrl = m3u8MediaMap.get(fileId).get(mediaId);
             }
@@ -497,24 +491,24 @@ public class AliYun {
             downloadUrl = mediaUrl;
         }
 
+//        handleHeaders(params);
+        return new Object[]{ProxyVideo.proxy(downloadUrl, handleHeaders(params))};
+//        return new Object[]{HttpStatusCode.Companion.getFound().getValue(), "text/plain", downloadUrl};
+    }
+
+    private static Map<String, String> handleHeaders(Map<String, String> params) {
         Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        for (String key : params.keySet()) headers.put(key, params.get(key));
-        headers.remove("do");
-        headers.remove("host");
-        headers.remove("type");
-        headers.remove("cate");
-        headers.remove("fileId");
-        headers.remove("shareId");
-        headers.remove("mediaId");
-        headers.remove("templateId");
-        headers.remove("remote-addr");
-        headers.remove("http-client-ip");
-        return new Object[]{HttpStatusCode.Companion.getFound().getValue(), "text/plain", downloadUrl};
-//        if (thread == 1) {
-//            return new Object[]{ProxyVideo.proxy(downloadUrl, headers)};
-//        } else {
-//            return new Object[]{new MultiThreadedDownloader(downloadUrl, headers, thread).start()};
-//        }
+        // referer 请求的时候带上 会导致无法播放
+//        List<String> keys = Arrays.asList(/*"referer", */"icy-metadata", "range", "connection", "accept-encoding"/*, "user-agent"*/);
+        List<String> keys = Arrays.asList("templateId", "shareId", "mediaId", "fileId", "cate", "do", "type");
+
+        for (String key : params.keySet()) if (!keys.contains(key)) headers.put(key, params.get(key));
+        headers.put(HttpHeaders.USER_AGENT, Utils.CHROME);
+        headers.remove(HttpHeaders.ACCEPT_ENCODING);
+        headers.remove(HttpHeaders.REFERER);
+        headers.remove(HttpHeaders.HOST);
+        headers.computeIfAbsent(HttpHeaders.RANGE, k->"bytes=0-");
+        return headers;
     }
 
     private Object[] previewProxy(String shareId, String fileId, String templateId) {
@@ -650,7 +644,10 @@ public class AliYun {
 
     private void dismiss() {
         try {
-            if (dialog != null) dialog.setVisible(false);
+            if (dialog != null) {
+                dialog.setVisible(false);
+                dialog.dispose();
+            }
         } catch (Exception ignored) {
         }
     }
