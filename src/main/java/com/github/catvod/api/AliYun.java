@@ -611,7 +611,7 @@ public class AliYun {
                 JPanel jPanel = new JPanel();
                 jPanel.setSize(Swings.dp2px(size), Swings.dp2px(size));
                 jPanel.add(new JLabel(new ImageIcon(image)));
-                Utils.showDialog(jPanel, "请使用阿里云盘app扫描");
+                dialog = Utils.showDialog(jPanel, "请使用阿里云盘app扫描");
             });
             Utils.notify("請使用阿里雲盤 App 掃描二維碼");
         } catch (Exception ignored) {
