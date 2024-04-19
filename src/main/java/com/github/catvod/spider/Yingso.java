@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Yingso extends Ali {
-    private static final String siteUrl = "https://yingso.fun:3000";
+    private static final String siteUrl = Utils.base64Decode("aHR0cHM6Ly95aW5nc28uZnVuOjMwMDEv");
 
     private static final String shareUrl = "https://www.aliyundrive.com/s/";
 
     @Override
     public String searchContent(String key, boolean quick) throws Exception {
-        String data = OkHttp.post(siteUrl + "/ali/search", new Req(30, 1, key).toJson(), Utils.webHeaders(siteUrl)).getBody();
+        String data = OkHttp.post(siteUrl + "v3/ali/search", new Req(30, 1, key).toJson(), Utils.webHeaders(siteUrl)).getBody();
         Res res = Res.fromJson(data);
         if (res == null || res.code != 200) {
             SpiderDebug.log("yingso error:" + res.msg + "data: " + data);
@@ -40,10 +40,12 @@ public class Yingso extends Ali {
         // ？ 不知道这是啥 层级？
         Integer root = 0;
 
+        String cat = "all";
+
         public Req(Integer pageSize, Integer pageNum, String title) throws UnsupportedEncodingException {
             this.pageSize = pageSize;
             this.pageNum = pageNum;
-            this.title = URLEncoder.encode(title, Charset.defaultCharset().name());
+            this.title = title;
         }
 
         public String toJson() {

@@ -4,6 +4,8 @@ import com.github.catvod.crawler.Spider;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -96,7 +98,11 @@ public class OkHttp {
 
     public static OkHttpClient.Builder getBuilder() {
         return new OkHttpClient.Builder()
-//                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost",8080)))
-                .addInterceptor(new OkhttpInterceptor()).dns(dns()).connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).hostnameVerifier((hostname, session) -> true).sslSocketFactory(new SSLCompat(), SSLCompat.TM);
+//                .proxy(new java.net.Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost",8080)))
+                .addInterceptor(new OkhttpInterceptor()).dns(dns()).connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .sslSocketFactory(SSLSocketClient.getSSLSocketFactory(), SSLSocketClient.getX509TrustManager())
+                .hostnameVerifier((SSLSocketClient.getHostnameVerifier()));
     }
 }

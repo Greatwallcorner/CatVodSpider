@@ -3,10 +3,10 @@ package com.github.catvod.utils;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.spider.Proxy;
+import io.ktor.http.ContentType;
 import okhttp3.Response;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
-import org.apache.http.entity.ContentType;
 
 import javax.swing.Timer;
 import javax.swing.*;
@@ -342,16 +342,20 @@ public class Utils {
             synchronized (Utils.class) {
                 if (webHttpHeaderMap == null || webHttpHeaderMap.isEmpty()) {
                     webHttpHeaderMap = new HashMap<>();
-                    webHttpHeaderMap.put(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+                    webHttpHeaderMap.put(HttpHeaders.CONTENT_TYPE, ContentType.Application.INSTANCE.getJson().getContentType());
                     webHttpHeaderMap.put(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
                     webHttpHeaderMap.put(HttpHeaders.CONNECTION, "keep-alive");
                     webHttpHeaderMap.put(HttpHeaders.USER_AGENT, CHROME);
                     webHttpHeaderMap.put(HttpHeaders.ACCEPT, "*/*");
+                    webHttpHeaderMap.put(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate, br");
                 }
             }
         }
         URI uri = URI.create(referer);
-        webHttpHeaderMap.put(HttpHeaders.REFERER, uri.getScheme() + "://" + uri.getHost());
+        String u = uri.getScheme() + "://" + uri.getHost();
+        webHttpHeaderMap.put(HttpHeaders.REFERER, u);
+        webHttpHeaderMap.put(io.ktor.http.HttpHeaders.INSTANCE.getOrigin(), u);
+        webHttpHeaderMap.put(HttpHeaders.HOST, uri.getHost() + ":" + uri.getPort());
         return webHttpHeaderMap;
     }
 
