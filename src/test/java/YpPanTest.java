@@ -6,15 +6,15 @@ public class YpPanTest {
     private static YpPan instance = new YpPan();
 
     @Test
-    public void homeTest() throws Exception {
-        String s = instance.searchContent("泪之女王", false);
+    public void searchTest() throws Exception {
+        String s = instance.searchContent("惜花芷", false);
         System.out.println(s);
         AssertUtil.INSTANCE.assertResult(s);
     }
 
     @Test
     public void detailTest() throws Exception {
-        String s = instance.detailContent(Lists.newArrayList("https://www.yppan.com/archives/41873"));
+        String s = instance.detailContent(Lists.newArrayList("https://www.yppan.com/archives/45299"));
         System.out.println(s);
         AssertUtil.INSTANCE.assertResult(s);
     }

@@ -1,9 +1,11 @@
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.alist.Drive;
 import com.github.catvod.spider.AList;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class AlistTest {
@@ -26,6 +28,13 @@ public class AlistTest {
     @Test
     public void cate() throws Exception {
         String s = aList.categoryContent("小雅", "1", false, new HashMap<>());
+        System.out.println(s);
+        AssertUtil.INSTANCE.assertResult(s);
+    }
+
+    @Test
+    public void detail() throws Exception {
+        String s = aList.detailContent(Arrays.asList("小雅/元数据"));
         System.out.println(s);
         AssertUtil.INSTANCE.assertResult(s);
     }

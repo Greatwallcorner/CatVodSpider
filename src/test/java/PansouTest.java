@@ -21,7 +21,7 @@ public class PansouTest {
 
     @Test
     public void searchTest() throws Exception {
-        String s = panSou.searchContent("花青歌", false);
+        String s = panSou.searchContent("阿凡达", false);
         System.out.println(s);
         AssertUtil.INSTANCE.assertResult(s);
     }

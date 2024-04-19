@@ -55,15 +55,20 @@ public class YpPan extends Ali {
 
     @Override
     public String detailContent(List<String> ids) throws Exception {
-        String doc = OkHttp.string(ids.get(0), Utils.webHeaders("https://www.bing.com"));
+        String doc = OkHttp.string(ids.get(0), Utils.webHeaders(host));
         Elements document = Jsoup.parse(doc).body().select("#page #main #content");
         Vod vod = new Vod();
         vod.setVodId(ids.get(0));
         vod.setVodName(document.select(".post-title").text());
         vod.setVodPic(defaultPicUrl);
         Elements entry = document.select(".entry p");
-        vod.setVodContent(entry.get(1).text().replace("资源简介：", "") + entry.get(4).text());
-        vod.setVodTag(entry.get(3).text().replace("关键词：", "").replace("#", ""));
+        String vodContent = "";
+        if(!entry.isEmpty()) vodContent += entry.get(1).text().replace("资源简介：", "");
+        if(entry.size() >= 4) {
+            vodContent += entry.get(1).text();
+            vod.setVodTag(entry.get(3).text().replace("关键词：", "").replace("#", ""));
+        }
+        vod.setVodContent(vodContent);
         System.out.println(entry.get(2).text());
         Matcher matcher = pattern2.matcher(entry.get(2).text());
         boolean b = matcher.find();

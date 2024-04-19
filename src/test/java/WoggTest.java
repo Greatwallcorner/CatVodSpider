@@ -7,7 +7,7 @@ public class WoggTest {
     @BeforeAll
     public static void init() throws Exception {
         wogg = new Wogg();
-        wogg.init();
+        wogg.init("{}");
     }
 
     @org.junit.jupiter.api.Test

@@ -34,7 +34,6 @@ public class AList extends Spider {
     private void fetchRule() {
         SpiderDebug.log("fetch rule start");
         if (drives != null && !drives.isEmpty()) return;
-        SpiderDebug.log(ext);
         if (ext.startsWith("http")) {
             SpiderDebug.log("request rule:" + ext);
             ext = OkHttp.string(ext);
@@ -64,8 +63,6 @@ public class AList extends Spider {
     @Override
     public void init(String extend) {
         try {
-            System.out.println(extend);
-            System.out.println(extend.startsWith("\""));
             ext = extend.trim();
             fetchRule();
         } catch (Exception ignored) {

@@ -347,7 +347,6 @@ public class Utils {
                     webHttpHeaderMap.put(HttpHeaders.CONNECTION, "keep-alive");
                     webHttpHeaderMap.put(HttpHeaders.USER_AGENT, CHROME);
                     webHttpHeaderMap.put(HttpHeaders.ACCEPT, "*/*");
-                    webHttpHeaderMap.put(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate, br");
                 }
             }
         }
@@ -355,7 +354,7 @@ public class Utils {
         String u = uri.getScheme() + "://" + uri.getHost();
         webHttpHeaderMap.put(HttpHeaders.REFERER, u);
         webHttpHeaderMap.put(io.ktor.http.HttpHeaders.INSTANCE.getOrigin(), u);
-        webHttpHeaderMap.put(HttpHeaders.HOST, uri.getHost() + ":" + uri.getPort());
+        webHttpHeaderMap.put(HttpHeaders.HOST, uri.getHost());
         return webHttpHeaderMap;
     }
 
