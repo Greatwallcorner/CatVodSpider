@@ -31,15 +31,19 @@ public class Proxy extends Spider {
 
     static void adjustPort() {
         if (Proxy.port > 0) return;
-        int port = 9978;
-        while (port < 10000) {
-            String resp = OkHttp.string("http://127.0.0.1:" + port + "/proxy?do=ck", null);
-            if (resp.equals("ok")) {
-                SpiderDebug.log("Found local server port " + port);
-                Proxy.port = port;
-                break;
+        int pt = 9978;
+        while (pt < 10000) {
+            try {
+                String resp = OkHttp.string("http://127.0.0.1:" + pt + "/proxy?do=ck", null);
+                if (resp.equals("ok")) {
+                    SpiderDebug.log("Found local server port " + pt);
+                    Proxy.port = pt;
+                    break;
+                }
+                pt++;
+            } catch (Exception e) {
+                SpiderDebug.log("请求端口 异常：" + e.getMessage());
             }
-            port++;
         }
     }
 

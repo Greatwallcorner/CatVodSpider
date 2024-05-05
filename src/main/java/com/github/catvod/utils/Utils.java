@@ -2,6 +2,7 @@ package com.github.catvod.utils;
 
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.spider.Init;
 import com.github.catvod.spider.Proxy;
 import io.ktor.http.ContentType;
 import okhttp3.Response;
@@ -227,11 +228,13 @@ public class Utils {
     }
 
     public static void notify(String msg) {
-        try {
-            postHttpMsg(msg);
-        } catch (IOException e) {
-            SpiderDebug.log(e);
-        }
+        Init.execute(()->{
+            try {
+                postHttpMsg(msg);
+            } catch (IOException e) {
+                SpiderDebug.log(e);
+            }
+        });
 //        NotifyEvent.post(msg);
 //        showToast(msg, 2000);
     }

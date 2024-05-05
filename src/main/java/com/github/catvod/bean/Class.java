@@ -3,8 +3,10 @@ package com.github.catvod.bean;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Class {
@@ -46,5 +48,23 @@ public class Class {
         if (!(obj instanceof Class)) return false;
         Class it = (Class) obj;
         return getTypeId().equals(it.getTypeId());
+    }
+
+    /**
+     * name=value&name1=value1&name2=value2
+     * @param formatStr
+     * @return
+     */
+    @NotNull
+    public static List<Class> parseFromFormatStr(@NotNull String formatStr) {
+        ArrayList<Class> list = new ArrayList<>();
+        String[] split = formatStr.split("&");
+        for (String s : split) {
+            String[] strings = s.split("=");
+            if(strings.length==2){
+                list.add(new Class(strings[1], strings[0]));
+            }
+        }
+        return list;
     }
 }

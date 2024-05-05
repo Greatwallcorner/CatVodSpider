@@ -11,6 +11,10 @@ import java.lang.reflect.Type;
 public class Json {
     private static Gson gson = new Gson();
 
+    public static Gson get(){
+        return gson;
+    }
+
     public static JsonElement parse(String json) {
         try {
             return JsonParser.parseString(json);

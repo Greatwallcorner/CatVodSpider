@@ -4,8 +4,7 @@ import com.github.catvod.crawler.Spider;
 import okhttp3.*;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +15,7 @@ public class OkHttp {
     public static final String GET = "GET";
 
     private OkHttpClient client;
+    private OkHttpClient shortTimeOutClient;
 
     private static class Loader {
         static volatile OkHttp INSTANCE = new OkHttp();
@@ -33,9 +33,17 @@ public class OkHttp {
         if (get().client != null) return get().client;
         return get().client = getBuilder().build();
     }
+    public static OkHttpClient shortTimeoutClient() {
+        if (get().client != null) return get().shortTimeOutClient;
+        return get().client = getBuilder().callTimeout(Duration.ofSeconds(2L)).build();
+    }
 
     public static OkHttpClient noRedirect() {
         return client().newBuilder().followRedirects(false).followSslRedirects(false).build();
+    }
+
+    public static Response newCall(Request request) throws IOException {
+        return client().newCall(request).execute();
     }
 
     public static Response newCall(String url) throws IOException {

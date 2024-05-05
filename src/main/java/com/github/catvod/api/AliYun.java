@@ -573,15 +573,16 @@ public class AliYun {
             textField.setName("token");
             textField.setColumns(Swings.dp2px(38));
             JButton button = new JButton("Ok");
-            button.addActionListener((event) -> {
-                onPositive(textField.getText());
-            });
             jPanel.add(textField);
             jPanel.add(button);
 
             JButton qrButton = new JButton("QRCode");
             jPanel.add(qrButton);
             JDialog jDialog = Utils.showDialog(jPanel, "输入token");
+            button.addActionListener((event) -> {
+                onPositive(textField.getText());
+                jDialog.dispose();
+            });
             qrButton.addActionListener((event) -> {
                 SwingUtilities.invokeLater(this::getQRCode);
                 jDialog.dispose();
@@ -604,7 +605,7 @@ public class AliYun {
     }
 
     private void showQRCode(Data data) {
-        final Integer size = 300;
+        final int size = 300;
         try {
             SwingUtilities.invokeLater(() -> {
                 BufferedImage image = QRCode.getBitmap(data.getCodeContent(), size, 2);
