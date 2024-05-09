@@ -17,11 +17,13 @@ import java.util.List;
 public class Yingso extends Ali {
     private static final String siteUrl = Utils.base64Decode("aHR0cHM6Ly95aW5nc28uZnVuOjMwMDEv");
 
+    private static final String searchUrl = Utils.base64Decode("aHR0cHM6Ly95c3Rlc3QuYXBpLnlpbmdzby5mdW4vdjMvYWxpL3NlYXJjaA==");
+
     private static final String shareUrl = "https://www.aliyundrive.com/s/";
 
     @Override
     public String searchContent(String key, boolean quick) throws Exception {
-        String data = OkHttp.post(siteUrl + "v3/ali/search", new Req(30, 1, key).toJson(), Utils.webHeaders(siteUrl)).getBody();
+        String data = OkHttp.post(searchUrl, new Req(30, 1, key).toJson(), Utils.webHeaders(siteUrl)).getBody();
         Res res = Res.fromJson(data);
         if (res == null || res.code != 200) {
             SpiderDebug.log("yingso error:" + res.msg + "data: " + data);
