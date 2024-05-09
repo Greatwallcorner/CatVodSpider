@@ -4,6 +4,8 @@ import com.github.catvod.crawler.Spider;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,9 @@ public class OkHttp {
 
     public static String string(String url, Map<String, String> header) {
         return string(client(), url, null, header);
+    }
+    public static String string(String url,Map<String, String> param, Map<String, String> header) {
+        return string(client(), url, param, header);
     }
 
     public static String string(OkHttpClient client, String url, Map<String, String> header) {

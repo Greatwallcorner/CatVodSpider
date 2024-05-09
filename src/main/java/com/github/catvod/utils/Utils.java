@@ -340,6 +340,17 @@ public class Utils {
         }
     }
 
+    /**
+     * @param referer
+     * @param cookie 多个cookie name=value;name2=value2
+     * @return
+     */
+    public static HashMap<String, String> webHeaders(String referer, String cookie){
+        HashMap<String, String> map = webHeaders(referer);
+        map.put(com.google.common.net.HttpHeaders.COOKIE, cookie);
+        return map;
+    }
+
     public static HashMap<String, String> webHeaders(String referer) {
         if (webHttpHeaderMap == null || webHttpHeaderMap.isEmpty()) {
             synchronized (Utils.class) {

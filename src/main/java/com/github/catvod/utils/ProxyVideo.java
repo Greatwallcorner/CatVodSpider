@@ -7,6 +7,7 @@ import com.github.catvod.net.OkHttp;
 
 import java.util.Map;
 
+import io.ktor.http.HttpStatusCode;
 import okhttp3.Response;
 
 public class ProxyVideo {
@@ -37,6 +38,16 @@ public class ProxyVideo {
     public static Response proxy(String url, Map<String, String> headers) throws Exception {
         SpiderDebug.log("proxy url："+ url + " headers" + Json.toJson(headers));
         return OkHttp.newCall(url, headers);
+    }
+
+    public static class ProxyRespBuilder{
+        public static Object[] redirect(String url){
+            return new Object[]{HttpStatusCode.Companion.getFound().getValue(), "text/plain", url};
+        }
+
+        public static Object[] response(Response response){
+            return new Object[]{response};
+        }
     }
 
 //    public static NanoHTTPD.Response proxy1(String url, Map<String, String> headers) throws Exception {

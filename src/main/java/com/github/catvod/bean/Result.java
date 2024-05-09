@@ -214,4 +214,21 @@ public class Result {
     public String toString() {
         return new Gson().newBuilder().disableHtmlEscaping().create().toJson(this);
     }
+
+    /**
+     * 真实播放链接
+     */
+    public static class UrlBuilder{
+        private List<String> urlList = new ArrayList<>();
+
+        public UrlBuilder add(String name, String value){
+            urlList.add(name);
+            urlList.add(value);
+            return this;
+        }
+
+        public List<String> build(){
+            return urlList;
+        }
+    }
 }

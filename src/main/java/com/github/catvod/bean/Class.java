@@ -67,4 +67,12 @@ public class Class {
         }
         return list;
     }
+
+    public static String listToFormatStr(List<Class> list){
+        List<String> li = new ArrayList<>();
+        for (Class aClass : list) {
+            li.add(aClass.typeName+"="+aClass.typeId);
+        }
+        return String.join("&", li);
+    }
 }
