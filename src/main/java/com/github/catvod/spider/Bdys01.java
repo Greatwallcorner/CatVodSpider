@@ -3,11 +3,14 @@ package com.github.catvod.spider;
 import cn.hutool.core.compress.Gzip;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
+import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.net.OkResult;
+import com.github.catvod.utils.Json;
 import com.google.common.collect.Lists;
 import okhttp3.Response;
 import org.json.JSONArray;
@@ -61,10 +64,10 @@ public class Bdys01 extends Spider {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36");
         if (!ref.equals("google")) {
-            headers.put("Authority", "www.bdys01.com");
+            headers.put("Authority", siteHost);
             if (ref.length() > 0) {
                 if (ref.equals("origin")) {
-                    headers.put("Origin", "https://www.bdys01.com");
+                    headers.put("Origin", siteUrl);
                 } else {
                     headers.put("Referer", ref);
                 }
@@ -82,7 +85,7 @@ public class Bdys01 extends Spider {
         String ss = url.replace("https://", "").split("/")[0];
         headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36");
         headers.put("Authority", ss);
-        headers.put("Origin", "www.bdys01.com");
+        headers.put("Origin", siteHost);
         headers.put("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
         return headers;
     }
@@ -90,7 +93,7 @@ public class Bdys01 extends Spider {
 
     protected void getCookie() {
         cookie = "";
-        String cookieurl = "https://www.bdys01.com/zzzzz";
+        String cookieurl = siteUrl + "/zzzzz";
         Map<String, List<String>> cookies = new HashMap<>();
         OkHttp.string(cookieurl, getHeaders(cookieurl, ""));
         for (Map.Entry<String, List<String>> entry : cookies.entrySet()) {
@@ -114,46 +117,43 @@ public class Bdys01 extends Spider {
             Document doc = Jsoup.parse(OkHttp.string(siteUrl, getHeaders(siteUrl, referer)));
             referer = siteUrl + "/";
             // 分类节点
-            JSONObject result = new JSONObject();
-            JSONArray classes = new JSONArray();
-            String catestr = "{\"全部\": \"a\",\"电影\": \"0\",\"电视剧\": \"1\"}";
-            JSONObject catedef = new JSONObject(catestr);
-            Iterator it = catedef.keys();
-            while (it.hasNext()) {
-                JSONObject jsonObject = new JSONObject();
-                String key = (String) it.next();
-                jsonObject.put("type_name", key);
-                jsonObject.put("type_id", catedef.getString(key));
-                classes.put(jsonObject);
+
+            List<Class> classes = new ArrayList<>();
+            List<String> catStrList = Lists.newArrayList("全部", "电影", "电视剧");
+            List<String> cateCodeList = Lists.newArrayList("a", "0", "1");
+            List<Vod> videos = new ArrayList<>();
+            for (int i = 0; i < catStrList.size(); i++) {
+
+                classes.add(new Class(cateCodeList.get(i), catStrList.get(i)));
             }
-            result.put("class", classes);
-            if (filter) {
+
+            /*if (filter) {
                 result.put("filters", filterConfig);
-            }
+            }*/
             try {
                 // 取首页推荐视频列表
                 Element homeList = doc.select("div.row.row-cards").get(0);
                 Elements list = homeList.select("div.col-4.rows-md-7");
-                JSONArray videos = new JSONArray();
+
                 for (int i = 0; i < list.size(); i++) {
                     Element vod = list.get(i);
                     String title = vod.selectFirst("h3.card-title").text();
                     String cover = vod.selectFirst("img.w-100").attr("data-src");
                     String remark = vod.selectFirst("p.text-muted").text();
                     String id = vod.selectFirst("a.d-block.cover").attr("href");
-                    JSONObject v = new JSONObject();
-                    v.put("vod_id", id);
-                    v.put("vod_name", title);
-                    v.put("vod_pic", cover);
-                    v.put("vod_remarks", remark);
-                    videos.put(v);
+                    Vod v = new Vod();
+                    v.setVodId(id);
+                    v.setVodName(title);
+                    v.setVodPic(cover);
+                    v.setVodRemarks(remark);
+                    videos.add(v);
                 }
-                result.put("list", videos);
+
             } catch (Exception e) {
                 SpiderDebug.log(e);
             }
-            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+homeContent" + result.toString());
-            return result.toString();
+            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+homeContent" + Result.string(classes, videos));
+            return Result.string(classes, videos);
 
         } catch (Exception e) {
             SpiderDebug.log(e);
@@ -181,10 +181,9 @@ public class Bdys01 extends Spider {
                 } else {
                     urlformat = url + "{s}/" + pg + "?&type=" + tid + "&area={area}&year={year}&order={order}";
                 }
-                for (Iterator<String> it = extend.keySet().iterator(); it.hasNext(); ) {
-                    String key = it.next();
+                for (String key : extend.keySet()) {
                     String value = extend.get(key);
-                    if (value.length() > 0) {
+                    if (!value.isEmpty()) {
                         urlformat = urlformat.replace("{" + key + "}", URLEncoder.encode(value));
                     }
                 }
@@ -212,7 +211,7 @@ public class Bdys01 extends Spider {
             referer = url;
             Document doc = Jsoup.parse(html);
             JSONObject result = new JSONObject();
-            JSONArray videos = new JSONArray();
+            List<Vod> videos = new ArrayList<>();
             if (!html.contains("没有找到您想要的结果哦")) {
                 // 取当前分类页的视频列表
                 Elements list = doc.select("div.col-lg-8");
@@ -223,29 +222,25 @@ public class Bdys01 extends Spider {
                     String remark = vod.selectFirst("p.mb-0").text();
                     String idtt = vod.selectFirst("a.d-block").attr("href");
                     String id = "";
-                    if (idtt.contains("JSESSIONID")) {
-                        int end = idtt.indexOf(";");
-                        id = idtt.substring(0, end);
-                    } else {
-                        id = idtt;
-                    }
-                    JSONObject v = new JSONObject();
-                    v.put("vod_id", id);
-                    v.put("vod_name", title);
-                    v.put("vod_pic", cover);
-                    v.put("vod_remarks", remark);
-                    videos.put(v);
+
+                    id = idtt;
+
+                    Vod v = new Vod();
+                    v.setVodPic(cover);
+                    v.setVodId(id.split(";")[0]);
+                    v.setVodName(title);
+                    v.setVodRemarks(remark);
+                    videos.add(v);
                 }
             }
             int page = Integer.parseInt(pg);
-            result.put("page", page);
-            result.put("pagecount", videos.length() == 24 ? page + 1 : page);
-            result.put("limit", 24);
-            result.put("total", Integer.MAX_VALUE);
-            result.put("list", videos);
+
             SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+categoryContent" + result.toString());
 
-            return result.toString();
+            return Result.get().vod(videos)
+                     .page(Integer.parseInt(pg), Integer.MAX_VALUE / 24+((Integer.MAX_VALUE % 24)>0?1:0), 24, Integer.MAX_VALUE)
+                    //.page(Integer.parseInt(pg), Integer.parseInt(total) / 72+((Integer.parseInt(total) % 72)>0?1:0), 72, Integer.parseInt(total)).string();
+                    .string();
         } catch (Exception e) {
             SpiderDebug.log(e);
         }
@@ -265,7 +260,7 @@ public class Bdys01 extends Spider {
             Document doc = Jsoup.parse(OkHttp.string(url, getHeaders(url, referer)));
             referer = url;
             JSONObject result = new JSONObject();
-            JSONObject vodList = new JSONObject();
+
             String cover = doc.selectFirst("div.col-md-auto img").attr("src");
             String title = doc.selectFirst("h1.d-none.d-md-block").text();
             String desc = doc.select("div.card.collapse > div.card-body").text();
@@ -300,48 +295,45 @@ public class Bdys01 extends Spider {
                     actor = StrUtil.join(",", actors);
                 }
             }
+            Vod vod = new Vod();
             String vid = ids.get(0);
-            vodList.put("vod_id", vid);
-            vodList.put("vod_name", title);
-            vodList.put("vod_pic", cover);
-            vodList.put("type_name", category);
-            vodList.put("vod_year", year);
-            vodList.put("vod_area", area);
-            vodList.put("vod_remarks", remark);
-            vodList.put("vod_actor", actor);
-            vodList.put("vod_director", director);
-            vodList.put("vod_content", desc);
+
             Map<String, String> vod_play = new TreeMap<>();
             // 取播放列表数据
             Elements playListA = doc.select("a.btn.btn-square");
             String sourceName = "播放列表";
             String playList = "";
             List<String> vodItems = new ArrayList<>();
-            for (int j = 0; j < playListA.size(); j++) {
-                Element vod = playListA.get(j);
-                String idtt = vod.attr("href");
+            for (Element element : playListA) {
+                String idtt = element.attr("href");
                 String playURL = "";
-                if (idtt.contains("JSESSIONID")) {
-                    int end = idtt.indexOf(";");
-                    playURL = idtt.substring(0, end);
-                } else {
-                    playURL = idtt;
-                }
-                vodItems.add(vod.text() + "$" + playURL);
+
+                playURL = idtt;
+
+                vodItems.add(element.text() + "$" + playURL);
             }
             if (vodItems.size() > 0) playList = StrUtil.join("#", vodItems);
             vod_play.put(sourceName, playList);
             if (vod_play.size() > 0) {
                 String vod_play_from = StrUtil.join("$$$", vod_play.keySet());
                 String vod_play_url = StrUtil.join("$$$", vod_play.values());
-                vodList.put("vod_play_from", vod_play_from);
-                vodList.put("vod_play_url", vod_play_url);
+
+                vod.setVodPlayFrom(vod_play_from);
+                vod.setVodPlayUrl(vod_play_url);
             }
-            JSONArray list = new JSONArray();
-            list.put(vodList);
-            result.put("list", list);
-            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+detailContent" + result.toString());
-            return result.toString();
+
+
+            vod.setVodId(vid);
+            vod.setVodYear(year);
+            vod.setVodName(title);
+            vod.setVodArea(area);
+            vod.setVodActor(actor);
+            vod.setVodPic(cover);
+            vod.setVodRemarks(remark);
+            vod.setVodContent(desc);
+            vod.setVodDirector(director);
+            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+detailContent" + Result.string(vod));
+            return Result.string(vod);
         } catch (Exception e) {
             SpiderDebug.log(e);
         }
@@ -419,14 +411,14 @@ public class Bdys01 extends Spider {
                 urldblist.add(url3);
             }
             if (!urldb.isNull("m3u8")) {
-                String m3u8 = urldb.optString("m3u8").replace("www.bde4.cc", "www.bdys01.com");
+                String m3u8 = urldb.optString("m3u8").replace("www.bde4.cc", siteHost);
                 urldblist.add(m3u8);
             }
             if (!urldb.isNull("m3u8_2")) {
                 String m3u8_2 = urldb.optString("m3u8_2");
                 String[] m2 = m3u8_2.split(",");
                 for (String s : m2) {
-                    urldblist.add(s.replace("www.bde4.cc", "www.bdys01.com"));
+                    urldblist.add(s.replace("www.bde4.cc", siteHost));
                 }
             }
             if (urldblist.isEmpty()) {
@@ -531,7 +523,7 @@ public class Bdys01 extends Spider {
                         JSONObject v = new JSONObject();
                         String cover = ddrklink.selectFirst("div.col-md-auto img").attr("src");
                         String title = ddrklink.selectFirst("h2.d-sm-block.d-md-none").text();
-                        String id = list1.replace("https://www.bdys01.com", "");
+                        String id = list1.replace(siteUrl, "");
                         v.put("vod_name", title);
                         v.put("vod_remarks", "");
                         v.put("vod_id", id);

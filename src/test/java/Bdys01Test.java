@@ -21,7 +21,7 @@ class Bdys01Test {
     @Test
     public void homeTest() throws Exception {
         String s = douban.homeContent(false);
-        System.out.println(s);
+        System.out.println("homeTest--"+s);
         AssertUtil.INSTANCE.assertResult(s);
     }
 
@@ -31,7 +31,7 @@ class Bdys01Test {
         //String palyDoc= OkHttp.string("http://www.lzizy9.com/index.php/vod/play/id/79816/sid/1/nid/1.html");
 
         String s = douban.categoryContent("0", "1", true, Maps.newHashMap());
-        System.out.println(s);
+        System.out.println("cateTest--"+s);
         AssertUtil.INSTANCE.assertResult(s);
 
     }
@@ -40,7 +40,7 @@ class Bdys01Test {
     public void detailTest() throws Exception {
 
         String detail = douban.detailContent(Lists.newArrayList("/kehuan/24802.htm;jsessionid=ukDN-L4VK3uuz0mKd2PVWqRRoR0tbSxK3j9sjUTZ"));
-        System.out.println(detail);
+        System.out.println("detailTest--"+detail);
 
     }
 
@@ -48,7 +48,7 @@ class Bdys01Test {
     public void playerTest() throws Exception {
 
         String palyer = douban.playerContent(null, "/play/24802-0.htm", null);
-        System.out.println(palyer);
+        System.out.println("playerTest--"+palyer);
 
 
     }
