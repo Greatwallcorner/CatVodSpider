@@ -12,21 +12,10 @@
       }
     },
     {
-      "key": "Liangzi",
-      "name": "量子影视",
+      "key": "土豆",
+      "name": "土豆|4K",
       "type": 3,
-      "api": "csp_Liangzi",
-      "searchable": "1",
-      "filterable": "0",
-      "changeable": 0,
-      "ext": {
-      }
-    },
-    {
-      "key": "玩偶",
-      "name": "玩偶",
-      "type": 3,
-      "api": "csp_Wogg",
+      "api": "csp_Wobg",
       "searchable": 1,
       "changeable": 1,
       "ext": {
