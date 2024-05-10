@@ -10,9 +10,7 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.net.OkResult;
 import com.google.common.collect.Lists;
 import okhttp3.Response;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.security.Security;
 import java.util.*;
 
 
@@ -155,7 +152,7 @@ public class Bdys01 extends Spider {
             } catch (Exception e) {
                 SpiderDebug.log(e);
             }
-            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+homeContent"+result.toString());
+            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+homeContent" + result.toString());
             return result.toString();
 
         } catch (Exception e) {
@@ -246,7 +243,7 @@ public class Bdys01 extends Spider {
             result.put("limit", 24);
             result.put("total", Integer.MAX_VALUE);
             result.put("list", videos);
-            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+categoryContent"+result.toString());
+            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+categoryContent" + result.toString());
 
             return result.toString();
         } catch (Exception e) {
@@ -343,7 +340,7 @@ public class Bdys01 extends Spider {
             JSONArray list = new JSONArray();
             list.put(vodList);
             result.put("list", list);
-            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+detailContent"+result.toString());
+            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+detailContent" + result.toString());
             return result.toString();
         } catch (Exception e) {
             SpiderDebug.log(e);
@@ -412,7 +409,7 @@ public class Bdys01 extends Spider {
                         result.put("playUrl", "");
                         result.put("url", realurl);
                         result.put("header", "");
-                        SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+playerContent"+Result.get().url(realurl).header(getHeaders(geturl, "")).string());
+                        SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+playerContent" + Result.get().url(realurl).header(getHeaders(geturl, "")).string());
                         return Result.get().url(realurl).header(getHeaders(geturl, "")).string();
                     }
                 }
@@ -456,7 +453,7 @@ public class Bdys01 extends Spider {
                 result.put("playUrl", "");
                 result.put("url", realurl);
                 result.put("header", "");
-                SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+playerContent"+result.toString());
+                SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+playerContent" + result.toString());
                 Result.get().url(realurl).header(getHeaders(geturl, "")).string();
             }
             int index = new Random().nextInt(urldblist.size());
@@ -466,7 +463,7 @@ public class Bdys01 extends Spider {
                 result.put("playUrl", "");
                 result.put("url", videourl);
                 result.put("header", "");
-                SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+playerContent"+result.toString());
+                SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+playerContent" + result.toString());
                 return Result.get().url(realurl).header(getHeaders(geturl, "")).string();
             }
             Map<String, List<String>> respHeaders = new HashMap<>();
@@ -505,7 +502,7 @@ public class Bdys01 extends Spider {
             result.put("parse", 0);
             result.put("playUrl", "");
             result.put("header", new JSONObject(getHeaders2("https://vod.bdys.me/")).toString());
-            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+playerContent"+result.toString());
+            SpiderDebug.log("!!!!!!!!!!!!!!哔嘀影视+playerContent" + result.toString());
             return Result.get().url(realurl).header(getHeaders(geturl, "")).string();
         } catch (Exception e) {
             SpiderDebug.log(e);
