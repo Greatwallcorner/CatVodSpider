@@ -1,6 +1,18 @@
 pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.hq.hydraulic.software")
+    }
+
     plugins {
-        kotlin("jvm") version "1.9.22"
+        val kotlinVer = "1.9.23"
+        val composeVer = "1.6.2"
+        kotlin("jvm").version(kotlinVer)
+        kotlin("multiplatform").version(kotlinVer)
+        id("org.jetbrains.compose").version(composeVer)
     }
 }
 plugins {

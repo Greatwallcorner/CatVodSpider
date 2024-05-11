@@ -1,6 +1,7 @@
 ﻿plugins {
     id("java")
     kotlin("jvm")
+    id("org.jetbrains.compose")
 }
 
 java {
@@ -33,7 +34,12 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:2.3.7")
     implementation(kotlin("stdlib-jdk8"))
 
-
+    implementation(compose.foundation)
+    implementation(compose.material3)
+    implementation(compose.desktop.common)
+    implementation(compose.ui)
+    implementation(compose.uiUtil)
+    implementation(compose.uiTooling)
 }
 
 tasks.withType<Jar> {

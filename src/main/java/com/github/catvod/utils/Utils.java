@@ -368,7 +368,6 @@ public class Utils {
         String u = uri.getScheme() + "://" + uri.getHost();
         webHttpHeaderMap.put(HttpHeaders.REFERER, u);
         webHttpHeaderMap.put(io.ktor.http.HttpHeaders.INSTANCE.getOrigin(), u);
-        webHttpHeaderMap.put(HttpHeaders.HOST, uri.getHost());
         return webHttpHeaderMap;
     }
 

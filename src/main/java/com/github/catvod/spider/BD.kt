@@ -1,6 +1,19 @@
 package com.github.catvod.spider
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.unit.dp
 import cn.hutool.core.codec.Base64
+import cn.hutool.core.net.URLEncodeUtil
 import cn.hutool.crypto.Mode
 import cn.hutool.crypto.Padding
 import cn.hutool.crypto.digest.DigestUtil
@@ -13,29 +26,28 @@ import com.github.catvod.bean.Vod.VodPlayBuilder.PlayUrl
 import com.github.catvod.crawler.Spider
 import com.github.catvod.crawler.SpiderDebug
 import com.github.catvod.net.OkHttp
-import com.github.catvod.utils.Image
-import com.github.catvod.utils.Json
-import com.github.catvod.utils.ProxyVideo
-import com.github.catvod.utils.Utils
+import com.github.catvod.utils.*
 import io.ktor.http.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.util.*
-import kotlin.random.Random
+import java.util.concurrent.atomic.AtomicReference
 
 
-class BD: Spider() {
+class BD : Spider() {
 
     override fun init() {
         val res = OkHttp.newCall("$host$ad", Utils.webHeaders(host))
-        if(res.isSuccessful){
+        if (res.isSuccessful) {
             val c = res.headers[com.google.common.net.HttpHeaders.SET_COOKIE]
-            session = c ?: ""
-        }else{
+            val split = c?.split(";")
+            session = if((split?.size ?: 0) > 1) split?.get(0) ?: "" else c ?: ""
+        } else {
             SpiderDebug.log("Db初始化失败：$res")
         }
+        SpiderDebug.log("BD init session:"+ session)
     }
 
     override fun homeContent(filter: Boolean): String {
@@ -61,7 +73,7 @@ class BD: Spider() {
             vod.setVodId(cover.attr("href"))
             val img = cover.select("img")
             var pic = img.attr("data-src")
-            if(pic.isEmpty()){
+            if (pic.isEmpty()) {
                 pic = img.attr("src")
             }
             vod.setVodPic(
@@ -128,17 +140,17 @@ class BD: Spider() {
     private val pattern = Utils.base64Decode("dmFyICVzID0gKFxkKyk=")
 
     data class Resp(
-        val code:Int,
-        val data:Data,
-        val msg:String
+        val code: Int,
+        val data: Data,
+        val msg: String
     )
 
     data class Data(
-        val m3u8:String,
-        val m3u8_2:String,
-        val ptoken:String,
-        val tos:String,
-        val url3:String
+        val m3u8: String,
+        val m3u8_2: String,
+        val ptoken: String,
+        val tos: String,
+        val url3: String
     )
 
     private val bdFourHost = Utils.base64Decode("d3d3LmJkZTQuY2M=")
@@ -154,46 +166,147 @@ class BD: Spider() {
         val resp = OkHttp.string("${host}lines", map, Utils.webHeaders(reference))
         val res = Json.parseSafe<Resp>(resp, Resp::class.java)
         SpiderDebug.log("BD lines res:$resp")
-        if(res.code != 0){
+        if (res.code != 0) {
             SpiderDebug.log("Bd 播放失败")
             return ""
         }
         val urlList = mutableListOf<String>()
-        if(StringUtils.isNotEmpty(res.data.url3)){
+        if (StringUtils.isNotEmpty(res.data.url3)) {
             urlList.add(res.data.url3)
         }
-        if(StringUtils.isNotEmpty(res.data.tos)){
+        if (StringUtils.isNotEmpty(res.data.tos)) {
             urlList.add("${host}god/$pid?type=1")
         }
-        if(StringUtils.isNotEmpty(res.data.m3u8)){
+        if (StringUtils.isNotEmpty(res.data.m3u8)) {
             urlList.add(res.data.m3u8)
         }
-        if(StringUtils.isNotEmpty(res.data.ptoken)){
+        if (StringUtils.isNotEmpty(res.data.ptoken)) {
             urlList.add("${host}god/$pid")
         }
         val urlBuilder = Result.UrlBuilder()
         for (i in 0 until urlList.size) {
             urlList[i] = urlList[i].replace(bdFourHost, host.toHttpUrl().host)
             val split = urlList[i].split("#")
-            if(split.size > 1){
+            if (split.size > 1) {
                 urlBuilder.add(split[1], buildUrl(split[0], pid, session, s))
-            }else{
+            } else {
                 urlBuilder.add(i.toString(), buildUrl(urlList[i], pid, session, s))
             }
         }
-        return Result.get().url(urlBuilder.build()).header(mutableMapOf(HttpHeaders.Referrer to s, HttpHeaders.Cookie to session)).string()
+        return Result.get().url(urlBuilder.build())
+            .header(mutableMapOf(HttpHeaders.Referrer to s, HttpHeaders.Cookie to session)).string()
     }
 
-    private fun buildUrl(url: String, id:String, session:String, ref:String):String{
-        return "${Proxy.getProxyUrl()}?do=bd&url=${Utils.base64Encode(url)}&id=$id&session=${Utils.base64Encode(session)}&ref=${Utils.base64Encode(ref)}"
+    private val js = Utils.base64Decode("djQvanMvc2VhcmNoLWpjYXJvdXNlbC5yZXNwb25zaXZlLmpzOw==")
+
+    override fun searchContent(key: String, quick: Boolean): String {
+        val url = "${host}search/${URLEncodeUtil.encode(key)}"
+        val string = AtomicReference<String>(OkHttp.string(url, Utils.webHeaders(host, session)))
+        if (string.get().contains("验证码")) {
+            val jsResp = OkHttp.string("$host$js${session.split(";")[0]}", Utils.webHeaders(url))
+            val resp = getVerifyCodePic(url)
+            if (resp.isNotEmpty()) {
+                DialogUtil.showDialog(content =
+                    {
+                        verifyCode(resp, url, onClose = { DialogUtil.close() }, onConfirm = {
+                            SpiderDebug.log("Bd code confirm start")
+                            DialogUtil.close()
+                            string.set(OkHttp.string("$url?code=$it", Utils.webHeaders(url, session)))
+                            SpiderDebug.log("Bd code confirm end")
+                        })
+                    },
+                    "BD验证"
+                )
+            } else {
+                SpiderDebug.log("BD 获取验证码失败")
+                return ""
+            }
+        }
+        SpiderDebug.log("req end:" + string.get())
+        val parse = Jsoup.parse(string.get())
+        val vodList = mutableListOf<Vod>()
+        val items = parse.select("div[class*=row-cards] div[class*=row]")
+        for (item in items) {
+            val pic = item.select("div[class*=row] > a > img").attr("src")
+            val head = item.select("a[class*=search]")
+            val id = head.attr("href")
+            val name = head.text()
+//            val detail = item.select("div[class*=row] div.col")
+//            val removeHtmlTag = HtmlUtil.removeHtmlTag(detail.html(), "strong")
+//            val dt = Jsoup.parse(removeHtmlTag)
+//            val pList = dt.select("p")
+            val vod = Vod(id, name, Image.UrlHeaderBuilder(pic).referer(url).build())
+            vodList.add(vod)
+        }
+        return Result.string(vodList)
     }
 
-    companion object{
-        private var session:String = ""
+    private fun getVerifyCodePic(url: String): ByteArray {
+        val codeUrl = "${host}search/verifyCode?t=${Date().time}"
+        val resp = OkHttp.newCall(codeUrl, Utils.webHeaders(url, session))
+        return resp.body.bytes()
+    }
+
+    @Composable
+    fun verifyCode(ins: ByteArray, url: String, onClose: () -> Unit, onConfirm: (String) -> Unit) {
+        var stream by remember { mutableStateOf(ins) }
+        var value by remember { mutableStateOf("") }
+        var bitmap: ImageBitmap = loadImageBitmap(stream.inputStream())
+        DisposableEffect(stream) {
+            SpiderDebug.log("stream change " + stream.size)
+            if (stream.isNotEmpty()) {
+                bitmap = loadImageBitmap(stream.inputStream())
+            }
+            onDispose { }
+        }
+        Box(Modifier.padding(8.dp)) {
+            Column(modifier = Modifier.width(350.dp)) {
+                Row(modifier = Modifier.padding(vertical = 5.dp)) {
+                    Image(
+                        bitmap,
+                        contentDescription = "verifyCode",
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier.clickable {
+                            val response = getVerifyCodePic(url)
+                            if (response.isNotEmpty()) {
+                                SpiderDebug.log("BD 请求成功")
+                                stream = response
+                            }
+                        }.padding(end = 10.dp)
+                            .size(width = 150.dp, height = 50.dp)
+                    )
+                    TextField(value, onValueChange = {
+                        SpiderDebug.log("BD text change: "+ it)
+                        value = it
+                    })
+                }
+                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Button(onClick = { onClose() }) {
+                        Text("取消")
+                    }
+                    Button(onClick = { onConfirm(value) }) {
+                        Text("确认")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun buildUrl(url: String, id: String, session: String, ref: String): String {
+        return "${Proxy.getProxyUrl()}?do=bd&url=${Utils.base64Encode(url)}&id=$id&session=${Utils.base64Encode(session)}&ref=${
+            Utils.base64Encode(
+                ref
+            )
+        }"
+    }
+
+    companion object {
+        private var session: String = ""
 
         private val host = Utils.base64Decode("aHR0cHM6Ly93d3cueWp5cy5tZS8=")
 
-        private val classList = Class.parseFromFormatStr(Utils.base64Decode("5Yqo5L2cPS9zL2Rvbmd6dW8m54ix5oOFPS9zL2FpcWluZybllpzliac9L3MveGlqdSbnp5Hlubs9L3Mva2VodWFuJuaBkOaAlj0vcy9rb25nYnUm5oiY5LqJPS9zL3poYW56aGVuZybmrabkvqA9L3Mvd3V4aWEm6a2U5bm7PS9zL21vaHVhbibliafmg4U9L3MvanVxaW5nJuWKqOeUuz0vcy9kb25naHVhJuaDiuaCmj0vcy9qaW5nc29uZyYzRD0vcy8zRCbngb7pmr49L3MvemFpbmFuJuaCrOeWkT0vcy94dWFueWkm6K2m5YyqPS9zL2ppbmdmZWkm5paH6Im6PS9zL3dlbnlpJumdkuaYpT0vcy9xaW5nY2h1biblhpLpmak9L3MvbWFveGlhbibniq/nvao9L3MvZmFuenVpJue6quW9lT0vcy9qaWx1JuWPpOijhT0vcy9ndXpodWFuZyblpYflubs9L3MvcWlodWFuJuWbveivrT0vcy9ndW95dSbnu7zoibo9L3Mvem9uZ3lpJuWOhuWPsj0vcy9saXNoaSbov5Dliqg9L3MveXVuZG9uZybljp/liJvljovliLY9L3MveXVhbmNodWFuZybnvo7liac9L3MvbWVpanUm6Z+p5YmnPS9zL2hhbmp1JuWbveS6p+eUteinhuWJpz0vcy9ndW9qdSbml6Xliac9L3MvcmlqdSboi7Hliac9L3MveWluZ2p1JuW+t+WJpz0vcy9kZWp1JuS/hOWJpz0vcy9lanUm5be05YmnPS9zL2JhanUm5Yqg5YmnPS9zL2ppYWp1Juilv+WJpz0vcy9zcGFuaXNoJuaEj+Wkp+WIqeWJpz0vcy95aWRhbGlqdSbms7Dliac9L3MvdGFpanUm5riv5Y+w5YmnPS9zL2dhbmd0YWlqdSbms5Xliac9L3MvZmFqdSbmvrPliac9L3MvYW9qdQ=="))
+        private val classList =
+            Class.parseFromFormatStr(Utils.base64Decode("5Yqo5L2cPS9zL2Rvbmd6dW8m54ix5oOFPS9zL2FpcWluZybllpzliac9L3MveGlqdSbnp5Hlubs9L3Mva2VodWFuJuaBkOaAlj0vcy9rb25nYnUm5oiY5LqJPS9zL3poYW56aGVuZybmrabkvqA9L3Mvd3V4aWEm6a2U5bm7PS9zL21vaHVhbibliafmg4U9L3MvanVxaW5nJuWKqOeUuz0vcy9kb25naHVhJuaDiuaCmj0vcy9qaW5nc29uZyYzRD0vcy8zRCbngb7pmr49L3MvemFpbmFuJuaCrOeWkT0vcy94dWFueWkm6K2m5YyqPS9zL2ppbmdmZWkm5paH6Im6PS9zL3dlbnlpJumdkuaYpT0vcy9xaW5nY2h1biblhpLpmak9L3MvbWFveGlhbibniq/nvao9L3MvZmFuenVpJue6quW9lT0vcy9qaWx1JuWPpOijhT0vcy9ndXpodWFuZyblpYflubs9L3MvcWlodWFuJuWbveivrT0vcy9ndW95dSbnu7zoibo9L3Mvem9uZ3lpJuWOhuWPsj0vcy9saXNoaSbov5Dliqg9L3MveXVuZG9uZybljp/liJvljovliLY9L3MveXVhbmNodWFuZybnvo7liac9L3MvbWVpanUm6Z+p5YmnPS9zL2hhbmp1JuWbveS6p+eUteinhuWJpz0vcy9ndW9qdSbml6Xliac9L3MvcmlqdSboi7Hliac9L3MveWluZ2p1JuW+t+WJpz0vcy9kZWp1JuS/hOWJpz0vcy9lanUm5be05YmnPS9zL2JhanUm5Yqg5YmnPS9zL2ppYWp1Juilv+WJpz0vcy9zcGFuaXNoJuaEj+Wkp+WIqeWJpz0vcy95aWRhbGlqdSbms7Dliac9L3MvdGFpanUm5riv5Y+w5YmnPS9zL2dhbmd0YWlqdSbms5Xliac9L3MvZmFqdSbmvrPliac9L3MvYW9qdQ=="))
 
         private val ad = Utils.base64Decode("enp6eno=")
 
@@ -203,7 +316,7 @@ class BD: Spider() {
             val id = Utils.base64Decode(params["id"] ?: "")
             val cookie = Utils.base64Decode(params["session"] ?: "")
             val ref = Utils.base64Decode(params["ref"] ?: "")
-            if(url.contains("god")){
+            if (url.contains("god")) {
                 val t = Date().time
                 val p = mutableMapOf("t" to t, "sg" to getSg(id, t.toString()), "verifyCode" to "888")
                 val body = OkHttp.post("${host}god", Json.toJson(p), Utils.webHeaders(host, cookie)).body
@@ -213,14 +326,14 @@ class BD: Spider() {
             return ProxyVideo.ProxyRespBuilder.redirect(url)
         }
 
-        fun getSg(id:String, time:String):String{
+        fun getSg(id: String, time: String): String {
             val s = "$id-$time"
             val digest = DigestUtil.md5Hex(s).substring(IntRange(0, 15)).toByteArray()
             val aes = AES(Mode.ECB, Padding.PKCS5Padding, digest)
             return base64ToHex(Base64.encode(aes.encrypt(s.toByteArray())))
         }
 
-        private fun base64ToHex(s:String): String {
+        private fun base64ToHex(s: String): String {
             val decodedBytes = Base64.decode(s)
             val hexString = StringBuilder()
             for (byte in decodedBytes) {
