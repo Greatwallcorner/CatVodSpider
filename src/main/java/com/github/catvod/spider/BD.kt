@@ -247,10 +247,10 @@ class BD : Spider() {
         var resp:Response? = null
         try {
             resp = OkHttp.newCall(codeUrl, Utils.webHeaders(url, session))
+            return resp?.body?.bytes() ?: byteArrayOf()
         } finally {
             resp?.close()
         }
-        return resp?.body?.bytes() ?: byteArrayOf()
     }
 
     @Composable
