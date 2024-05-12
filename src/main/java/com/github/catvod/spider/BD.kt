@@ -29,6 +29,7 @@ import com.github.catvod.net.OkHttp
 import com.github.catvod.utils.*
 import io.ktor.http.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.Response
 import org.apache.commons.lang3.StringUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -243,8 +244,13 @@ class BD : Spider() {
 
     private fun getVerifyCodePic(url: String): ByteArray {
         val codeUrl = "${host}search/verifyCode?t=${Date().time}"
-        val resp = OkHttp.newCall(codeUrl, Utils.webHeaders(url, session))
-        return resp.body.bytes()
+        var resp:Response? = null
+        try {
+            resp = OkHttp.newCall(codeUrl, Utils.webHeaders(url, session))
+        } finally {
+            resp?.close()
+        }
+        return resp?.body?.bytes() ?: byteArrayOf()
     }
 
     @Composable
