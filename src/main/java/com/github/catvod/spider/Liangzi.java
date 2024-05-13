@@ -1,7 +1,5 @@
 package com.github.catvod.spider;
 
-import cn.hutool.core.util.ReUtil;
-import cn.hutool.core.util.URLUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
 import com.github.catvod.bean.Result;
@@ -10,24 +8,12 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Utils;
-import com.google.common.collect.Lists;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Debug;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,8 +60,8 @@ public class Liangzi extends Spider {
         List<Vod> list = new ArrayList<>();
         String target = siteUrl + "/index.php/vod/show/id/" + tid + "/page/" + pg + ".html";
         //String filters = extend.get("filters");
-
-        Document doc = Jsoup.parse(OkHttp.string(target));
+        String html = OkHttp.string(target);
+        Document doc = Jsoup.parse(html);
         for (Element div : doc.select(".module-item")) {
             String id = siteUrl + div.select(".module-item-pic > a").attr("href");
             String name = div.select(".module-item-pic > a").attr("title");
@@ -87,9 +73,15 @@ public class Liangzi extends Spider {
 
             list.add(new Vod(id, name, pic, remark));
         }
-        String total = doc.select(".mac_total").text();
+        String total = "" + Integer.MAX_VALUE;
+        for (Element element : doc.select("script")) {
+            if (element.data().contains("mac_total")) {
+                total = element.data().split("'")[1];
+            }
+        }
+
         SpiderDebug.log("++++++++++++量子-categoryContent" + Json.toJson(list));
-        return Result.get().vod(list).page(Integer.parseInt(pg), Integer.parseInt(total) / 72+((Integer.parseInt(total) % 72)>0?1:0), 72, Integer.parseInt(total)).string();
+        return Result.get().vod(list).page(Integer.parseInt(pg), Integer.parseInt(total) / 72 + ((Integer.parseInt(total) % 72) > 0 ? 1 : 0), 72, Integer.parseInt(total)).string();
     }
 
     @Override
