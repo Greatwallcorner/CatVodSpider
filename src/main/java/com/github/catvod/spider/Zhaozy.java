@@ -52,7 +52,7 @@ public class Zhaozy extends Ali {
     public String detailContent(List<String> ids) throws Exception {
         if (pattern.matcher(ids.get(0)).find()) return super.detailContent(ids);
         Matcher matcher = regexAli.matcher(OkHttp.string(siteUrl + ids.get(0), getHeader()));
-        if (matcher.find()) return super.detailContent(Arrays.asList(matcher.group(1)));
+        if (matcher.find()) return super.detailContent(Collections.singletonList(matcher.group(1)));
         return "";
     }
 

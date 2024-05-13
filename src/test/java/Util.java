@@ -1,14 +1,12 @@
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HtmlUtil;
 import com.github.catvod.utils.Utils;
-import org.apache.commons.codec.StringDecoder;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 public class Util {
@@ -17,6 +15,13 @@ public class Util {
         String s = "";
         System.out.println(Utils.base64Encode(s));
     }
+
+    @Test
+    public void strDecode(){
+        String s = "aHR0cHM6Ly95cy5hcGkueWluZ3NvLmZ1bi92My9hbGkvc2VhcmNo";
+        System.out.println(Utils.base64Decode(s));
+    }
+
 
     @Test
     public void md5Test(){

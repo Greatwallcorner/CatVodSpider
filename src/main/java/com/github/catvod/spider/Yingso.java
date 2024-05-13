@@ -8,16 +8,13 @@ import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Utils;
 import com.google.common.collect.Lists;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Yingso extends Ali {
     private static final String siteUrl = Utils.base64Decode("aHR0cHM6Ly95aW5nc28uZnVuOjMwMDEv");
 
-    private static final String searchUrl = Utils.base64Decode("aHR0cHM6Ly95c3Rlc3QuYXBpLnlpbmdzby5mdW4vdjMvYWxpL3NlYXJjaA==");
+    private static final String searchUrl = Utils.base64Decode("aHR0cHM6Ly95cy5hcGkueWluZ3NvLmZ1bi92My9hbGkvc2VhcmNo");
 
     private static final String shareUrl = "https://www.aliyundrive.com/s/";
 
@@ -44,7 +41,7 @@ public class Yingso extends Ali {
 
         String cat = "all";
 
-        public Req(Integer pageSize, Integer pageNum, String title) throws UnsupportedEncodingException {
+        public Req(Integer pageSize, Integer pageNum, String title) {
             this.pageSize = pageSize;
             this.pageNum = pageNum;
             this.title = title;

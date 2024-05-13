@@ -63,8 +63,7 @@ class OkRequest {
     }
 
     public OkResult execute(OkHttpClient client) {
-        try {
-            Response response = client.newCall(request).execute();
+        try(Response response = client.newCall(request).execute()) {
             return new OkResult(response.code(), response.body().string(), response.headers().toMultimap());
         } catch (IOException e) {
             return new OkResult();
