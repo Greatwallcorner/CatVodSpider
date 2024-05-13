@@ -74,8 +74,8 @@ public class Liangzi extends Spider {
         List<Vod> list = new ArrayList<>();
         String target = siteUrl + "/index.php/vod/show/id/" + tid + "/page/" + pg + ".html";
         //String filters = extend.get("filters");
-
-        Document doc = Jsoup.parse(OkHttp.string(target));
+        String html = OkHttp.string(target);
+        Document doc = Jsoup.parse(html);
         for (Element div : doc.select(".module-item")) {
             String id = siteUrl + div.select(".module-item-pic > a").attr("href");
             String name = div.select(".module-item-pic > a").attr("title");
@@ -87,9 +87,15 @@ public class Liangzi extends Spider {
 
             list.add(new Vod(id, name, pic, remark));
         }
-        String total = doc.select(".mac_total").text();
+        String total = "" + Integer.MAX_VALUE;
+        for (Element element : doc.select("script")) {
+            if (element.data().contains("mac_total")) {
+                total = element.data().split("'")[1];
+            }
+        }
+
         SpiderDebug.log("++++++++++++量子-categoryContent" + Json.toJson(list));
-        return Result.get().vod(list).page(Integer.parseInt(pg), Integer.parseInt(total) / 72+((Integer.parseInt(total) % 72)>0?1:0), 72, Integer.parseInt(total)).string();
+        return Result.get().vod(list).page(Integer.parseInt(pg), Integer.parseInt(total) / 72 + ((Integer.parseInt(total) % 72) > 0 ? 1 : 0), 72, Integer.parseInt(total)).string();
     }
 
     @Override
