@@ -1,7 +1,5 @@
 package com.github.catvod.spider;
 
-import cn.hutool.core.util.ReUtil;
-import cn.hutool.core.util.URLUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
 import com.github.catvod.bean.Result;
@@ -10,24 +8,12 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Utils;
-import com.google.common.collect.Lists;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Debug;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
