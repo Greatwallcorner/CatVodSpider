@@ -1,6 +1,5 @@
 package com.github.catvod.spider;
 
-import cn.hutool.core.util.NumberUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
 import com.github.catvod.bean.Result;
@@ -11,7 +10,6 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.internal.StringUtil;
 import org.jsoup.nodes.Document;
@@ -29,6 +27,7 @@ public class WuMingMusic extends Spider {
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
         header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+        header.put("Referer", "http://www.mvmp3.com/");
         return header;
     }
 
@@ -179,10 +178,9 @@ public class WuMingMusic extends Spider {
             return Result.get().url(json).header(getHeader()).string();
         } else {
             String content = OkHttp.string(id, getHeader());
-            Matcher matcher = Pattern.compile(",music:(.*?)}\\)").matcher(content);
+            Matcher matcher = Pattern.compile("url:\"(.*?)\",pic").matcher(content);
             String json = matcher.find() ? matcher.group(1) : "";
-            JSONObject player = new JSONObject(json);
-            String realUrl = player.getString("url");
+            String realUrl = OkHttp.getLocation(json, getHeader());
             SpiderDebug.log("++++++++++++无名音乐-playerContent" + Json.toJson(realUrl));
             return Result.get().url(realUrl).header(getHeader()).string();
         }

@@ -41,7 +41,7 @@ public class WuMingMusicTest {
     @Test
     public void detailTest() throws Exception {
 
-        String detail = douban.detailContent(Lists.newArrayList("http://www.mvmp3.com/sing/57b78785108a4a5136bbb2e4ee5f7ec1.html"));
+        String detail = douban.detailContent(Lists.newArrayList("http://www.mvmp3.com/sing/70ec1f2e0383021891a716060cc6eeae.html"));
         System.out.println(detail);
         String detail2 = douban.detailContent(Lists.newArrayList("http://www.mvmp3.com/mp4/54340c3ab942a50df0d9b49f202f6623.html"));
         System.out.println(detail2);
@@ -52,7 +52,7 @@ public class WuMingMusicTest {
     @Test
     public void playerTest() throws Exception {
 
-        String palyer = douban.playerContent(null, "http://www.mvmp3.com/sing/57b78785108a4a5136bbb2e4ee5f7ec1.html", null);
+        String palyer = douban.playerContent(null, "http://www.mvmp3.com/sing/70ec1f2e0383021891a716060cc6eeae.html", null);
         System.out.println(palyer);
         String palyer2 = douban.playerContent(null, "http://www.mvmp3.com/mp4/54340c3ab942a50df0d9b49f202f6623.html", null);
         System.out.println(palyer2);
