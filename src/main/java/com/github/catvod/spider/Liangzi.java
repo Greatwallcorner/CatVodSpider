@@ -1,5 +1,6 @@
 package com.github.catvod.spider;
 
+import cn.hutool.core.util.URLUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
 import com.github.catvod.bean.Result;
@@ -14,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -215,6 +217,12 @@ public class Liangzi extends Spider {
         JSONObject player = new JSONObject(json);
         String realUrl = player.getString("url");
         SpiderDebug.log("++++++++++++量子-playerContent" + Json.toJson(realUrl));
+        if(!realUrl.contains("m3u8")){
+            String videoContent = OkHttp.string(realUrl, getHeader());
+            Matcher mainMatcher = Pattern.compile("var main = \"(.*?)\";").matcher(videoContent);
+            String mainUrl = mainMatcher.find() ? mainMatcher.group(1) : "";
+            realUrl= URLUtil.getHost(new URL(realUrl)).toString()+mainUrl;
+        }
         return Result.get().url(realUrl).header(getHeader()).string();
     }
 
