@@ -9,9 +9,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+
 import com.github.catvod.bean.Class;
 
 public class Jable extends Spider {
@@ -23,7 +26,9 @@ public class Jable extends Spider {
 
     private HashMap<String, String> getHeaders() {
         HashMap<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", Utils.CHROME);
+        headers.put("User-Agent", "PostmanRuntime/7.36.3");
+        headers.put("Host", "jable.tv");
+        headers.put("Postman-Token", "33290483-3c8d-413f-a160-0d3aea9e6f95");
         return headers;
     }
 
@@ -76,7 +81,7 @@ public class Jable extends Spider {
         vod.setVodYear(year.replace("上市於 ", ""));
         vod.setVodName(name);
         vod.setVodPlayFrom("Jable");
-        vod.setVodPlayUrl("播放$" + Util.getVar(doc.html(), "hlsUrl"));
+        vod.setVodPlayUrl("播放$" + Utils.getVar(doc.html(), "hlsUrl"));
         return Result.string(vod);
     }
 
