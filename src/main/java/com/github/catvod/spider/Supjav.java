@@ -139,14 +139,15 @@ public class Supjav extends Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws URISyntaxException, IOException {
-        Map<String, List<String>> respHeaders = new HashMap<>();
-        String redirect =    OkHttp.getLocation(playUrl + "supjav.php?c=" + new StringBuilder(id).reverse(), getVideoHeaders(playUrl+ "supjav.php?l=" +new StringBuilder(id)+"&bg=undefined"));
+        String redirect = OkHttp.getLocation(playUrl + "supjav.php?c=" + new StringBuilder(id).reverse(), getVideoHeaders(playUrl + "supjav.php?l=" + new StringBuilder(id) + "&bg=undefined"));
         switch (flag) {
             case "TV":
                 return parseTV(redirect);
             case "ST":
                 return parseST(redirect);
-            case "DS":
+            case "FST":
+                return parseDS(redirect);
+            case "VOE":
                 return parseDS(redirect);
             default:
                 return Result.get().url(id).parse().string();
@@ -159,7 +160,6 @@ public class Supjav extends Spider {
     }
 
     private String parseST(String redirect) throws IOException {
-        Map<String, List<String>> respHeaders = new HashMap<>();
         String data = OkHttp.string(redirect, getHeaders(playUrl));
         String robot = Jsoup.parse(data).getElementById("robotlink").text();
         robot = robot.substring(0, robot.indexOf("&token=") + 7);
@@ -174,7 +174,6 @@ public class Supjav extends Spider {
 
     private String parseDS(String redirect) throws URISyntaxException, IOException {
         String host = "https://" + URIUtils.extractHost(new URI(redirect));
-        Map<String, List<String>> respHeaders = new HashMap<>();
         redirect = host + OkHttp.getLocation(redirect, getHeaders(playUrl));
         String data = OkHttp.string(redirect, getHeaders());
         for (String text : data.split("'")) {
