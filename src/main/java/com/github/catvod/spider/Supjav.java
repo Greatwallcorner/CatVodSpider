@@ -38,7 +38,7 @@ public class Supjav extends Spider {
         return headers;
     }
 
-    private HashMap<String, String> getVideoHeaders(String referer) {
+    private HashMap<String, String> getTVVideoHeaders(String referer) {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Referer", referer);
         headers.put("User-Agent", Utils.CHROME);
@@ -139,14 +139,15 @@ public class Supjav extends Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws URISyntaxException, IOException {
-        Map<String, List<String>> respHeaders = new HashMap<>();
-        String redirect =    OkHttp.getLocation(playUrl + "supjav.php?c=" + new StringBuilder(id).reverse(), getVideoHeaders(playUrl+ "supjav.php?l=" +new StringBuilder(id)+"&bg=undefined"));
+        String redirect = OkHttp.getLocation(playUrl + "supjav.php?c=" + new StringBuilder(id).reverse(), getTVVideoHeaders(playUrl + "supjav.php?l=" + new StringBuilder(id) + "&bg=undefined"));
         switch (flag) {
             case "TV":
                 return parseTV(redirect);
             case "ST":
                 return parseST(redirect);
-            case "DS":
+            case "FST":
+                return parseDS(redirect);
+            case "VOE":
                 return parseDS(redirect);
             default:
                 return Result.get().url(id).parse().string();
@@ -154,19 +155,18 @@ public class Supjav extends Spider {
     }
 
     private String parseTV(String redirect) {
-        String data = OkHttp.string(redirect, getHeaders(playUrl));
+        String data = OkHttp.string(redirect, getTVVideoHeaders(playUrl));
         return Result.get().url(Utils.getVar(data, "urlPlay")).header(getHeaders(redirect)).string();
     }
 
     private String parseST(String redirect) throws IOException {
-        Map<String, List<String>> respHeaders = new HashMap<>();
-        String data = OkHttp.string(redirect, getHeaders(playUrl));
+        String data = OkHttp.string(redirect, getTVVideoHeaders(playUrl));
         String robot = Jsoup.parse(data).getElementById("robotlink").text();
         robot = robot.substring(0, robot.indexOf("&token=") + 7);
         for (String text : data.split("&token=")) {
             if (!text.contains("').substring(")) continue;
             robot = "https:/" + robot + text.split("'")[0] + "&stream=1";
-            String url = OkHttp.getLocation(robot, getHeaders(redirect));
+            String url = OkHttp.getLocation(robot, getTVVideoHeaders(redirect));
             return Result.get().url(url).header(getHeaders(redirect)).string();
         }
         return "";
@@ -174,8 +174,7 @@ public class Supjav extends Spider {
 
     private String parseDS(String redirect) throws URISyntaxException, IOException {
         String host = "https://" + URIUtils.extractHost(new URI(redirect));
-        Map<String, List<String>> respHeaders = new HashMap<>();
-        redirect = host + OkHttp.getLocation(redirect, getHeaders(playUrl));
+        redirect = host + OkHttp.getLocation(redirect, getTVVideoHeaders(playUrl));
         String data = OkHttp.string(redirect, getHeaders());
         for (String text : data.split("'")) {
             if (!text.startsWith("/pass_md5/")) continue;
