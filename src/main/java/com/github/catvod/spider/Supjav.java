@@ -117,8 +117,8 @@ public class Supjav extends Spider {
             sites.put(sourceName, "播放" + "$" + sourceUrl);
         }
         if (sites.size() > 0) {
-            vod.setVodPlayFrom(StringUtils.join("$$$", sites.keySet()));
-            vod.setVodPlayUrl(StringUtils.join("$$$", sites.values()));
+            vod.setVodPlayFrom(StringUtils.join(sites.keySet(),"$$$"));
+            vod.setVodPlayUrl(StringUtils.join( sites.values(),"$$$"));
         }
         return Result.string(vod);
     }
