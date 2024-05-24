@@ -33,6 +33,18 @@
       "ext": {
       }
     },
+
+    {
+      "key": "Supjav",
+      "name": "Supjav",
+      "type": 3,
+      "api": "csp_Supjav",
+      "searchable": "1",
+      "filterable": "0",
+      "changeable": 0,
+      "ext": {
+      }
+    },
     {
       "key": "WuMingMusic",
       "name": "无名音乐",
