@@ -1,6 +1,7 @@
 package com.github.catvod.spider;
 
 import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.URLUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
@@ -16,9 +17,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.*;
 
 public class Supjav extends Spider {
@@ -113,7 +112,7 @@ public class Supjav extends Spider {
         for (int i = 0; i < sources.size(); i++) {
             Element source = sources.get(i);
             String sourceName = source.text();
-            if (sourceName.equals("JPA")) continue;
+            if (sourceName.equals("TV")) continue;
             String sourceUrl = source.attr("data-link");
             sites.put(sourceName, "播放" + "$" + sourceUrl);
         }
@@ -165,9 +164,9 @@ public class Supjav extends Spider {
         return Result.get().url(ReUtil.findAllGroup1("file:\"(.*?)\"}]", data).get(0)).header(getHeaders(redirect)).string();
     }
 
-    private String parseTV(String redirect) {
-        String data = OkHttp.string(redirect, getTVVideoHeaders(playUrl));
-        return Result.get().url(Utils.getVar(data, "urlPlay")).header(getHeaders(redirect)).string();
+    private String parseTV(String redirect) throws MalformedURLException {
+        String data = OkHttp.string(redirect, getTVVideoHeaders(URLUtil.getHost(new URL(redirect)).toString()));
+        return Result.get().url(Utils.getVar(data, "urlPlay")).header(getTVVideoHeaders(URLUtil.getHost(new URL(redirect)).toString())).string();
     }
 
     private String parseST(String redirect) throws IOException {
