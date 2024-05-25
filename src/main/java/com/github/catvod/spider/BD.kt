@@ -113,6 +113,7 @@ class BD : Spider() {
         val pList = detail.select("p")
         val alia = pList[0].text()
         vod.setVodTag("")
+        vod.setVodId(id)
         vod.setVodDirector(pList[1].text())
         vod.setVodActor(pList[3].select("a").joinToString(separator = " ") { it.text() })
         vod.setVodTag(pList[4].select("a").joinToString(separator = " ") { it.text() })
@@ -173,7 +174,7 @@ class BD : Spider() {
         }
         val urlList = mutableListOf<String>()
         if (StringUtils.isNotEmpty(res.data.url3)) {
-            urlList.add(res.data.url3)
+            urlList.addAll(res.data.url3.split(","))
         }
         if (StringUtils.isNotEmpty(res.data.tos)) {
             urlList.add("${host}god/$pid?type=1")
