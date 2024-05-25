@@ -52,6 +52,10 @@ public class SupjavTest {
         System.out.println(palyer);
         String palyerST = douban.playerContent("ST", "0a6777b5ebd586c4e022f0d28d425b4bc6c3e6386c8f85bf6b84381f4a6baaa18a6538b46749f1e79fcea83893ca1c69022b72cc2952c6f363ea1cdb83b4906b549b8fd2edab26b7049e1116b32c18c9", null);
         System.out.println(palyerST);
+        String palyerFST = douban.playerContent("FST", "b13642e792fcd70d5e0cb8a4b196aa40cf448dbe04641d4e81ed2e52b4dc55ce7f4a59ad0e865f1b4d9e34dbe226cdcc40ec53eb3cf4f17270830acf091765df", null);
+        System.out.println(palyerFST);
+        String palyerVOE = douban.playerContent("VOE", "3cda8a7304b947f4fce29ed20010713b5b229fdf65f58cd9b6ae863c963731a6ae400d97783fef11414778e14c221ae85b8c9b26fdfbb54fef4cad7eaf8a6b32", null);
+        System.out.println(palyerVOE);
 
     }
 

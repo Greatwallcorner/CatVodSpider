@@ -1,5 +1,6 @@
 package com.github.catvod.spider;
 
+import cn.hutool.core.util.ReUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
@@ -117,8 +118,8 @@ public class Supjav extends Spider {
             sites.put(sourceName, "播放" + "$" + sourceUrl);
         }
         if (sites.size() > 0) {
-            vod.setVodPlayFrom(StringUtils.join(sites.keySet(),"$$$"));
-            vod.setVodPlayUrl(StringUtils.join( sites.values(),"$$$"));
+            vod.setVodPlayFrom(StringUtils.join(sites.keySet(), "$$$"));
+            vod.setVodPlayUrl(StringUtils.join(sites.values(), "$$$"));
         }
         return Result.string(vod);
     }
@@ -146,12 +147,22 @@ public class Supjav extends Spider {
             case "ST":
                 return parseST(redirect);
             case "FST":
-                return parseDS(redirect);
+                return parseFST(redirect);
             case "VOE":
-                return parseDS(redirect);
+                return parseVOE(redirect);
             default:
                 return Result.get().url(id).parse().string();
         }
+    }
+
+    private String parseVOE(String redirect) {
+        String data = OkHttp.string(redirect, getTVVideoHeaders(playUrl));
+        return Result.get().url(ReUtil.findAllGroup1("prompt\\(\"Node\",(.*?)\\);", data).get(0).trim().replace("\"", "")).header(getHeaders(redirect)).string();
+    }
+
+    private String parseFST(String redirect) {
+        String data = OkHttp.string(redirect, getTVVideoHeaders(playUrl));
+        return Result.get().url(ReUtil.findAllGroup1("file:\"(.*?)\"}]", data).get(0)).header(getHeaders(redirect)).string();
     }
 
     private String parseTV(String redirect) {
