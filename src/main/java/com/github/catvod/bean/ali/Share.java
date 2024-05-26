@@ -15,6 +15,9 @@ public class Share {
     @SerializedName("message")
     private String message;
 
+    @SerializedName("display_message")
+    private String displayMessage;
+
     @SerializedName("share_id")
     private String shareId;
     @SerializedName("share_token")
@@ -113,6 +116,10 @@ public class Share {
 
     public boolean isHasPwd() {
         return hasPwd;
+    }
+
+    public String getDisplayMessage() {
+        return displayMessage;
     }
 
     public List<Item> getFileInfos() {

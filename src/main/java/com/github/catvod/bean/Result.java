@@ -202,6 +202,10 @@ public class Result {
         return list == null ? Collections.emptyList() : list;
     }
 
+    public Object getUrl() {
+        return url;
+    }
+
     public String string() {
         return toString();
     }

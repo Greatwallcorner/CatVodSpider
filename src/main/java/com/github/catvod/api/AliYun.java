@@ -118,6 +118,7 @@ public class AliYun {
         url = url.startsWith("https") ? url : "https://api.aliyundrive.com/" + url;
         OkResult result = OkHttp.post(url, json, url.contains("file/list") ? getHeaders() : getHeaderAuth());
         SpiderDebug.log(result.getCode() + "," + url + "," + result.getBody());
+        if(result.getBody().contains("TooManyRequests")) Utils.notify("阿里： 太多请求, 请稍后再试");
         if (retry && result.getCode() == 401 && refreshAccessToken()) return auth(url, json, false);
         if (retry && result.getCode() == 429) return auth(url, json, false);
         return result.getBody();
@@ -224,6 +225,7 @@ public class AliYun {
         param.addProperty("share_id", shareId);
         Share share = Share.objectFrom(post("adrive/v3/share_link/get_share_by_anonymous", param));
 //        if(StringUtils.isNoneBlank(share.getCode()) && share.getCode().equals("ShareLink.Cancelled")) Utils.notify("该分享已取消");
+        if(StringUtils.isNoneBlank(share.getCode()) && share.getCode().equals("TooManyRequests")) Utils.notify("阿里："+share.getDisplayMessage());
         List<Item> files = new ArrayList<>();
         List<Item> subs = new ArrayList<>();
         listFiles(shareId, new Item(getParentFileId(fileId, share)), files, subs);

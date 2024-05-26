@@ -39,7 +39,9 @@ class DBTest {
 
     @Test
     fun playerTest() {
-        val playerContent = bd.playerContent("", "/play/24802-0.htm", mutableListOf())
+//        val playerContent = bd.playerContent("", "/play/24839-0.htm", mutableListOf())
+//        val playerContent = bd.playerContent("", "/play/24802-0.htm", mutableListOf())
+        val playerContent = bd.playerContent("", "/play/24867-0.htm", mutableListOf())
         println(playerContent)
         AssertUtil.assertResult(playerContent)
     }
