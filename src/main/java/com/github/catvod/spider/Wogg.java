@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 public class Wogg extends Ali {
 
-    private final String siteUrl = "https://www.wogg.xyz";
+    private final String siteUrl = "https://www.wogg.net";
     private final Pattern regexCategory = Pattern.compile("/vodtype/(\\w+).html");
     private final Pattern regexPageTotal = Pattern.compile("\\$\\(\"\\.mac_total\"\\)\\.text\\('(\\d+)'\\);");
 
