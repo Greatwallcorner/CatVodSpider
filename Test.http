@@ -27,3 +27,14 @@ Content-Type: application/json
 ###
 
 GET https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/json/alist.json
+
+###
+GET http://117.24.14.14:32061/?url=https://s3.bfengbf.com/video/baolina/%E7%AC%AC01%E9%9B%86/index.m3u8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36
+
+
+
+###
+GET http://www.饭太硬.com/tv/
+User-Agent: OkHttp/3.12.0
+Content-Type: application/json

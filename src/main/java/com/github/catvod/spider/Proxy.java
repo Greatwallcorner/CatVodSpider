@@ -3,9 +3,16 @@ package com.github.catvod.spider;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Json;
 import com.github.catvod.utils.MultiThread;
+import com.github.catvod.utils.ProxyVideo;
+import com.github.catvod.utils.Utils;
+import org.apache.http.HttpHeaders;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Proxy extends Spider {
@@ -21,14 +28,27 @@ public class Proxy extends Spider {
             case "ali":
                 return Ali.proxy(params);
             case "bili":
-//                return Bili.proxy(params);
+                return Bili.proxy(params);
             case "webdav":
 //                return WebDAV.vod(params);
             case "bd":
                  return BD.Companion.proxyLocal(params);
+            case "proxy":
+                return commonProxy(params);
             default:
                 return null;
         }
+    }
+
+    private static final List<String> keys = Arrays.asList("url", "header", "do", HttpHeaders.USER_AGENT, HttpHeaders.CONTENT_TYPE, HttpHeaders.HOST);
+    private static Object[] commonProxy(Map<String, String> params) throws Exception {
+        String url = Utils.base64Decode(params.get("url"));
+        Map<String,String> header = Json.parseSafe(Utils.base64Decode(params.get("header")), Map.class);
+        if(header == null) header = new HashMap<>();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if(!keys.contains(entry.getKey())) header.put(entry.getKey(), entry.getValue());
+        }
+        return new Object[]{ProxyVideo.proxy(url, header)};
     }
 
     static void adjustPort() {

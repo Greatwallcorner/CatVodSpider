@@ -12,13 +12,13 @@ import java.io.File;
 public class Util {
     @Test
     public void strEncode(){
-        String s = "";
+        String s = "/api.php/provide/search_result";
         System.out.println(Utils.base64Encode(s));
     }
 
     @Test
     public void strDecode(){
-        String s = "aHR0cHM6Ly95cy5hcGkueWluZ3NvLmZ1bi92My9hbGkvc2VhcmNo";
+        String s = "eyJVc2VyLUFnZW50IjoiIERhbHZpay8yLjEuMCAoTGludXg7IFU7IGlQaG9uZSAxMjsgVjQxQSBCdWlsZC9TUDFBLjIxMDgxMi4wMDMpIiwiYWxsb3dDcm9zc1Byb3RvY29sUmVkaXJlY3RzIjoiIHRydWUiLCJBY2NlcHQiOiIgKi8qIiwiQ29udGVudC10eXBlIjoiIHZpZGVvL21wMnQiLCJDb25uZWN0aW9uIjoiIGtlZXAtYWxpdmUifQ==";
         System.out.println(Utils.base64Decode(s));
     }
 

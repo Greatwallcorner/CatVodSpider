@@ -1,10 +1,7 @@
 package com.github.catvod.utils;
 
 import com.github.catvod.crawler.SpiderDebug;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 
 import java.lang.reflect.Type;
 
@@ -34,5 +31,13 @@ public class Json {
 
     public static String toJson(Object obj) {
         return gson.toJson(obj);
+    }
+
+    public static JsonObject safeObject(String extend) {
+        try {
+            return JsonParser.parseString(extend).getAsJsonObject();
+        } catch (JsonSyntaxException e) {
+            return new JsonObject();
+        }
     }
 }

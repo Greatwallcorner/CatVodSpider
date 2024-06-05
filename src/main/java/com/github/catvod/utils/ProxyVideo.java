@@ -7,33 +7,15 @@ import com.github.catvod.net.OkHttp;
 
 import java.util.Map;
 
+import com.github.catvod.spider.Proxy;
 import io.ktor.http.HttpStatusCode;
 import okhttp3.Response;
 
 public class ProxyVideo {
 
-//    private static final String GO_SERVER = "http://127.0.0.1:7777/";
-
-//    public static void go() {
-//        boolean close = OkHttp.string(GO_SERVER).isEmpty();
-//        if (close) OkHttp.string("http://127.0.0.1:" + Proxy.getPort() + "/go");
-//        if (close) while (OkHttp.string(GO_SERVER).isEmpty()) SystemClock.sleep(20);
-//    }
-//
-//    public static String goVer() {
-//        try {
-//            go();
-//            String result = OkHttp.string(GO_SERVER + "version");
-//            return new JSONObject(result).optString("version");
-//        } catch (Exception e) {
-//            return "";
-//        }
-//    }
-
-//    public static String url(String url, int thread) {
-//        if (!TextUtils.isEmpty(goVer()) && url.contains("/proxy?")) url += "&response=url";
-//        return String.format(Locale.getDefault(), "%s?url=%s&thread=%d", GO_SERVER, URLEncoder.encode(url), thread);
-//    }
+    public static String buildCommonProxyUrl(String url, Map<String, String> headers){
+        return Proxy.getProxyUrl()+"?do=proxy&url="+Utils.base64Encode(url)+"&header="+Utils.base64Encode(Json.toJson(headers));
+    }
 
     public static Response proxy(String url, Map<String, String> headers) throws Exception {
         SpiderDebug.log("proxy url："+ url + " headers" + Json.toJson(headers));

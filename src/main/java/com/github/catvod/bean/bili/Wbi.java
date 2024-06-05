@@ -32,7 +32,7 @@ public class Wbi {
         return key.toString();
     }
 
-    public String getParam(LinkedHashMap<String, Object> params) {
+    public String getQuery(LinkedHashMap<String, Object> params) {
         String imgKey = URI.create(getImgUrl()).getFragment().split("\\.")[0];
         String subKey = URI.create(getSubUrl()).getFragment().split("\\.")[0];
         String mixinKey = getMixinKey(imgKey, subKey);
