@@ -1,5 +1,6 @@
 package com.github.catvod.api;
 
+import cn.hutool.core.net.url.UrlBuilder;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Sub;
 import com.github.catvod.bean.Vod;
@@ -11,23 +12,23 @@ import com.github.catvod.spider.Init;
 import com.github.catvod.spider.Proxy;
 import com.github.catvod.utils.*;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class AliYun {
@@ -118,7 +119,7 @@ public class AliYun {
         url = url.startsWith("https") ? url : "https://api.aliyundrive.com/" + url;
         OkResult result = OkHttp.post(url, json, url.contains("file/list") ? getHeaders() : getHeaderAuth());
         SpiderDebug.log(result.getCode() + "," + url + "," + result.getBody());
-        if(result.getBody().contains("TooManyRequests")) Utils.notify("阿里： 太多请求, 请稍后再试");
+//        if(result.getBody().contains("TooManyRequests")) Utils.notify("阿里： 太多请求, 请稍后再试");
         if (retry && result.getCode() == 401 && refreshAccessToken()) return auth(url, json, false);
         if (retry && result.getCode() == 429) return auth(url, json, false);
         return result.getBody();
@@ -157,32 +158,33 @@ public class AliYun {
     }
 
     private boolean refreshAccessToken() {
-        try {
-            SpiderDebug.log("refreshAccessToken...");
-            JsonObject param = new JsonObject();
-            String token = cache.getUser().getRefreshToken();
-            if (token.isEmpty()) token = refreshToken;
-            if (token != null && token.startsWith("http")) token = OkHttp.string(token).trim();
-            param.addProperty("refresh_token", token);
-            param.addProperty("grant_type", "refresh_token");
-            String json = post("https://auth.aliyundrive.com/v2/account/token", param);
-            cache.setUser(User.objectFrom(json));
-            if (cache.getUser().getAccessToken().isEmpty()) throw new Exception(json);
-            return true;
-        } catch (Exception e) {
-            if (e instanceof TimeoutException) return onTimeout();
-            cache.getUser().clean();
-            e.printStackTrace();
-            stopService();
-            startFlow();
-            return true;
-        } finally {
-            try {
-                while (cache.getUser().getAccessToken().isEmpty()) Thread.sleep(250);
-            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-            }
-        }
+//        try {
+//            SpiderDebug.log("refreshAccessToken...");
+//            JsonObject param = new JsonObject();
+//            String token = cache.getUser().getRefreshToken();
+//            if (token.isEmpty()) token = refreshToken;
+//            if (token != null && token.startsWith("http")) token = OkHttp.string(token).trim();
+//            param.addProperty("refresh_token", token);
+//            param.addProperty("grant_type", "refresh_token");
+//            String json = post("https://auth.aliyundrive.com/v2/account/token", param);
+//            cache.setUser(User.objectFrom(json));
+//            if (cache.getUser().getAccessToken().isEmpty()) throw new Exception(json);
+//            return true;
+//        } catch (Exception e) {
+//            if (e instanceof TimeoutException) return onTimeout();
+//            cache.getUser().clean();
+//            e.printStackTrace();
+//            stopService();
+//            startFlow();
+//            return true;
+//        } finally {
+//            try {
+//                while (cache.getUser().getAccessToken().isEmpty()) Thread.sleep(250);
+//            } catch (InterruptedException e) {
+////                throw new RuntimeException(e);
+//            }
+//        }
+        return true;
     }
 
     private void getDriveId() {
@@ -326,7 +328,7 @@ public class AliYun {
             param.addProperty("share_id", shareId);
             param.addProperty("expire_sec", 600);
             String json = auth("v2/file/get_share_link_download_url", param.toString(), false);
-            String url = JsonParser.parseString(json).getAsJsonObject().get("download_url").getAsString();
+            String url = Json.parse(json).getAsJsonObject().get("download_url").getAsString();
             shareDownloadMap.put(fileId, url);
             return url;
         } catch (Exception e) {
@@ -586,7 +588,7 @@ public class AliYun {
                 jDialog.dispose();
             });
             qrButton.addActionListener((event) -> {
-                SwingUtilities.invokeLater(this::getQRCode);
+                SwingUtilities.invokeLater(this::getQRCode1);
                 jDialog.dispose();
             });
         } catch (Exception ignored) {
@@ -605,6 +607,21 @@ public class AliYun {
         Data data = Data.objectFrom(json).getContent().getData();
         showQRCode(data);
     }
+    String sid = "";
+
+    private void getQRCode1() {
+//        Map<String,String> param = new HashMap<>();
+//        param.put("scopes", "[\"user:base\", \"file:all:read\", \"file:all:write\"]");
+//        param.put("width", "300");
+//        param.put("height", "300");
+        String param = "{\"scopes\": [\"user:base\", \"file:all:read\", \"file:all:write\"],\"width\": 300,\"height\": 300}";
+        String json = OkHttp.post("https://aliyundrive-oauth.messense.me/oauth/authorize/qrcode", param);
+        JsonObject obj = Json.parse(json).getAsJsonObject();
+        sid = obj.get("sid").getAsString();
+        String url = obj.get("qrCodeUrl").getAsString();
+
+        showQRCode1(url);
+    }
 
     private void showQRCode(Data data) {
         final int size = 300;
@@ -622,6 +639,42 @@ public class AliYun {
             Init.execute(() -> startService(data.getParams()));
         }
     }
+    private void showQRCode1(String qrcodeUrl) {
+        BufferedImage read = null;
+        try {
+            read = ImageIO.read(UrlBuilder.of(qrcodeUrl).toURL());
+            if(read == null) throw new IOException("请求qrcode失败");
+        } catch (IOException e) {
+            SpiderDebug.log("获取qrcode失败" + e.getMessage());
+        }
+//        try {
+//            response = OkHttp.newCall(qrcodeUrl);
+//            if(!response.isSuccessful()) throw new IOException("请求qrcode失败");
+//            content = response.body().string();
+//        } catch (IOException e) {
+//            SpiderDebug.log("获取qrcode失败" + e.getMessage());
+//        }finally {
+//            if(response != null){
+//                response.close();
+//            }
+//        }
+        final int size = 300;
+        try {
+            BufferedImage finalRead = read;
+            SwingUtilities.invokeLater(() -> {
+
+//                BufferedImage image = QRCode.getBitmap(finalContent, size, 2);
+                JPanel jPanel = new JPanel();
+                jPanel.setSize(Swings.dp2px(size), Swings.dp2px(size));
+                jPanel.add(new JLabel(new ImageIcon(finalRead)));
+                dialog = Utils.showDialog(jPanel, "请使用阿里云盘app扫描");
+            });
+            Utils.notify("請使用阿里雲盤 App 掃描二維碼");
+        } catch (Exception ignored) {
+        }finally {
+            Init.execute(() -> startService1(sid));
+        }
+    }
 
     private void startService(Map<String, String> params) {
         service = Executors.newScheduledThreadPool(1);
@@ -629,6 +682,24 @@ public class AliYun {
             String result = OkHttp.post("https://passport.aliyundrive.com/newlogin/qrcode/query.do?appName=aliyun_drive&fromSite=52&_bx-v=2.2.3", params);
             Data data = Data.objectFrom(result).getContent().getData();
             if (data.hasToken()) setToken(data.getToken());
+        }, 1, 1, TimeUnit.SECONDS);
+    }
+    private void startService1(String sid) {
+        String furl = "https://openapi.aliyundrive.com/oauth/qrcode/%s/status";
+        service = Executors.newScheduledThreadPool(1);
+        service.scheduleAtFixedRate(() -> {
+            String result = OkHttp.string(String.format(furl, sid));
+            StatusData data = StatusData.objectFrom(result);
+            if(data.getStatus().equals("LoginSuccess")) {
+                String authCode = data.getAuthCode();
+                String post = OkHttp.post("https://aliyundrive-oauth.messense.me/oauth/access_token", String.format("{\"grant_type\": \"authorization_code\",\"code\": \"%s\"}", authCode));
+                JsonObject obj = Json.parse(post).getAsJsonObject();
+
+                if(obj.has("refresh_token")){
+                    setToken(obj.get("refresh_token").getAsString());
+                }
+            }
+//            if (data.hasToken()) setToken(data.getToken());
         }, 1, 1, TimeUnit.SECONDS);
     }
 
