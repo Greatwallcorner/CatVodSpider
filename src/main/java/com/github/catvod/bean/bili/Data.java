@@ -48,6 +48,16 @@ public class Data {
     @SerializedName("wbi_img")
     private Wbi wbi;
 
+    private Durl[] durl;
+
+    public Durl[] getDurl() {
+        return durl;
+    }
+
+//    public void setDurl(Durl[] durl) {
+//        this.durl = durl;
+//    }
+
     public JsonElement getResult() {
         return result;
     }
