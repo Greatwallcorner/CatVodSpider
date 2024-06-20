@@ -4,31 +4,22 @@ import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
-import com.github.catvod.bean.bili.Dash;
-import com.github.catvod.bean.bili.Data;
-import com.github.catvod.bean.bili.Media;
-import com.github.catvod.bean.bili.Page;
-import com.github.catvod.bean.bili.Resp;
-import com.github.catvod.bean.bili.Wbi;
+import com.github.catvod.bean.bili.*;
 import com.github.catvod.crawler.Spider;
+import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.ProxyVideo;
 import com.github.catvod.utils.Utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author ColaMint & FongMi & 唐三
@@ -213,39 +204,35 @@ public class Bili extends Spider {
         String aid = params.get("aid");
         String cid = params.get("cid");
         String qn = params.get("qn");
-        String api = "https://api.bilibili.com/x/player/playurl?avid=" + aid + "&cid=" + cid + "&qn=" + qn + "&fnval=4048&fourk=1";
+        String api = "https://api.bilibili.com/x/player/wbi/playurl?avid=" + aid + "&cid=" + cid + "&qn=" + qn + "&fnval=1&fourk=1";
         String json = OkHttp.string(api, getHeader());
         Resp resp = Resp.objectFrom(json);
-        Dash dash = resp.getData().getDash();
-        StringBuilder video = new StringBuilder();
-        StringBuilder audio = new StringBuilder();
-        findAudio(dash, audio);
-        findVideo(dash, video, qn);
-        String mpd = getMpd(dash, video.toString(), audio.toString());
-        Object[] result = new Object[3];
-        result[0] = 200;
-        result[1] = "application/dash+xml";
-        result[2] = new ByteArrayInputStream(mpd.getBytes());
-        return result;
+        Response response = null;
+        try {
+            response = ProxyVideo.proxy(resp.getData().getDurl()[0].getUrl(), getHeader());
+        } catch (Exception e) {
+            SpiderDebug.log("bili playurl proxy err: "+e.getMessage());
+        }
+        return ProxyVideo.ProxyRespBuilder.response(response);
     }
 
-    private static void findAudio(Dash dash, StringBuilder sb) {
-        for (Media audio : dash.getAudio()) {
-            for (String key : audios.keySet()) {
-                if (audio.getId().equals(key)) {
-                    sb.append(getMedia(audio));
-                }
-            }
-        }
-    }
-
-    private static void findVideo(Dash dash, StringBuilder sb, String qn) {
-        for (Media video : dash.getVideo()) {
-            if (video.getId().equals(qn)) {
-                sb.append(getMedia(video));
-            }
-        }
-    }
+//    private static void findAudio(Dash dash, StringBuilder sb) {
+//        for (Media audio : dash.getAudio()) {
+//            for (String key : audios.keySet()) {
+//                if (audio.getId().equals(key)) {
+//                    sb.append(getMedia(audio));
+//                }
+//            }
+//        }
+//    }
+//
+//    private static void findVideo(Dash dash, StringBuilder sb, String qn) {
+//        for (Media video : dash.getVideo()) {
+//            if (video.getId().equals(qn)) {
+//                sb.append(getMedia(video));
+//            }
+//        }
+//    }
 
     private static String getMedia(Media media) {
         if (media.getMimeType().startsWith("video")) {
@@ -264,9 +251,9 @@ public class Bili extends Spider {
         return String.format(Locale.getDefault(), "<AdaptationSet>\n" + "<ContentComponent contentType=\"%s\"/>\n" + "<Representation id=\"%s\" bandwidth=\"%s\" codecs=\"%s\" mimeType=\"%s\" %s startWithSAP=\"%s\">\n" + "<BaseURL>%s</BaseURL>\n" + "<SegmentBase indexRange=\"%s\">\n" + "<Initialization range=\"%s\"/>\n" + "</SegmentBase>\n" + "</Representation>\n" + "</AdaptationSet>", type, id, media.getBandWidth(), media.getCodecs(), media.getMimeType(), params, media.getStartWithSap(), baseUrl, media.getSegmentBase().getIndexRange(), media.getSegmentBase().getInitialization());
     }
 
-    private static String getMpd(Dash dash, String videoList, String audioList) {
-        return String.format(Locale.getDefault(), "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n <MPD xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:ns2=\"http://www.w3.org/1999/xlink\" xmlns=\"urn:mpeg:dash:schema:mpd:2011\" type=\"static\" mediaPresentationDuration=\"PT%sS\" minBufferTime=\"PT%sS\" profiles=\"urn:mpeg:dash:profile:isoff-on-demand:2011\">\n" + "<Period duration=\"PT%sS\" start=\"PT0S\">\n" + "%s\n" + "%s\n" + "</Period>\n" + "</MPD>", dash.getDuration(), dash.getMinBufferTime(), dash.getDuration(), videoList, audioList);
-    }
+//    private static String getMpd(Dash dash, String videoList, String audioList) {
+//        return String.format(Locale.getDefault(), "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n <MPD xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:ns2=\"http://www.w3.org/1999/xlink\" xmlns=\"urn:mpeg:dash:schema:mpd:2011\" type=\"static\" mediaPresentationDuration=\"PT%sS\" minBufferTime=\"PT%sS\" profiles=\"urn:mpeg:dash:profile:isoff-on-demand:2011\">\n" + "<Period duration=\"PT%sS\" start=\"PT0S\">\n" + "%s\n" + "%s\n" + "</Period>\n" + "</MPD>", dash.getDuration(), dash.getMinBufferTime(), dash.getDuration(), videoList, audioList);
+//    }
 
     private void checkLogin() {
         String json = OkHttp.string("https://api.bilibili.com/x/web-interface/nav", getHeader());
