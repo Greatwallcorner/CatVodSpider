@@ -23,6 +23,17 @@
       }
     },
     {
+      "key": "ChangZhang",
+      "name": "厂长影视",
+      "type": 3,
+      "api": "csp_ChangZhang",
+      "searchable": "1",
+      "filterable": "0",
+      "changeable": 0,
+      "ext": {
+      }
+    },
+    {
       "key": "Jable",
       "name": "Jable",
       "type": 3,
