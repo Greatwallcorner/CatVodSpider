@@ -56,17 +56,21 @@ public class ChangZhang extends Spider {
             classes.add(new Class(div.select(" a").attr("href"), div.select(" a").text()));
         }
 
+        getVods(list, doc);
+        SpiderDebug.log("++++++++++++厂长-homeContent" + Json.toJson(list));
+        return Result.string(classes, list);
+    }
+
+    private void getVods(List<Vod> list, Document doc) {
         for (Element div : doc.select(".bt_img.mi_ne_kd > ul >li")) {
-            String id = siteUrl + div.select(".dytit > a").attr("href");
+            String id = div.select(".dytit > a").attr("href");
             String name = div.select(".dytit > a").text();
-            String pic = div.select("img").attr("data-src");
+            String pic = div.select("img").attr("data-original");
             if (pic.isEmpty()) pic = div.select("img").attr("src");
             String remark = div.select(".hdinfo > span").text();
 
             list.add(new Vod(id, name, pic, remark));
         }
-        SpiderDebug.log("++++++++++++厂长-homeContent" + Json.toJson(list));
-        return Result.string(classes, list);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class ChangZhang extends Spider {
         //String filters = extend.get("filters");
         String html = OkHttp.string(target);
         Document doc = Jsoup.parse(html);
-        parseVodList(doc, list);
+        getVods(list,doc);
         String total = "" + Integer.MAX_VALUE;
 
 
@@ -140,23 +144,12 @@ public class ChangZhang extends Spider {
         }
         Document document = Jsoup.parse(html);
         List<Vod> list = new ArrayList<>();
-        parseVodList(document, list);
+        getVods(list, document);
 
         SpiderDebug.log("++++++++++++厂长-searchContent" + Json.toJson(list));
         return Result.string(list);
     }
 
-    private void parseVodList(Document document, List<Vod> list) {
-        for (Element div : document.select(".bt_img.mi_ne_kd > ul >li")) {
-            String id = div.select(".dytit > a").attr("href");
-            String name = div.select(".dytit > a").text();
-            String pic = div.select("img").attr("data-src");
-            if (pic.isEmpty()) pic = div.select("img").attr("src");
-            String remark = div.select(".hdinfo > span").text();
-
-            list.add(new Vod(id, name, pic, remark));
-        }
-    }
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
