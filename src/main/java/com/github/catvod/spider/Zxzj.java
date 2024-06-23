@@ -5,10 +5,10 @@ package com.github.catvod.spider;/*
 */
 
 
+import cn.hutool.core.codec.Base64Decoder;
 import cn.hutool.crypto.Mode;
 import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.symmetric.AES;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
@@ -20,13 +20,17 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Utils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Zxzj extends Spider {
 
@@ -36,6 +40,10 @@ public class Zxzj extends Spider {
         Map<String, String> header = new HashMap<>();
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/100.0.4896.77 Mobile/15E148 Safari/604.1");
         header.put("Connection", "keep-alive");
+        header.put("Referer", "https://www.zxzj.pro/");
+        header.put("sec-fetch-dest", "iframe");
+        header.put("sec-fetch-mode", "navigate");
+        header.put("sec-fetch-site", "cross-site");
         return header;
     }
 
@@ -59,7 +67,7 @@ public class Zxzj extends Spider {
     private void getVods(List<Vod> list, Document doc) {
         for (Element div : doc.select(".stui-vodlist >li")) {
             String id = div.select(".stui-vodlist__box > a.stui-vodlist__thumb").attr("href");
-            String name = div.select(".stui-vodlist__detail > a").text();
+            String name = div.select(".stui-vodlist__detail >h4.title > a").text();
             String pic = div.select(".stui-vodlist__box > a.stui-vodlist__thumb").attr("data-original");
             if (pic.isEmpty()) pic = div.select("img").attr("src");
             String remark = div.select(".stui-vodlist__box > a.stui-vodlist__thumb > span").text();
@@ -71,7 +79,8 @@ public class Zxzj extends Spider {
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
         List<Vod> list = new ArrayList<>();
-        String target = siteUrl +"/list/"+ tid + "-" + pg+".html";
+        String[] arr = tid.split("\\.");
+        String target = siteUrl + arr[0] + "-" + pg + ".html";
         //String filters = extend.get("filters");
         String html = OkHttp.string(target);
         Document doc = Jsoup.parse(html);
@@ -87,14 +96,14 @@ public class Zxzj extends Spider {
     public String detailContent(List<String> ids) throws Exception {
 
         SpiderDebug.log("++++++++++++在线之家-detailContent--args" + Json.toJson(ids));
-        Document doc = Jsoup.parse(OkHttp.string(this.siteUrl+ids.get(0), getHeader()));
+        Document doc = Jsoup.parse(OkHttp.string(this.siteUrl + ids.get(0), getHeader()));
 
         Elements sources = Objects.requireNonNull(doc.select("ul.stui-content__playlist").first()).children();
         StringBuilder vod_play_url = new StringBuilder();
         StringBuilder vod_play_from = new StringBuilder("在线之家").append("$$$");
 
         for (int i = 0; i < sources.size(); i++) {
-            String href = sources.get(i).attr("href");
+            String href = sources.get(i).select("a").attr("href");
             String text = sources.get(i).text();
             vod_play_url.append(text).append("$").append(href);
             boolean notLastEpisode = i < sources.size() - 1;
@@ -132,8 +141,8 @@ public class Zxzj extends Spider {
 
     @Override
     public String searchContent(String key, boolean quick) throws Exception {
-        String searchUrl = siteUrl + "/daoyongjiekoshibushiyoubing?q=";
-        String html = OkHttp.string(searchUrl + key);
+        String searchUrl = siteUrl + "/vodsearch/-------------.html?wd=" + key + "&submit=";
+        String html = OkHttp.string(searchUrl);
         if (html.contains("Just a moment")) {
             Utils.notify("在线之家资源需要人机验证");
         }
@@ -148,24 +157,17 @@ public class Zxzj extends Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
-        String content = OkHttp.string(id, getHeader());
-        Document document = Jsoup.parse(content);
-        Elements iframe = document.select("iframe");
-        String videoContent = OkHttp.string(iframe.get(0).attr("src"));
-        document = Jsoup.parse(videoContent);
-        Elements script = document.select("script");
-        String rand = "";
-        String player = "";
-        for (Element element : script) {
-            if (StringUtils.isNoneBlank(element.data())) {
-                rand = Utils.getVar(element.data(), "rand");
-                player = Utils.getVar(element.data(), "player");
-            }
-        }
-
-        String videoInfo = cryptJs(player, "VFBTzdujpR9FWBhe", rand);
-        JSONObject jsonElement = JSONUtil.parseObj(videoInfo);
-        String realUrl = jsonElement.getStr("url");
+        String content = OkHttp.string(this.siteUrl + id, getHeader());
+        Matcher matcher = Pattern.compile("player_aaaa=(.*?)</script>").matcher(content);
+        String json = matcher.find() ? matcher.group(1) : "";
+        org.json.JSONObject player = new JSONObject(json);
+        String realUrl = player.getString("url");
+        String videoContent = OkHttp.string(realUrl, getHeader());
+        Matcher matcher2 = Pattern.compile("result_v2 =(.*?);").matcher(videoContent);
+        String json2 = matcher2.find() ? matcher2.group(1) : "";
+        org.json.JSONObject jsonObject = new JSONObject(json2);
+        String encodedStr = jsonObject.getString("data");
+        new BigInteger(encodedStr, 16).toByteArray()
         SpiderDebug.log("++++++++++++在线之家-playerContent" + Json.toJson(realUrl));
 
         return Result.get().url(realUrl).header(getHeader()).string();

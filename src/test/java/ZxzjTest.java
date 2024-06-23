@@ -32,7 +32,7 @@ public class ZxzjTest {
 
         //String palyDoc= OkHttp.string("http://www.lzizy9.com/index.php/vod/play/id/79816/sid/1/nid/1.html");
 
-        String s = douban.categoryContent("/zuixindianying", "1", false, Maps.newHashMap());
+        String s = douban.categoryContent("/list/1.html", "1", false, Maps.newHashMap());
         System.out.println(s);
         AssertUtil.INSTANCE.assertResult(s);
 
@@ -41,7 +41,7 @@ public class ZxzjTest {
     @Test
     public void detailTest() throws Exception {
 
-        String detail = douban.detailContent(Lists.newArrayList("https://www.czys.pro/movie/3868.html"));
+        String detail = douban.detailContent(Lists.newArrayList("/detail/4465.html"));
         System.out.println(detail);
 
     }
@@ -49,7 +49,7 @@ public class ZxzjTest {
     @Test
     public void playerTest() throws Exception {
 
-        String palyer = douban.playerContent(null, "https://www.czys.pro/v_play/bXZfMTc1ODAtbm1fMQ==.html", null);
+        String palyer = douban.playerContent(null, "/video/3136-1-1.html", null);
         System.out.println(palyer);
 
 
