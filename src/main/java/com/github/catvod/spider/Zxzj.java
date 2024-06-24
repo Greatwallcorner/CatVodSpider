@@ -5,11 +5,10 @@ package com.github.catvod.spider;/*
 */
 
 
-import cn.hutool.core.codec.Base64Decoder;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.Mode;
 import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.symmetric.AES;
-import cn.hutool.json.JSONUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
 import com.github.catvod.bean.Result;
@@ -19,7 +18,6 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Utils;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -167,7 +165,7 @@ public class Zxzj extends Spider {
         String json2 = matcher2.find() ? matcher2.group(1) : "";
         org.json.JSONObject jsonObject = new JSONObject(json2);
         String encodedStr = jsonObject.getString("data");
-        new BigInteger(encodedStr, 16).toByteArray()
+        realUrl = new String(new BigInteger(StrUtil.reverse(encodedStr), 16).toByteArray());
         SpiderDebug.log("++++++++++++在线之家-playerContent" + Json.toJson(realUrl));
 
         return Result.get().url(realUrl).header(getHeader()).string();

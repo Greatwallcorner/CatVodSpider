@@ -62,6 +62,16 @@
       "changeable": 0,
       "ext": {
       }
+    }, {
+      "key": "Zxzj",
+      "name": "在线之家",
+      "type": 3,
+      "api": "csp_Zxzj",
+      "searchable": "1",
+      "filterable": "0",
+      "changeable": 0,
+      "ext": {
+      }
     },
     {
       "key": "WuMingMusic",
