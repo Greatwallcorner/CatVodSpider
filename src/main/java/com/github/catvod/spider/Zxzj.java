@@ -9,6 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.Mode;
 import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.symmetric.AES;
+import cn.hutool.json.JSONUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
 import com.github.catvod.bean.Result;
@@ -43,7 +44,9 @@ public class Zxzj extends Spider {
         header.put("sec-fetch-mode", "navigate");
         header.put("sec-fetch-site", "cross-site");
         return header;
-    } private Map<String, String> getVideoHeader() {
+    }
+
+    private Map<String, String> getVideoHeader() {
         Map<String, String> header = new HashMap<>();
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/100.0.4896.77 Mobile/15E148 Safari/604.1");
         header.put("Connection", "keep-alive");
@@ -177,7 +180,7 @@ public class Zxzj extends Spider {
         realUrl = new String(new BigInteger(StrUtil.reverse(encodedStr), 16).toByteArray());
         SpiderDebug.log("++++++++++++在线之家-playerContent" + Json.toJson(realUrl));
 
-        return Result.get().url(realUrl).header(getVideoHeader()).string();
+        return Result.get().url(Proxy.getProxyUrl() + "?do=proxy&url=" + realUrl+"&header="+ Utils.base64Encode(JSONUtil.toJsonStr(getVideoHeader()))).header(getVideoHeader()).string();
     }
 
 
