@@ -72,7 +72,7 @@ public class Bili extends Spider {
     public void init(String extend) throws Exception {
         this.extend = Json.safeObject(extend);
         setCookie();
-        setAudio();
+//        setAudio();
     }
 
     @Override

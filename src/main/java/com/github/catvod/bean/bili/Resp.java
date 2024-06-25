@@ -73,7 +73,7 @@ public class Resp {
         }
 
         public String getPic() {
-            return StringUtils.isEmpty(pic) ? "" : pic;
+            return StringUtils.isEmpty(pic) ? "" : pic+"@200w";
         }
 
         public Vod getVod() {
