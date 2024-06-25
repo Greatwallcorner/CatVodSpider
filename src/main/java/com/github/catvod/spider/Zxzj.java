@@ -5,7 +5,11 @@ package com.github.catvod.spider;/*
 */
 
 
+import cn.hutool.core.net.URLEncodeUtil;
+import cn.hutool.core.net.url.UrlBuilder;
+import cn.hutool.core.net.url.UrlQuery;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.Mode;
 import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.symmetric.AES;
@@ -18,7 +22,14 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.ProxyVideo;
 import com.github.catvod.utils.Utils;
+import com.google.common.collect.Maps;
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,6 +37,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -48,12 +61,20 @@ public class Zxzj extends Spider {
 
     private Map<String, String> getVideoHeader() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/100.0.4896.77 Mobile/15E148 Safari/604.1");
-        header.put("Connection", "keep-alive");
-        header.put("sec-fetch-dest", "video");
-        header.put("sec-fetch-mode", "no-cors");
-        header.put("sec-fetch-site", "cross-site");
 
+        header.put("Accept", "*/*");
+        header.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,de;q=0.6");
+        header.put("Cache-Control", "no-cache");
+        header.put("Connection", "keep-alive");
+        header.put("Pragma", "no-cache");
+
+        header.put("Sec-Fetch-Dest", "video");
+        header.put("Sec-Fetch-Mode", "no-cors");
+        header.put("Sec-Fetch-Site", "cross-site");
+        header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+       /* header.put("sec-ch-ua", "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"");
+        header.put("sec-ch-ua-mobile", "?0");
+        header.put("sec-ch-ua-platform", "\"Windows\"");*/
         return header;
     }
 
@@ -179,10 +200,17 @@ public class Zxzj extends Spider {
         String encodedStr = jsonObject.getString("data");
         realUrl = new String(new BigInteger(StrUtil.reverse(encodedStr), 16).toByteArray());
         SpiderDebug.log("++++++++++++在线之家-playerContent" + Json.toJson(realUrl));
-
-        return Result.get().url(Proxy.getProxyUrl() + "?do=proxy&url=" + realUrl+"&header="+ Utils.base64Encode(JSONUtil.toJsonStr(getVideoHeader()))).header(getVideoHeader()).string();
+        Map<String, String> header = getVideoHeader();
+        String temp = decodeStr(realUrl);
+        return Result.get().url(ProxyVideo.buildCommonProxyUrl(temp, header)).header(getVideoHeader()).string();
     }
 
+    String decodeStr(String _0x267828) {
+        int _0x5cd2b5 = (_0x267828.length() - 7) / 2;
+        String _0x2191ed = _0x267828.substring(0, _0x5cd2b5);
+        String _0x35a256 = _0x267828.substring(_0x5cd2b5 + 7);
+        return _0x2191ed + _0x35a256;
+    }
 
     String cryptJs(String text, String key, String iv) {
         byte[] key_value = key.getBytes(StandardCharsets.UTF_8);
