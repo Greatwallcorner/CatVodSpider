@@ -12,7 +12,9 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.unit.dp
+import cn.hutool.captcha.generator.RandomGenerator
 import cn.hutool.core.codec.Base64
+import cn.hutool.core.util.RandomUtil
 import cn.hutool.crypto.Mode
 import cn.hutool.crypto.Padding
 import cn.hutool.crypto.digest.DigestUtil
@@ -25,6 +27,7 @@ import com.github.catvod.utils.DialogUtil
 import com.github.catvod.utils.Json
 import com.github.catvod.utils.ProxyVideo
 import com.github.catvod.utils.Utils
+import com.google.common.collect.ImmutableMap
 import okhttp3.Response
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
@@ -53,49 +56,85 @@ class MtyyKT {
         }
 
         @JvmStatic
-        fun verify(url: String, string: AtomicReference<String>, session: String): String {
+        fun verify(searchUrl: String, string: AtomicReference<String>) {
 
-            val resp = getVerifyCodePic(url, session)
+            val map = getVerifyCodePic(searchUrl)
+            val session = map.get("session") as String
+            val resp = map.get("pic") as ByteArray
             if (resp.isNotEmpty()) {
                 DialogUtil.showDialog(
                     content = {
-                        verifyCode(resp, url, onClose = { DialogUtil.close() }, onConfirm = {
+                        verifyCode(resp, searchUrl, onClose = { DialogUtil.close() }, onConfirm = {
                             SpiderDebug.log("麦田 code confirm start")
                             DialogUtil.close()
                             SpiderDebug.log("麦田 verify url:" + "$siteUrl/index.php/ajax/verify_check?type=search&verify=$it")
 
-                            val header = Utils.webHeaders(
-                                url, session
-                            )
-                            header.put("X-Requested-With", "XMLHttpRequest")
-                            SpiderDebug.log(
-                                "麦田 verify header:" + JSONUtil.toJsonPrettyStr(
-                                    header
-                                ),
-                            )
-                            val res = OkHttp.post(
-                                "$siteUrl/index.php/ajax/verify_check?type=search&verify=$it", "", header
-                            ).body
-                            if (!res.contains("错误")) {
-                                SpiderDebug.log("麦田验证结果：" + res)
-                                string.set(
-                                    OkHttp.string(url, Utils.webHeaders(url, session))
-                                )
-                            }
+                            val res = verifying(searchUrl, session, it)
+                            if (JSONUtil.parseObj(res).getInt("code") == 1) {
+                               /* val html = OkHttp.string(searchUrl, Utils.webHeaders(searchUrl, session))
+                                SpiderDebug.log("搜索结果：$html")*/
 
+                                string.set(
+                                    session
+                                )
+                            } else {
+                                SpiderDebug.log("麦田验证：" + JSONUtil.parseObj(res).getStr("msg"))
+                                Utils.notify(JSONUtil.parseObj(res).getStr("msg"));
+                            }
                             SpiderDebug.log("麦田 code confirm end")
                         }, session)
                     }, "麦田验证"
                 )
             } else {
                 SpiderDebug.log("麦田 获取验证码失败")
-                return ""
             }
-            return "";
+        }
+
+        public fun verifying(
+            url: String, session: String, it: String
+        ): String? {
+            val header = Utils.webHeaders(
+                url, session
+            )
+            header["X-Requested-With"] = "XMLHttpRequest"
+            SpiderDebug.log(
+                "麦田 verify header:" + JSONUtil.toJsonPrettyStr(
+                    header
+                ),
+            )
+            val res = OkHttp.post(
+                "$siteUrl/index.php/ajax/verify_check?type=search&verify=$it", "", header
+            ).body
+
+            SpiderDebug.log("麦田验证结果：$res")
+
+            return res;
         }
 
 
-        private fun getVerifyCodePic(url: String, session: String): ByteArray {
+        public fun getVerifyCodePic(url: String): ImmutableMap<String, Any> {
+            val codeUrl = "${siteUrl}/verify/index.html?r=0.6416516521737"+RandomUtil.randomInt(0,9)
+            var resp: Response? = null
+            try {
+                val header = Utils.webHeaders(url)
+                header["Sec-Fetch-Dest"] = "image";
+                header["Sec-Fetch-Mode"] = "no-cors";
+                header["Sec-Fetch-Site"] = "same-origin";
+                resp = OkHttp.newCall(codeUrl, Utils.webHeaders(url))
+                var session = "";
+                if (resp.isSuccessful) {
+                    val c = resp.headers[com.google.common.net.HttpHeaders.SET_COOKIE]
+                    val split = c?.split(";")
+                    session = if ((split?.size ?: 0) > 1) split?.get(0) ?: "" else c ?: ""
+                    SpiderDebug.log("麦田session：" + session)
+                }
+                return ImmutableMap.of<String, Any>("pic", resp?.body?.bytes() ?: byteArrayOf(), "session", session);
+            } finally {
+                resp?.close()
+            }
+        }
+
+        public fun getVerifyCodePic(url: String, session: String): ByteArray {
             val codeUrl = "${siteUrl}/verify/index.html?"
             var resp: Response? = null
             try {

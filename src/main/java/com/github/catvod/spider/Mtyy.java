@@ -13,6 +13,7 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Utils;
 import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,12 +31,9 @@ import java.util.regex.Pattern;
 public class Mtyy extends Spider {
 
     private static final String siteUrl = "https://mtyy2.com";
-    private String session = "";
 
-    @Override
-    public void init() throws Exception {
-        session =  MtyyKT.init();
-    }
+
+
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
@@ -149,16 +147,22 @@ public class Mtyy extends Spider {
 
     @Override
     public String searchContent(String key, boolean quick) throws Exception {
+      // String session = MtyyKT.init();
         String searchUrl = siteUrl + "/vodsearch/-------------.html?wd=" + URLEncodeUtil.encode(key);
-        SpiderDebug.log("麦田search header:"+ JSONUtil.toJsonPrettyStr(Utils.webHeaders(searchUrl, session)));
-        AtomicReference<String> html = new AtomicReference<String>(OkHttp.string(searchUrl,Utils.webHeaders(searchUrl, session)));
-        SpiderDebug.log("麦田search content:"+ html);
-        if (html.get().contains("验证码")) {
-             MtyyKT.verify(searchUrl, html, session);
-        }else if(html.get().contains("请不要频繁操作")){
+
+        AtomicReference<String> html = new AtomicReference<String>("");//OkHttp.string(searchUrl,Utils.webHeaders(searchUrl, session))
+
+       if (html.get().contains("验证码") || StringUtils.isAllBlank(html.get())) {
+            MtyyKT.verify(searchUrl, html);
+        } else if (html.get().contains("请不要频繁操作")) {
             Utils.notify("麦田影视提示：请不要频繁操作");
         }
-        Document document = Jsoup.parse(html.get());
+     /*    String res = OkHttp.string(searchUrl, Utils.webHeaders(searchUrl, "PHPSESSID=uv4hpgb9oqmp5lk6igtorlls38"));
+       html.set(res);*/
+        String htm = OkHttp.string(searchUrl, Utils.webHeaders(searchUrl, html.get()));
+        Document document = Jsoup.parse(htm);
+        SpiderDebug.log("++++++++++++麦田-搜索结果" + html.get());
+
         List<Vod> list = new ArrayList<>();
 
 
