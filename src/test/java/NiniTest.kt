@@ -36,7 +36,7 @@ class NiniTest {
 
     @Test
     fun playTest(){
-        val playerContent = nini.playerContent("", "WYK1NxUrYHNxbdL7SlusOSDVCFUkD0du_rsAr9R5W9huUOppHxNo9E9diwBkrZRrc", listOf())
+        val playerContent = nini.playerContent("", "WYK1NxUrYHNxbdL7SlusOSDVCFUkD0du_rsAr9R5W9huUOppHxNo9E9diwBkrZRrc_1", listOf())
         println(playerContent)
         AssertUtil.assertResult(playerContent)
     }
