@@ -85,6 +85,17 @@
       }
     },
     {
+      "key": "DaGongRen",
+      "name": "打工人",
+      "type": 3,
+      "api": "csp_DaGongRen",
+      "searchable": "1",
+      "filterable": "0",
+      "changeable": 0,
+      "ext": {
+      }
+    },
+    {
       "key": "WuMingMusic",
       "name": "无名音乐",
       "type": 3,
