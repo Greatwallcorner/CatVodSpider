@@ -52,7 +52,8 @@
       "changeable": 0,
       "ext": {
       }
-    },  {
+    },
+    {
       "key": "ChangZhang",
       "name": "厂长影视",
       "type": 3,
@@ -62,7 +63,8 @@
       "changeable": 0,
       "ext": {
       }
-    }, {
+    },
+    {
       "key": "Zxzj",
       "name": "在线之家",
       "type": 3,

@@ -6,6 +6,7 @@ import com.github.catvod.spider.Init;
 import com.github.catvod.spider.Proxy;
 import io.ktor.http.ContentType;
 import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 
@@ -381,6 +382,7 @@ public class Utils {
     }
 
     public static String base64Decode(String str) {
+        if(StringUtils.isBlank(str)) return "";
         return new String(Base64.getDecoder().decode(str));
     }
 }
