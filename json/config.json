@@ -87,6 +87,17 @@
       }
     },
     {
+      "key": "Ikanbot",
+      "name": "爱看机器人",
+      "type": 3,
+      "api": "csp_Ikanbot",
+      "searchable": "1",
+      "filterable": "0",
+      "changeable": 0,
+      "ext": {
+      }
+    },
+    {
       "key": "DaGongRen",
       "name": "打工人",
       "type": 3,
