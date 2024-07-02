@@ -98,6 +98,14 @@
       }
     },
     {
+      "key": "JustLive",
+      "name": "JustLive | 直播",
+      "type": 3,
+      "api": "csp_JustLive",
+      "searchable": 1,
+      "filterable": 1
+    },
+    {
       "key": "DaGongRen",
       "name": "打工人",
       "type": 3,
