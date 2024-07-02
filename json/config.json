@@ -87,6 +87,25 @@
       }
     },
     {
+      "key": "Ikanbot",
+      "name": "爱看机器人",
+      "type": 3,
+      "api": "csp_Ikanbot",
+      "searchable": "1",
+      "filterable": "0",
+      "changeable": 0,
+      "ext": {
+      }
+    },
+    {
+      "key": "JustLive",
+      "name": "JustLive | 直播",
+      "type": 3,
+      "api": "csp_JustLive",
+      "searchable": 1,
+      "filterable": 1
+    },
+    {
       "key": "DaGongRen",
       "name": "打工人",
       "type": 3,
