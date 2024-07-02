@@ -125,10 +125,10 @@ public class JustLive extends Spider {
                 String playUrl = item.getString("playUrl");
                 episodeItems.add(qualityName + "$" + playUrl);
             }
-            vodItems.add(StringUtils.join("#", episodeItems));
+            vodItems.add(StringUtils.join(episodeItems,"#"));
         }
-        String vod_play_from = StringUtils.join("$$$", lineNames);
-        String vod_play_urls = StringUtils.join("$$$", vodItems);
+        String vod_play_from = StringUtils.join(lineNames,"$$$" );
+        String vod_play_urls = StringUtils.join(vodItems,"$$$" );
         JSONObject data = new JSONObject(content1).getJSONObject("data");
         Vod vod = new Vod();
         vod.setVodId(ids.get(0));
