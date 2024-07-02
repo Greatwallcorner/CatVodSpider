@@ -13,6 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.unit.dp
 import cn.hutool.core.codec.Base64
+import cn.hutool.core.exceptions.ExceptionUtil
 import cn.hutool.core.net.URLEncodeUtil
 import cn.hutool.crypto.Mode
 import cn.hutool.crypto.Padding
@@ -300,7 +301,7 @@ class BD : Spider() {
     }
 
     private fun buildUrl(url: String, id: String, session: String, ref: String): String {
-        return "${Proxy.getProxyUrl()}?do=bd&url=${Utils.base64Encode(url)}&id=$id&session=${Utils.base64Encode(session)}&ref=${
+        return "${Proxy.getProxyUrl()}?do=bd&url=${Utils.base64Encode(url)}&id=${Utils.base64Encode(id)}&session=${Utils.base64Encode(session)}&ref=${
             Utils.base64Encode(
                 ref
             )
@@ -319,18 +320,27 @@ class BD : Spider() {
 
         private var reference = host
         fun proxyLocal(params: MutableMap<String, String>): Array<Any> {
-            var url = Utils.base64Decode(params["url"] ?: "")
-            val id = Utils.base64Decode(params["id"] ?: "")
-            val cookie = Utils.base64Decode(params["session"] ?: "")
-            val ref = Utils.base64Decode(params["ref"] ?: "")
-            if (url.contains("god")) {
-                val t = Date().time
-                val p = mutableMapOf("t" to t, "sg" to getSg(id, t.toString()), "verifyCode" to "888")
-                val body = OkHttp.post("${host}god", Json.toJson(p), Utils.webHeaders(host, cookie)).body
-                SpiderDebug.log("DB god req:$body")
-                url = Json.get().toJsonTree(body).asJsonObject.get("url").asString
+            try {
+                var url = Utils.base64Decode(params["url"] ?: "")
+                val id = if(StringUtils.isNotBlank(params["id"])){
+                    Utils.base64Decode(params["id"] ?: "")
+                }else ""
+                val cookie = if(StringUtils.isNotBlank(params["session"])){
+                    Utils.base64Decode(params["session"] ?: "")
+                }else ""
+//                val ref = Utils.base64Decode(params["ref"] ?: "")
+                if (url.contains("god")) {
+                    val t = Date().time
+                    val p = mutableMapOf("t" to t, "sg" to getSg(id, t.toString()), "verifyCode" to "888")
+                    val body = OkHttp.post("${host}god", Json.toJson(p), Utils.webHeaders(host, cookie)).body
+                    SpiderDebug.log("DB god req:$body")
+                    url = Json.get().toJsonTree(body).asJsonObject.get("url").asString
+                }
+                return ProxyVideo.ProxyRespBuilder.redirect(url)
+            } catch (e: Exception) {
+                SpiderDebug.log("bd proxy error: " + ExceptionUtil.stacktraceToString(e))
             }
-            return ProxyVideo.ProxyRespBuilder.redirect(url)
+            return arrayOf()
         }
 
         fun getSg(id: String, time: String): String {
