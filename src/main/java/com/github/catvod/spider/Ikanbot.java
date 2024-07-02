@@ -6,6 +6,7 @@ import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.ProxyVideo;
 import com.github.catvod.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -16,7 +17,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,7 @@ public class Ikanbot extends Spider {
             String url = element.attr("href");
             String name = element.select("img").attr("alt");
             String id = url.split("/")[2];
-            list.add(new Vod(id, name, pic));
+            list.add(new Vod(id, name, ProxyVideo.buildCommonProxyUrl(pic, Utils.webHeaders(pic))));
         }
         return list;
     }
@@ -64,7 +64,7 @@ public class Ikanbot extends Spider {
             String name = element.select("img").attr("alt");
             try {
                 String id = url.split("/")[2];
-                list.add(new Vod(id, name, pic));
+                list.add(new Vod(id, name, ProxyVideo.buildCommonProxyUrl(pic, Utils.webHeaders(pic))));
             } catch (Exception e) {
 
             }
@@ -132,7 +132,7 @@ public class Ikanbot extends Spider {
         }
         Vod vod = new Vod();
         vod.setVodId(ids.get(0));
-        vod.setVodPic(pic);
+        vod.setVodPic(ProxyVideo.buildCommonProxyUrl(pic, Utils.webHeaders(pic)));
         vod.setVodYear(year);
         vod.setVodActor(actor);
         vod.setVodArea(area);
@@ -151,7 +151,8 @@ public class Ikanbot extends Spider {
             String url = element.attr("href");
             String name = element.select("img").attr("alt");
             String id = url.split("/")[2];
-            list.add(new Vod(id, name, pic));
+
+            list.add(new Vod(id, name, ProxyVideo.buildCommonProxyUrl(pic, Utils.webHeaders(pic))));
         }
         return Result.string(list);
     }
