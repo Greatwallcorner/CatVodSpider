@@ -87,20 +87,6 @@
       }
     },
     {
-      "key": "世界短剧",
-      "name": "🌏世界┃短剧",
-      "type": 3,
-      "api": "csp_AppYsV2",
-      "searchable": 1,
-      "changeable": 0,
-      "style": {
-        "type": "rect",
-        "ratio": 1.433
-      },
-      "timeout": 10,
-      "ext": "http://106.52.241.21:83/api.php/app/"
-    },
-    {
       "key": "DaGongRen",
       "name": "打工人",
       "type": 3,
