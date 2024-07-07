@@ -13,7 +13,7 @@ def copy_folder(source_folder, destination_folder):
         if os.path.isdir(source):
             copy_folder(source, destination)
         else:
-            shutil.copy2(source, destination)
+            shutil.copy(source, destination)
             
 os.makedirs("./res/json")   
 os.makedirs("./res/jar")   
