@@ -145,7 +145,7 @@
       "searchable": "0",
       "filterable": "1",
       "changeable": 0,
-      "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/json/alist.json"
+      "ext": "./alist.json"
     },
     {
       "key": "PanSou",
