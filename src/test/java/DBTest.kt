@@ -13,7 +13,7 @@ class DBTest {
     private val bd: BD = BD()
 
     init {
-        bd.init()
+        bd.init("aHR0cHM6Ly93d3cueWp5czAyLmNvbS8=")
     }
 
     @Test
