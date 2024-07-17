@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;401c3e3596f2a7503bb1303b867bc871",
+  "spider": "../jar/spider.jar;md5;0457b08898bb446396a6679b4f95e4b4",
   "sites": [
     {
       "key": "Douban",
@@ -18,6 +18,15 @@
       "searchable": 1,
       "changeable": 0,
       "ext": "aHR0cHM6Ly93d3cueWp5czAyLmNvbS8="
+    },
+    {
+      "key": "NCat",
+      "name": "网飞猫 | 影视",
+      "type": 3,
+      "api": "csp_NCat",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": {}
     },
     {
       "key": "NN",
