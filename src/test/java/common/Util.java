@@ -1,3 +1,5 @@
+package common;
+
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HtmlUtil;
 import com.github.catvod.utils.Utils;

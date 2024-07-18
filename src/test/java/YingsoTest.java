@@ -1,4 +1,5 @@
 import com.github.catvod.spider.Yingso;
+import common.AssertUtil;
 import org.junit.jupiter.api.Test;
 
 public class YingsoTest {

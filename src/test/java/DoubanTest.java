@@ -1,5 +1,6 @@
 import com.github.catvod.spider.Douban;
 import com.google.common.collect.Maps;
+import common.AssertUtil;
 import org.junit.jupiter.api.Test;
 
 /**

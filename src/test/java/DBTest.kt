@@ -5,6 +5,7 @@ import cn.hutool.crypto.symmetric.AES
 import com.github.catvod.bean.Class
 import com.github.catvod.net.OkHttp
 import com.github.catvod.spider.BD
+import common.AssertUtil
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
 import kotlin.io.encoding.ExperimentalEncodingApi

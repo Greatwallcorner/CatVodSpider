@@ -1,7 +1,7 @@
 import com.github.catvod.spider.ChangZhang;
-import com.github.catvod.spider.Liangzi;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import common.AssertUtil;
 import org.junit.jupiter.api.Test;
 
 /**

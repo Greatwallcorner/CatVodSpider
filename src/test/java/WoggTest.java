@@ -1,4 +1,5 @@
 import com.github.catvod.spider.Wogg;
+import common.AssertUtil;
 import org.junit.jupiter.api.BeforeAll;
 
 public class WoggTest {

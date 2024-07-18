@@ -1,4 +1,5 @@
 import com.github.catvod.spider.Zhaozy;
+import common.AssertUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

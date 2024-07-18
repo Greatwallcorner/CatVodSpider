@@ -1,4 +1,5 @@
 import com.github.catvod.spider.IkBot
+import common.AssertUtil
 import org.junit.jupiter.api.Test
 
 class IkBotTest {
