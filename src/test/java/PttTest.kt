@@ -14,6 +14,10 @@ class PttTest : TestInterface<PTT> {
     override fun homeTest() {
     }
 
+    override fun searchTest() {
+
+    }
+
     @Test
     override fun cateTest() {
         val categoryContent = t.categoryContent("1", "1", false, hashMapOf())
