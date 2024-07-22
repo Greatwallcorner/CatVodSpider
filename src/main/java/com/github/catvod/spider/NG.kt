@@ -28,7 +28,7 @@ class NG: Spider() {
 
 
     private val classList = mutableListOf<Class>()
-    private val filters = LinkedHashMap<String, List<Filter>>()
+    private val filters = LinkedHashMap<String, MutableList<Filter>>()
 
 
     private fun getParams(): Map<String, String> {
@@ -81,7 +81,11 @@ class NG: Spider() {
                         list.add(Filter.Value(jsonElement1.asString, jsonElement1.asString))
                     }
 
-                    filters[name] = listOf(Filter(msgObj.get("name").asString, dataArray.get(0).asString, list))
+                    if(filters[id.toString()].isNullOrEmpty()){
+                        filters[id.toString()] = mutableListOf(Filter(msgObj.get("name").asString, dataArray.get(0).asString, list))
+                    }else{
+                        filters[id.toString()]!!.add(Filter(msgObj.get("name").asString, dataArray.get(0).asString, list))
+                    }
                 }
             }
         }
