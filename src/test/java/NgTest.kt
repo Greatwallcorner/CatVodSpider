@@ -31,6 +31,7 @@ class NgTest:TestInterface<NG> {
     @Test
     override fun playTest() {
         val playerContent = t.playerContent("", "http://43.248.129.14:20240/?url=https://svipsvip.ffzyread1.com/20240627/28803_0fc1e40f/index.m3u8", mutableListOf())
+//        val playerContent = t.playerContent("", "https://json.oorl.cn/api/svip.php?key=aYqmunbBybpvTu6hnZ&url=https://v.youku.com/v_show/id_XNjIyMjUxMzM2.html", mutableListOf())
         println(playerContent)
     }
 

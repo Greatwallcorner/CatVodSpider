@@ -120,7 +120,7 @@ class NG: Spider() {
             SpiderDebug.log("ng detail err: ${dt.msg}")
             return Result.error(dt.msg)
         }
-        return Result.string(dt.data.toVod())
+        return Result.string(dt.data.toVod().apply { setVodId(ids[0]) })
     }
 
     override fun playerContent(flag: String, id: String, vipFlags: MutableList<String>): String {
