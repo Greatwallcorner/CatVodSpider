@@ -68,25 +68,25 @@ class NG: Spider() {
                 val name = obj.get("name").asString
                 val clazz = Class(id.toString(), name)
                 classList.add(clazz)
-                val msgs = obj.get("msg").asJsonArray
-                if(msgs.isEmpty){
-                    continue
-                }
-                for (msg in msgs) {
-                    val msgObj = msg.asJsonObject
-                    val dataArray = msgObj.get("data").asJsonArray
-                    val list = mutableListOf<Filter.Value>()
-                    for ((index, jsonElement1) in dataArray.withIndex()) {
-                        if(index == 0) continue
-                        list.add(Filter.Value(jsonElement1.asString, jsonElement1.asString))
-                    }
-
-                    if(filters[id.toString()].isNullOrEmpty()){
-                        filters[id.toString()] = mutableListOf(Filter(msgObj.get("name").asString, dataArray.get(0).asString, list))
-                    }else{
-                        filters[id.toString()]!!.add(Filter(msgObj.get("name").asString, dataArray.get(0).asString, list))
-                    }
-                }
+//                val msgs = obj.get("msg").asJsonArray
+//                if(msgs.isEmpty){
+//                    continue
+//                }
+//                for (msg in msgs) {
+//                    val msgObj = msg.asJsonObject
+//                    val dataArray = msgObj.get("data").asJsonArray
+//                    val list = mutableListOf<Filter.Value>()
+//                    for ((index, jsonElement1) in dataArray.withIndex()) {
+//                        if(index == 0) continue
+//                        list.add(Filter.Value(jsonElement1.asString, jsonElement1.asString))
+//                    }
+//
+//                    if(filters[id.toString()].isNullOrEmpty()){
+//                        filters[id.toString()] = mutableListOf(Filter(msgObj.get("name").asString, dataArray.get(0).asString, list))
+//                    }else{
+//                        filters[id.toString()]!!.add(Filter(msgObj.get("name").asString, dataArray.get(0).asString, list))
+//                    }
+//                }
             }
         }
         return Result.string(classList, filters)
@@ -99,7 +99,9 @@ class NG: Spider() {
         extend: java.util.HashMap<String, String>
     ): String {
         val params = getParams().toMutableMap()
-        params.putAll(extend)
+        extend.forEach { (t, u) ->
+            params[t] = URLEncodeUtil.encode(u)
+        }
         params["page"] = pg
         params["id"] = tid
         val string = OkHttp.string("$COMMON_URL$FIND_VIDEO_VOD_LIST", params, getHeaders())
