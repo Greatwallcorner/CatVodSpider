@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;bb73f999b93ea20a6f3d00b0b737ce51",
+  "spider": "../jar/spider.jar;md5;27461e2aeb99328f32598182108f4ee5",
   "sites": [
     {
       "key": "Douban",
@@ -27,6 +27,23 @@
       "searchable": 1,
       "changeable": 0,
       "ext": {}
+    },
+    {
+      "key": "QxiTv",
+      "name": "七喜 | 影视",
+      "type": 3,
+      "api": "csp_QxiTv",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "甲子",
+      "name": "甲子",
+      "type": 3,
+      "api": "csp_AppYsV2",
+      "searchable": 1,
+      "ext": "http://211.101.237.197:6532/api.php/app/"
     },
     {
       "key": "NN",
