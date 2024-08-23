@@ -12,6 +12,7 @@ import com.github.catvod.crawler.SpiderDebug
 import com.github.catvod.net.OkHttp
 import com.github.catvod.utils.Json
 import com.github.catvod.utils.Utils
+import com.google.gson.JsonArray
 import org.jsoup.Jsoup
 import java.util.*
 
@@ -22,20 +23,12 @@ class Glod:Spider() {
 
     private val deviceId = cn.hutool.core.lang.UUID.randomUUID().toString()
 
-    private val classList = Class.parseFromFormatStr("电影=1&电视剧2&综艺=3&动漫=4")
+    private val classList = Class.parseFromFormatStr("电影=1&电视剧=2&综艺=3&动漫=4")
 
     override fun homeContent(filter: Boolean): String {
         val string = OkHttp.string(host, Utils.webHeaders("https://www.bing.com"))
-        val parse = Jsoup.parse(string)
-        val list = parse.select("div.content-card")
-        val vodList = mutableListOf<Vod>()
-        for (element in list) {
-            val id = element.select("a").attr("href")
-            val title = element.select("div.info-title-box > div.title").text()
-            val score = element.select("div.bottom div[class^=score]").text()
-            val img = element.select("img").attr("src")
-            vodList.add(Vod(id, title, host + img, score))
-        }
+        val vodList = parseFromJson(string, "home")
+//        val vodList = parseVodList(string)
         return Result.string(classList, vodList)
     }
 
@@ -55,14 +48,19 @@ class Glod:Spider() {
         val desc = parse.select("div.intro div.wrapper_more_text").text()
         vod.vodContent = desc
 
-        val link = parse.select("div.listitem > a")
-        val u = link.attr("href")
-        val n = link.text()
+        val linkList = parse.select("div.listitem > a")
 
-        val buildResult = VodPlayBuilder().append("glod", listOf(PlayUrl().also {
-            it.url = u
-            it.name = n
-        })).build()
+        val playUrlList = mutableListOf<PlayUrl>()
+        for (element in linkList) {
+            val u = element.attr("href")
+            val n = element.text()
+            playUrlList.add(PlayUrl().also {
+                it.name = n
+                it.url = u
+            })
+        }
+
+        val buildResult = VodPlayBuilder().append("glod", playUrlList).build()
 
         val time = parse.select("div.item:contains(上映时间)").select(".item-top").text()
         vod.setVodYear(DateUtil.parse(time, "yyyy-MM-dd").toString("yyyy"))
@@ -105,16 +103,74 @@ class Glod:Spider() {
     override fun categoryContent(tid: String, pg: String, filter: Boolean, extend: HashMap<String, String>): String {
         val url = "$host/type/$tid"
         val string = OkHttp.string(url, Utils.webHeaders(host))
+        val vodList = parseFromJson(string, "cate")
+        return Result.string(classList, vodList)
+    }
+
+    private fun parseFromJson(string: String, type: String): List<Vod> {
+        val vodList = mutableListOf<Vod>()
         val parse = Jsoup.parse(string)
         val select = parse.select("script")
         val data = select.find {
             it.html().contains("操作成功")
         }
-        val json = data?.html()?.replace("self.__next_f.push(", "")?.replace(")", "")
+        if(data == null) {
+            SpiderDebug.log("glod 找不到json")
+            return vodList
+        }
+        val json = data.html().replace("self.__next_f.push(", "").replace(")", "")
 
         val gson = Json.parse(json).asJsonArray.get(1).asString.replace("6:", "")
-        val element = Json.parse(gson).asJsonArray.get(3)
-        return ""
+        val resp =
+            Json.parse(gson).asJsonArray.get(3).asJsonObject.get("children").asJsonArray.get(3).asJsonObject.get("data")
+        if(type == "home"){
+            val data = resp.asJsonObject.get("data")
+            var vList = data.asJsonObject.get("homeNewMoviePageData").asJsonObject.get("list").asJsonArray
+            getVodList(vList, vodList)
+            vList = data.asJsonObject.get("homeBroadcastPageData").asJsonObject.get("list").asJsonArray
+            getVodList(vList, vodList)
+            vList = data.asJsonObject.get("homeManagerPageData").asJsonObject.get("list").asJsonArray
+            getVodList(vList, vodList)
+            vList = data.asJsonObject.get("newestTvPageData").asJsonObject.get("list").asJsonArray
+            getVodList(vList, vodList)
+            vList = data.asJsonObject.get("newestCartoonPageData").asJsonObject.get("list").asJsonArray
+            getVodList(vList, vodList)
+        }else{
+            for (jsonElement in resp.asJsonArray) {
+                val objList = jsonElement.asJsonObject.get("vodList").asJsonObject.get("list").asJsonArray
+                getVodList(objList, vodList)
+            }
+        }
+        return vodList
+    }
 
+    private fun getVodList(
+        objList: JsonArray,
+        vodList: MutableList<Vod>
+    ) {
+        for (oj in objList) {
+            val obj = oj.asJsonObject
+            val v = Vod()
+            v.setVodId("/detail/" + obj.get("vodId").asString)
+            v.setVodName(obj.get("vodName").asString)
+            //            v.setVodActor(obj.get("vodActor").asString)
+            v.setVodRemarks(obj.get("vodScore").asString)
+            v.setVodPic(obj.get("vodPic").asString)
+            vodList.add(v)
+        }
+    }
+
+    private fun parseVodList(string: String?): MutableList<Vod> {
+        val parse = Jsoup.parse(string)
+        val list = parse.select("div.content-card")
+        val vodList = mutableListOf<Vod>()
+        for (element in list) {
+            val id = element.select("a").attr("href")
+            val title = element.select("div.info-title-box > div.title").text()
+            val score = element.select("div.bottom div[class^=score]").text()
+            val img = element.select("img").attr("srcset")
+            vodList.add(Vod(id, title, host + img, score))
+        }
+        return vodList
     }
 }

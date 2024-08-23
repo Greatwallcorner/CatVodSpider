@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;27461e2aeb99328f32598182108f4ee5",
+  "spider": "../jar/spider.jar;md5;033e0dbdbf15836d6e199d931c1c1aeb",
   "sites": [
     {
       "key": "Douban",
@@ -9,6 +9,15 @@
       "searchable": 0,
       "changeable": 0,
       "ext": {}
+    },
+    {
+      "key": "drpy_js_豆瓣",
+      "name": "搜索 | 豆瓣[js]",
+      "type": 3,
+      "api": "../lib/drpy2.min.js",
+      "ext": "../js/drpy.js",
+      "searchable": 1,
+      "changeable": 0
     },
     {
       "key": "BD",
@@ -25,6 +34,15 @@
       "type": 3,
       "api": "csp_NCat",
       "searchable": 1,
+      "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "glod",
+      "name": "金牌 | 影视",
+      "type": 3,
+      "api": "csp_Glod",
+      "searchable": 0,
       "changeable": 0,
       "ext": {}
     },
