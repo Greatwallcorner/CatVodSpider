@@ -20,7 +20,7 @@ public class Cloud extends Spider {
 
     @Override
     public void init(String extend) throws Exception {
-        JsonObject ext = Json.safeObject(extend) == null ? new JsonObject() : Json.safeObject(extend);
+        JsonObject ext = StringUtils.isAllBlank(extend) ? new JsonObject() : Json.safeObject(extend);
         quark = new Quark();
         ali = new Ali();
         quark.init(ext.has("cookie") ? ext.get("cookie").getAsString() : "");
