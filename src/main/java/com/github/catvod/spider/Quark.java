@@ -16,6 +16,7 @@ import java.util.Map;
  * @author ColaMint & Adam & FongMi
  */
 public class Quark extends Spider {
+    public static final String patternQuark = "(https:\\/\\/pan\\.quark\\.cn\\/s\\/[^\"]+)";
 
 
     @Override

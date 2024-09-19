@@ -4,7 +4,9 @@ package com.github.catvod.spider;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Utils;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,19 +19,19 @@ public class Cloud extends Spider {
     private Ali ali = null;
 
     @Override
-    public void init( String extend) throws Exception {
+    public void init(String extend) throws Exception {
         JsonObject ext = Json.safeObject(extend);
         quark = new Quark();
         ali = new Ali();
-        quark.init(context, ext.has("cookie") ? ext.get("cookie").getAsString() : "");
-        ali.init(context, ext.has("token") ? ext.get("token").getAsString() : "");
+        quark.init(ext.has("cookie") ? ext.get("cookie").getAsString() : "");
+        ali.init(ext.has("token") ? ext.get("token").getAsString() : "");
     }
 
     @Override
     public String detailContent(List<String> shareUrl) throws Exception {
-        if (shareUrl.get(0).matches(Util.patternAli)) {
+        if (shareUrl.get(0).matches(Ali.pattern.pattern())) {
             return ali.detailContent(shareUrl);
-        } else if (shareUrl.get(0).matches(Util.patternQuark)) {
+        } else if (shareUrl.get(0).matches(Quark.patternQuark)) {
             return quark.detailContent(shareUrl);
         }
         return null;
@@ -45,9 +47,9 @@ public class Cloud extends Spider {
         List<String> aliShare = new ArrayList<>();
         List<String> quarkShare = new ArrayList<>();
         for (String shareLink : shareLinks) {
-            if (shareLink.matches(Util.patternAli)) {
+            if (shareLink.matches(Ali.pattern.pattern())) {
                 aliShare.add(shareLink);
-            } else if (shareLink.matches(Util.patternQuark)) {
+            } else if (shareLink.matches(Quark.patternQuark)) {
                 quarkShare.add(shareLink);
             }
         }
@@ -58,18 +60,18 @@ public class Cloud extends Spider {
             from.add(ali.detailContentVodPlayFrom(aliShare));
         }
 
-        return TextUtils.join("$$$", from);
+        return StringUtils.join(from, "$$$");
     }
 
     protected String detailContentVodPlayUrl(List<String> shareLinks) throws Exception {
         List<String> urls = new ArrayList<>();
         for (String shareLink : shareLinks) {
-            if (shareLink.matches(Util.patternAli)) {
-                urls.add(ali.detailContentVodPlayUrl(List.of(shareLink)));
-            } else if (shareLink.matches(Util.patternQuark)) {
-                urls.add(quark.detailContentVodPlayUrl(List.of(shareLink)));
+            if (shareLink.matches(Ali.pattern.pattern())) {
+                urls.add(ali.detailContentVodPlayUrl(ImmutableList.of(shareLink)));
+            } else if (shareLink.matches(Quark.patternQuark)) {
+                urls.add(quark.detailContentVodPlayUrl(ImmutableList.of(shareLink)));
             }
         }
-        return TextUtils.join("$$$", urls);
+        return StringUtils.join(urls, "$$$");
     }
 }
