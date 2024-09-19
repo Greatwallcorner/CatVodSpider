@@ -2,6 +2,10 @@
 
 https://github.com/FongMi/CatVodSpider
 
+## 爬虫来源
+https://github.com/bizhangjie/CatVodSpider
+https://github.com/lushunming/AndroidCatVodSpider
+
 # 声明
 
 专用于TV-Multiplatform项目, 无法包含安卓相关包，所以在改动中移除了相关代码

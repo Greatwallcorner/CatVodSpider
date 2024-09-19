@@ -1,5 +1,6 @@
 import com.github.catvod.spider.YpPan;
 import com.google.common.collect.Lists;
+import common.AssertUtil;
 import org.junit.jupiter.api.Test;
 
 public class YpPanTest {

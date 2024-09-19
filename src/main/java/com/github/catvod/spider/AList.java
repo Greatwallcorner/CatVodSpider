@@ -32,14 +32,10 @@ public class AList extends Spider {
     }
 
     private void fetchRule() {
-        SpiderDebug.log("fetch rule start");
         if (drives != null && !drives.isEmpty()) return;
         if (ext.startsWith("http")) {
-            SpiderDebug.log("request rule:" + ext);
             ext = OkHttp.string(ext);
-            SpiderDebug.log("content: " + ext);
         }
-        SpiderDebug.log("fetch rule resp:" + ext);
         Drive drive = Drive.objectFrom(ext);
         drives = drive.getDrives();
         vodPic = drive.getVodPic();

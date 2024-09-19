@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar",
+  "spider": "../jar/spider.jar;md5;05edd4f2f16844c531af06ae72006855",
   "sites": [
     {
       "key": "Douban",
@@ -8,8 +8,7 @@
       "api": "csp_Douban",
       "searchable": 0,
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "Liangzi",
@@ -19,8 +18,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "ChangZhang",
@@ -30,8 +28,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "Jable",
@@ -41,10 +38,8 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
-
     {
       "key": "Supjav",
       "name": "Supjav",
@@ -53,8 +48,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "WuMingMusic",
@@ -64,8 +58,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "玩偶",
@@ -74,8 +67,7 @@
       "api": "csp_Wogg",
       "searchable": 1,
       "changeable": 1,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "csp_AList",

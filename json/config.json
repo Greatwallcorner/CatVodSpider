@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar",
+  "spider": "../jar/spider.jar;md5;05edd4f2f16844c531af06ae72006855",
   "sites": [
     {
       "key": "Douban",
@@ -8,8 +8,7 @@
       "api": "csp_Douban",
       "searchable": 0,
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "BD",
@@ -18,8 +17,42 @@
       "api": "csp_BD",
       "searchable": 1,
       "changeable": 0,
-      "ext": {
-      }
+      "ext": "aHR0cHM6Ly93d3cueWp5czAyLmNvbS8="
+    },
+    {
+      "key": "NCat",
+      "name": "网飞猫 | 影视",
+      "type": 3,
+      "api": "csp_NCat",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "glod",
+      "name": "金牌 | 影视",
+      "type": 3,
+      "api": "csp_Glod",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "QxiTv",
+      "name": "七喜 | 影视",
+      "type": 3,
+      "api": "csp_QxiTv",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "甲子",
+      "name": "甲子",
+      "type": 3,
+      "api": "csp_AppYsV2",
+      "searchable": 1,
+      "ext": "http://211.101.237.197:6532/api.php/app/"
     },
     {
       "key": "NN",
@@ -28,6 +61,15 @@
       "api": "csp_NiNi",
       "searchable": 1,
       "changeable": 1
+    },
+    {
+      "key": "NG",
+      "name": "瓜瓜",
+      "type": 3,
+      "api": "csp_NG",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
     },
     {
       "key": "bili",
@@ -50,8 +92,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "ChangZhang",
@@ -61,8 +102,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "Zxzj",
@@ -72,8 +112,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "Mtyy",
@@ -83,8 +122,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "Ikanbot",
@@ -94,8 +132,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "JustLive",
@@ -113,8 +150,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "WuMingMusic",
@@ -124,8 +160,7 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "玩偶",
@@ -134,8 +169,7 @@
       "api": "csp_Wogg",
       "searchable": 1,
       "changeable": 1,
-      "ext": {
-      }
+      "ext": {}
     },
     {
       "key": "csp_AList",
@@ -145,7 +179,7 @@
       "searchable": "0",
       "filterable": "1",
       "changeable": 0,
-      "ext": "https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/CatVodSpider/main/json/alist.json"
+      "ext": "./alist.json"
     },
     {
       "key": "PanSou",

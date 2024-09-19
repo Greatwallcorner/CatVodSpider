@@ -1,9 +1,7 @@
-import cn.hutool.core.util.ReUtil;
-import com.github.catvod.net.OkHttp;
-import com.github.catvod.spider.Douban;
 import com.github.catvod.spider.Liangzi;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import common.AssertUtil;
 import org.junit.jupiter.api.Test;
 
 /**

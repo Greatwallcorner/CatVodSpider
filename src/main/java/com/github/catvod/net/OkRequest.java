@@ -1,5 +1,6 @@
 package com.github.catvod.net;
 
+import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.utils.Utils;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
@@ -66,6 +67,7 @@ class OkRequest {
         try(Response response = client.newCall(request).execute()) {
             return new OkResult(response.code(), response.body().string(), response.headers().toMultimap());
         } catch (IOException e) {
+            SpiderDebug.log("request fail path:" + e.getMessage());
             return new OkResult();
         }
     }

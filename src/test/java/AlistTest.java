@@ -1,7 +1,7 @@
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.alist.Drive;
 import com.github.catvod.spider.AList;
-import com.google.common.collect.Lists;
+import common.AssertUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

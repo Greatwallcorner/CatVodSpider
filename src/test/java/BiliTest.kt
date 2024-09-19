@@ -1,4 +1,5 @@
 import com.github.catvod.spider.Bili
+import common.AssertUtil
 import org.junit.jupiter.api.Test
 
 class BiliTest {
@@ -15,7 +16,7 @@ class BiliTest {
     fun homeTest(){
         val homeContent = bili.homeContent(false)
         println(homeContent)
-//        AssertUtil.assertResult(homeContent)
+//        common.AssertUtil.assertResult(homeContent)
     }
 
     @Test

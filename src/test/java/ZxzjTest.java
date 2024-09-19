@@ -1,14 +1,12 @@
-import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
-import com.github.catvod.spider.ChangZhang;
 import com.github.catvod.spider.Zxzj;
 import com.github.catvod.utils.ProxyVideo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import common.AssertUtil;
 import okhttp3.Response;
 import org.junit.jupiter.api.Test;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 

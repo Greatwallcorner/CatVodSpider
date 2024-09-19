@@ -21,6 +21,9 @@ public class Result {
     private String header;
     @SerializedName("format")
     private String format;
+
+    @SerializedName("msg")
+    private String msg;
     @SerializedName("danmaku")
     private String danmaku;
     @SerializedName("url")
@@ -82,6 +85,15 @@ public class Result {
 
     public static Result get() {
         return new Result();
+    }
+
+    public static String error(String msg) {
+        return Result.get().vod(Collections.emptyList()).msg(msg).string();
+    }
+
+    public Result msg(String msg) {
+        this.msg = msg;
+        return this;
     }
 
     public Result classes(List<Class> classes) {

@@ -1,6 +1,6 @@
 import com.github.catvod.spider.NiNi
+import common.AssertUtil
 import org.junit.jupiter.api.Test
-import java.security.Security
 
 class NiniTest {
     private val nini:NiNi = NiNi()

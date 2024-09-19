@@ -1,5 +1,6 @@
 package com.github.catvod.spider;
 
+import cn.hutool.core.util.URLUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
@@ -13,6 +14,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,6 +83,9 @@ public class Wogg extends Ali {
         for (Element e : elements) {
             String vodId = e.selectFirst(".video-name a").attr("href");
             String vodPic = e.selectFirst(".module-item-pic > img").attr("data-src");
+            if(!vodPic.startsWith("http")){
+                vodPic = URLUtil.completeUrl(siteUrl, vodPic);
+            }
             String vodName = e.selectFirst(".video-name").text();
             String vodRemarks = e.selectFirst(".module-item-text").text();
             list.add(new Vod(vodId, vodName, vodPic, vodRemarks));

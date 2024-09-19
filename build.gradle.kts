@@ -1,4 +1,12 @@
-﻿plugins {
+﻿import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
+import com.google.gson.stream.JsonReader
+import java.io.FileInputStream
+import java.io.FileReader
+import java.security.MessageDigest
+
+
+plugins {
     id("java")
     kotlin("jvm")
     id("org.jetbrains.compose")
@@ -48,6 +56,44 @@ tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "org.github.catvod.Main"
     }
+    doLast{
+        modJson()
+    }
+}
+
+fun modJson(){
+    val files = listOf("$rootDir/json/config.json", "$rootDir/json/configAll.json")
+    val gson = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
+    for (file in files) {
+        if(!File(file).exists()) return
+        val parseReader = JsonParser.parseReader(JsonReader(FileReader(File(file))))
+        var spiderPath = parseReader.asJsonObject.get("spider").asString
+        if(spiderPath.contains("md5")){
+            spiderPath = spiderPath.split(";")[0]
+        }
+        val md5 = calculateMD5(File("$rootDir/jar/spider.jar"))
+        spiderPath += ";md5;$md5"
+        println("new spider path $spiderPath")
+        parseReader.asJsonObject.addProperty("spider", spiderPath)
+        println("new json ${parseReader.toString()}")
+        File(file).writeText(gson.toJson(parseReader))
+    }
+}
+
+fun calculateMD5(file: File): String {
+    val digest = MessageDigest.getInstance("MD5")
+    val fis = FileInputStream(file)
+    val bytes = ByteArray(4096)
+    var count: Int
+    while ((fis.read(bytes).also { count = it }) != -1) digest.update(bytes, 0, count)
+    fis.close()
+    val sb = StringBuilder()
+    for (b in digest.digest()) sb.append(((b.toInt() and 0xff) + 0x100).toString(16).substring(1))
+    return sb.toString()
+}
+
+fun ByteArray.toHex(): String {
+    return joinToString("") { "%02x".format(it) }
 }
 
 tasks.withType<JavaCompile> {

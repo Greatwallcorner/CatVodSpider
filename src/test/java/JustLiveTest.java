@@ -1,8 +1,8 @@
 import cn.hutool.json.JSONUtil;
-import com.github.catvod.spider.Ikanbot;
 import com.github.catvod.spider.JustLive;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import common.AssertUtil;
 import org.junit.jupiter.api.Test;
 
 /**
