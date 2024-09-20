@@ -254,7 +254,7 @@ public class QuarkApi {
                 cookie = cache.getUser().getCookie();
             }
             //获取到cookie，初始化quark，并且把cookie缓存一次
-            if (StringUtils.isNoneBlank(cookie)) {
+            if (StringUtils.isNoneBlank(cookie) && cookie.contains("__pus")) {
                 SpiderDebug.log(" initQuark ...");
                 initQuark(this.cookie);
                 cache.setUser(User.objectFrom(this.cookie));
@@ -640,7 +640,7 @@ public class QuarkApi {
 
             JButton qrButton = new JButton("QRCode");
             jPanel.add(qrButton);
-            JDialog jDialog = Utils.showDialog(jPanel, "请输入cookie");
+            JDialog jDialog = Utils.showDialog(jPanel, "请输入夸克cookie");
             button.addActionListener((event) -> {
                 onPositive(textField.getText());
                 jDialog.dispose();
@@ -705,24 +705,9 @@ public class QuarkApi {
         params.put("v", "1.2");
         params.put("request_id", UUID.randomUUID().toString());
         service = Executors.newScheduledThreadPool(1);
-      /*  timer = new Timer(true);
-         TimerTask task = new TimerTask()
-        {
-            @Override
-            public void run() {
-                SpiderDebug.log("----scheduleAtFixedRate"+new Date().toString());
-                String result = OkHttp.string("https://uop.quark.cn/cas/ajax/getServiceTicketByQrcodeToken", params, getWebHeaders());
-               Map<String,Object> json = Json.parseSafe(result, Map.class);
-                if (json.get("status").equals(2000000)) {
-                    setToken((String) ((Map<String,Object>)((Map<String,Object>)json.get("data")).get("members")).get("service_ticket"));
-
-                }
-            }
-        };
-        timer.schedule(task, 1000, 2000);*/
 
         service.scheduleWithFixedDelay(() -> {
-            SpiderDebug.log("----scheduleAtFixedRate" + new Date().toString());
+            SpiderDebug.log("----scheduleAtFixedRate" + new Date());
             String result = OkHttp.string("https://uop.quark.cn/cas/ajax/getServiceTicketByQrcodeToken", params, getWebHeaders());
             Map<String, Object> json = Json.parseSafe(result, Map.class);
             if (json.get("status").equals(new Double(2000000))) {
