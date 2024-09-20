@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -52,7 +53,7 @@ public class QuarkApi {
         List<String> arr = ImmutableList.of("Range", "Accept", "Accept-Encoding", "Accept-Language", "Cookie", "Origin", "Referer", "Sec-Ch-Ua", "Sec-Ch-Ua-Mobile", "Sec-Ch-Ua-Platform", "Sec-Fetch-Dest", "Sec-Fetch-Mode", "Sec-Fetch-Site", "User-Agent");
         for (String key : params.keySet()) {
             for (String s : arr) {
-                if (s.toLowerCase().equals(key)) {
+                if (s.toLowerCase().equals(key.toLowerCase())) {
                     header.put(key, params.get(key));
                 }
             }
@@ -96,7 +97,7 @@ public class QuarkApi {
         for (String key : result.getResp().keySet()) {
             respHeaders.put(key, result.getResp().get(key).get(0));
         }
-        return new Object[]{result.getCode(), contentType, new ByteArrayInputStream(m3u8Str.getBytes(Charset.forName("UTF-8"))), respHeaders};
+        return new Object[]{result.getCode(), contentType, new ByteArrayInputStream(m3u8Str.getBytes(StandardCharsets.UTF_8)), respHeaders};
     }
 
     private static class Loader {
