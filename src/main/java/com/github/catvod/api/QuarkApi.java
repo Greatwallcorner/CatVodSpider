@@ -13,7 +13,6 @@ import com.github.catvod.utils.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
@@ -27,8 +26,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.github.catvod.utils.Utils.getMimeType;
 
 public class QuarkApi {
     private String apiUrl = "https://drive-pc.quark.cn/1/clouddrive/";
@@ -64,34 +61,10 @@ public class QuarkApi {
         if (Utils.getExt(url).contains("m3u8")) {
             return getM3u8(url, header);
         }
-        return proxy(url, header);
+        return new Object[]{ProxyVideo.proxy(url, header)};
     }
 
-    public static Object[] proxy(String url, Map<String, String> headers) throws Exception {
-        SpiderDebug.log(" ++start proxy:");
-        SpiderDebug.log(" ++proxy url:" + url);
-        SpiderDebug.log(" ++proxy header:" + Json.toJson(headers));
 
-        Response response = OkHttp.newCall(url, headers);
-        SpiderDebug.log(" ++end proxy:");
-        SpiderDebug.log(" ++proxy res code:" + response.code());
-        SpiderDebug.log(" ++proxy res header:" + Json.toJson(headers));
-        //    SpiderDebug.log(" ++proxy res data:" + Json.toJson(response.body()));
-        String contentType = response.headers().get("Content-Type");
-        String contentDisposition = response.headers().get("Content-Disposition");
-        if (contentDisposition != null) contentType = getMimeType(contentDisposition);
-        Map<String, String> respHeaders = new HashMap<>();
-       /* respHeaders.put("Access-Control-Allow-Credentials", "true");
-        respHeaders.put("Access-Control-Allow-Origin", "*");*/
-
-        for (String key : response.headers().names()) {
-            respHeaders.put(key, response.headers().get(key));
-        }
-        SpiderDebug.log("++proxy res contentType:" + contentType);
-        //   SpiderDebug.log("++proxy res body:" + response.body());
-        SpiderDebug.log("++proxy res respHeaders:" + Json.toJson(respHeaders));
-        return new Object[]{206, contentType, response.body().byteStream(), respHeaders};
-    }
 
     /**
      * 代理m3u8
