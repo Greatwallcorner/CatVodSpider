@@ -97,6 +97,10 @@ public class OkHttp {
         return new OkRequest(POST, url, json, header).execute(client);
     }
 
+    public static OkResult get(String url, Map<String, String> params, Map<String, String> header) {
+        return new OkRequest(GET, url, params, header).execute(client());
+    }
+
     public static String getLocation(String url, Map<String, String> header) throws IOException {
         return getLocation(noRedirect().newCall(new Request.Builder().url(url).headers(Headers.of(header)).build()).execute().headers().toMultimap());
     }

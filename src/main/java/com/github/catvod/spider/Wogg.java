@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 /**
  * @author zhixc
  */
-public class Wogg extends Ali {
+public class Wogg extends Cloud {
 
     private final String siteUrl = "https://www.wogg.net";
     private final Pattern regexCategory = Pattern.compile("/vodtype/(\\w+).html");
@@ -41,7 +41,7 @@ public class Wogg extends Ali {
     }
 
     @Override
-    public void init(String extend) {
+    public void init(String extend) throws Exception {
         this.extend = JsonParser.parseString(extend).getAsJsonObject();
         super.init("");
     }
@@ -108,8 +108,8 @@ public class Wogg extends Ali {
         List<String> shareLinks = doc.select(".module-row-text").eachAttr("data-clipboard-text");
         for (int i = 0; i < shareLinks.size(); i++) shareLinks.set(i, shareLinks.get(i).trim());
 
-        item.setVodPlayFrom(super.detailContentVodPlayFrom(shareLinks));
         item.setVodPlayUrl(super.detailContentVodPlayUrl(shareLinks));
+        item.setVodPlayFrom(super.detailContentVodPlayFrom(shareLinks));
 
         Elements elements = doc.select(".video-info-item");
         for (Element e : elements) {
