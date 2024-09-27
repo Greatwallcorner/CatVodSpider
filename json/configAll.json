@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;2f561df8b25c0b8609f966c88690e8a7",
+  "spider": "../jar/spider.jar;md5;84047e09a63d7b249c8447058de034dd",
   "sites": [
     {
       "key": "Douban",
@@ -28,6 +28,15 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "KuaKeBa",
+      "name": "夸克吧",
+      "type": 3,
+      "api": "csp_KuaKeBa",
+      "searchable": 1,
+      "changeable": 1,
       "ext": {}
     },
     {
