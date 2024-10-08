@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;033e0dbdbf15836d6e199d931c1c1aeb",
+  "spider": "../jar/spider.jar;md5;8fe814538b2a4d9f1e37c8a4070b671f",
   "sites": [
     {
       "key": "Douban",
@@ -26,7 +26,7 @@
       "api": "csp_BD",
       "searchable": 1,
       "changeable": 0,
-      "ext": "aHR0cHM6Ly93d3cueWp5czAyLmNvbS8="
+      "ext": "aHR0cHM6Ly93d3cueWp5czA1LmNvbS8="
     },
     {
       "key": "NCat",
