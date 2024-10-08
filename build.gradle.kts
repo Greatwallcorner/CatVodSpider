@@ -14,7 +14,7 @@ plugins {
 
 java {
 }
-group = "org.heatdsert.catvod"
+group = "org.heatdesert.catvod"
 //version = "1.0"
 
 repositories {
@@ -56,19 +56,19 @@ tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "org.github.catvod.Main"
     }
-    doLast{
+    doLast {
         modJson()
     }
 }
 
-fun modJson(){
+fun modJson() {
     val files = listOf("$rootDir/json/config.json", "$rootDir/json/configAll.json")
     val gson = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
     for (file in files) {
-        if(!File(file).exists()) return
+        if (!File(file).exists()) return
         val parseReader = JsonParser.parseReader(JsonReader(FileReader(File(file))))
         var spiderPath = parseReader.asJsonObject.get("spider").asString
-        if(spiderPath.contains("md5")){
+        if (spiderPath.contains("md5")) {
             spiderPath = spiderPath.split(";")[0]
         }
         val md5 = calculateMD5(File("$rootDir/jar/spider.jar"))
