@@ -27,6 +27,14 @@
       "searchable": 1,
       "changeable": 0,
       "ext": {}
+    }, {
+      "key": "KuaKeBa",
+      "name": "夸克吧",
+      "type": 3,
+      "api": "csp_KuaKeBa",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
     },
     {
       "key": "glod",
