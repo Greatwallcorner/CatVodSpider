@@ -353,7 +353,8 @@ public class QuarkApi {
 
     private boolean getVip() throws Exception {
         Map<String, Object> listData = Json.parseSafe(api("member?pr=ucpro&fr=pc&uc_param_str=&fetch_subscribe=true&_ch=home&fetch_identity=true", null, null, 0, "GET"), Map.class);
-        return "EXP_SVIP".equals(((Map<String, String>) listData.get("data")).get("member_type"));
+        return ((Map<String, String>) listData.get("data")).get("member_type").contains("VIP");
+
     }
 
     public List<String> getPlayFormatList() {
