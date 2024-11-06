@@ -29,6 +29,8 @@ public class Proxy extends Spider {
                 return Ali.proxy(params);
             case "quark":
                 return Quark.proxy(params);
+            case "uc":
+                return UC.proxy(params);
             case "bili":
                 return Bili.proxy(params);
             case "webdav":

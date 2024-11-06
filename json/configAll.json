@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;d8564a11c706a4d1ab71872f12a91c32",
+  "spider": "../jar/spider.jar;md5;92ca9354dbc6a80563a500663ed2491e",
   "sites": [
     {
       "key": "Douban",
@@ -65,6 +65,15 @@
       "name": "玩偶",
       "type": 3,
       "api": "csp_Wogg",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
+    },
+    {
+      "key": "木偶",
+      "name": "木偶",
+      "type": 3,
+      "api": "csp_Mogg",
       "searchable": 1,
       "changeable": 1,
       "ext": {}
