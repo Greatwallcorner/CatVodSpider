@@ -54,10 +54,11 @@ public class UCApi {
     private String serviceTicket;
 
     public Object[] proxyVideo(Map<String, String> params) throws Exception {
-        String url = Utils.base64Decode(params.get("url"));
+        String url = base64Decode(params.get("url"));
         SpiderDebug.log("uc proxy param url :" + url);
-        SpiderDebug.log("uc proxy param header :" + Utils.base64Decode(params.get("header")));
-        Map header = new Gson().fromJson(Utils.base64Decode(params.get("header")), Map.class);
+        Map header = new Gson().fromJson(base64Decode(params.get("header")), Map.class);
+        SpiderDebug.log("uc proxy param header :" + Json.toJson(header));
+
         if (header == null) header = new HashMap<>();
         List<String> arr = ImmutableList.of("Range", "Accept", "Accept-Encoding", "Accept-Language", "Cookie", "Origin", "Referer", "Sec-Ch-Ua", "Sec-Ch-Ua-Mobile", "Sec-Ch-Ua-Platform", "Sec-Fetch-Dest", "Sec-Fetch-Mode", "Sec-Fetch-Site", "User-Agent");
         for (String key : params.keySet()) {
@@ -69,7 +70,7 @@ public class UCApi {
 
         }
 
-        SpiderDebug.log("uc proxy used header :" + Utils.base64Decode(params.get("header")));
+        SpiderDebug.log("uc proxy used header :" + Json.toJson(header));
         if (Utils.getExt(url).contains("m3u8")) {
             return getM3u8(url, header);
         }
@@ -222,7 +223,16 @@ public class UCApi {
     }
 
     private String proxyVideoUrl(String url, Map<String, String> header) {
-        return String.format(Proxy.getProxyUrl() + "?do=uc&type=video&url=%s&header=%s", Utils.base64Encode(url), Utils.base64Encode(Json.toJson(header)));
+        return String.format(Proxy.getProxyUrl() + "?do=uc&type=video&url=%s&header=%s", base64Encode(url), base64Encode(Json.toJson(header)));
+    }
+
+    public String base64Encode(String str) {
+        return new String(Base64.getUrlEncoder().encode(str.getBytes()));
+    }
+
+    public String base64Decode(String str) {
+        if (StringUtils.isBlank(str)) return "";
+        return new String(Base64.getUrlDecoder().decode(str));
     }
 
     /**
