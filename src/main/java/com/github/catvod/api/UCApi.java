@@ -227,7 +227,7 @@ public class UCApi {
     }
 
     public String base64Encode(String str) {
-        return new String(Base64.getUrlEncoder().encode(str.getBytes()));
+        return new String(Base64.getUrlEncoder().withoutPadding().encode(str.getBytes()));
     }
 
     public String base64Decode(String str) {
