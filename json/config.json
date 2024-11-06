@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;d8564a11c706a4d1ab71872f12a91c32",
+  "spider": "../jar/spider.jar;md5;676594ec897990d0d9fa8c83513c794b",
   "sites": [
     {
       "key": "Douban",
@@ -27,7 +27,8 @@
       "searchable": 1,
       "changeable": 0,
       "ext": {}
-    }, {
+    },
+    {
       "key": "KuaKeBa",
       "name": "夸克吧",
       "type": 3,
@@ -175,6 +176,15 @@
       "name": "玩偶",
       "type": 3,
       "api": "csp_Wogg",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
+    },
+    {
+      "key": "木偶",
+      "name": "木偶",
+      "type": 3,
+      "api": "csp_Mogg",
       "searchable": 1,
       "changeable": 1,
       "ext": {}
