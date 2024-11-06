@@ -55,8 +55,8 @@ public class UCApi {
 
     public Object[] proxyVideo(Map<String, String> params) throws Exception {
         String url = Utils.base64Decode(params.get("url"));
-        SpiderDebug.log("proxy url :" + url);
-        SpiderDebug.log("proxy header :" + Utils.base64Decode(params.get("header")));
+        SpiderDebug.log("uc proxy url :" + url);
+        SpiderDebug.log("uc proxy header :" + Utils.base64Decode(params.get("header")));
         Map header = new Gson().fromJson(Utils.base64Decode(params.get("header")), Map.class);
         if (header == null) header = new HashMap<>();
         List<String> arr = ImmutableList.of("Range", "Accept", "Accept-Encoding", "Accept-Language", "Cookie", "Origin", "Referer", "Sec-Ch-Ua", "Sec-Ch-Ua-Mobile", "Sec-Ch-Ua-Platform", "Sec-Fetch-Dest", "Sec-Fetch-Mode", "Sec-Fetch-Site", "User-Agent");
@@ -82,7 +82,7 @@ public class UCApi {
      * @return
      */
     private Object[] getM3u8(String url, Map header) {
-        SpiderDebug.log("m3u8 url  :" + url);
+        SpiderDebug.log("uc m3u8 url  :" + url);
         OkResult result = OkHttp.get(url, new HashMap<>(), header);
         String[] m3u8Arr = result.getBody().split("\n");
         List<String> listM3u8 = new ArrayList<>();
@@ -95,8 +95,8 @@ public class UCApi {
             if (oneLine.contains(".ts")) {
                 mediaId++;
                 thisOne = proxyVideoUrl(site + thisOne, header);
-                SpiderDebug.log("m3u8 line " + mediaId + ":" + oneLine);
-                SpiderDebug.log("m3u8 proxyed line " + mediaId + " :" + thisOne);
+                SpiderDebug.log("uc m3u8 line " + mediaId + ":" + oneLine);
+                SpiderDebug.log("uc m3u8 proxyed line " + mediaId + " :" + thisOne);
 
             }
             listM3u8.add(thisOne);
@@ -202,7 +202,7 @@ public class UCApi {
     }
 
     public String playerContent(String[] split, String flag) throws Exception {
-        SpiderDebug.log("flag:" + flag);
+        SpiderDebug.log("uc flag:" + flag);
         String fileId = split[0], fileToken = split[1], shareId = split[2], stoken = split[3];
         String playUrl = "";
         if (flag.contains("uc原画")) {
@@ -210,10 +210,12 @@ public class UCApi {
         } else {
             playUrl = this.getLiveTranscoding(shareId, stoken, fileId, fileToken, flag);
         }
-        SpiderDebug.log("origin playUrl:" + playUrl);
+        SpiderDebug.log("uc origin playUrl:" + playUrl);
         Map<String, String> header = getHeaders();
         header.remove("Host");
         header.remove("Content-Type");
+        SpiderDebug.log("uc origin header:" + Json.toJson(header));
+
         return Result.get().url(proxyVideoUrl(playUrl, header)).octet().header(header).string();
     }
 
