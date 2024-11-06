@@ -70,6 +70,15 @@
       "ext": {}
     },
     {
+      "key": "木偶",
+      "name": "木偶",
+      "type": 3,
+      "api": "csp_Mogg",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
+    },
+    {
       "key": "csp_AList",
       "name": "AList┃网盘",
       "type": "3",
