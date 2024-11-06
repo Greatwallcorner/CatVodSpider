@@ -55,8 +55,8 @@ public class UCApi {
 
     public Object[] proxyVideo(Map<String, String> params) throws Exception {
         String url = Utils.base64Decode(params.get("url"));
-        SpiderDebug.log("uc proxy url :" + url);
-        SpiderDebug.log("uc proxy header :" + Utils.base64Decode(params.get("header")));
+        SpiderDebug.log("uc proxy param url :" + url);
+        SpiderDebug.log("uc proxy param header :" + Utils.base64Decode(params.get("header")));
         Map header = new Gson().fromJson(Utils.base64Decode(params.get("header")), Map.class);
         if (header == null) header = new HashMap<>();
         List<String> arr = ImmutableList.of("Range", "Accept", "Accept-Encoding", "Accept-Language", "Cookie", "Origin", "Referer", "Sec-Ch-Ua", "Sec-Ch-Ua-Mobile", "Sec-Ch-Ua-Platform", "Sec-Fetch-Dest", "Sec-Fetch-Mode", "Sec-Fetch-Site", "User-Agent");
@@ -68,6 +68,8 @@ public class UCApi {
             }
 
         }
+
+        SpiderDebug.log("uc proxy used header :" + Utils.base64Decode(params.get("header")));
         if (Utils.getExt(url).contains("m3u8")) {
             return getM3u8(url, header);
         }
