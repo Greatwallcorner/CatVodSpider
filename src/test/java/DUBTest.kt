@@ -1,5 +1,6 @@
 import cn.hutool.core.lang.Assert
 import com.github.catvod.bean.Result
+import com.github.catvod.spider.DUB
 import common.TestInterface
 import org.junit.jupiter.api.Test
 
@@ -32,12 +33,15 @@ class DUBTest:TestInterface<DUB> {
         assert(detailContent)
     }
 
+    @Test
     override fun playTest() {
         val playerContent = t.playerContent("", "/vodplay/5067-1-1.html", mutableListOf())
         assert(playerContent)
     }
 
+    @Test
     override fun searchTest() {
-        TODO("Not yet implemented")
+        val searchContent = t.searchContent("庆余年", false)
+        assert(searchContent)
     }
 }

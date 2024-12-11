@@ -1,25 +1,35 @@
+package com.github.catvod.spider
+
+import cn.hutool.core.codec.Base64
 import com.github.catvod.bean.Class
 import com.github.catvod.bean.Result
 import com.github.catvod.bean.Vod
 import com.github.catvod.bean.Vod.VodPlayBuilder.PlayUrl
 import com.github.catvod.crawler.Spider
+import com.github.catvod.crawler.SpiderDebug
 import com.github.catvod.net.OkHttp
+import com.github.catvod.utils.Image
+import com.github.catvod.utils.Json
 import com.github.catvod.utils.Utils
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
-import java.util.HashMap
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.util.*
 
 class DUB: Spider() {
     private val host = Utils.base64Decode("aHR0cHM6Ly90di5nYm9rdS5jb20v")
 
     private val cateFormat = "/vodtype/%s.html" // tid-page
     private val cateFormat2 = "/vodtype/%s-%s.html" // tid-page
-    private var referer = "duboku.tv"
+    private var referer = Utils.base64Decode("YzNSaGRHbGpMM0JzWVhsbGNpOTJhV1JxY3pJMUxuQm9jQT09")
+    private val signUrl = Utils.base64Decode("c3RhdGljL3BsYXllci92aWRqczI1LnBocA==")
+    private val searchUrl = Utils.base64Decode("L3ZvZHNlYXJjaC8tLS0tLS0tLS0tLS0tLmh0bWw/d2Q9JXMmc3VibWl0PQ==")
 
 //    private val classList = Class.parseFromFormatStr("")
     override fun homeContent(filter: Boolean): String {
-        val result = OkHttp.string("https://tv.gboku.com/vodtype/1.html", Utils.webHeaders("duboku.tv"))
-//        val result = OkHttp.string("$host/vodtype/2.html", Utils.webHeaders("duboku.tv"))
+//        val result = OkHttp.string("https://tv.gboku.com/vodtype/1.html", Utils.webHeaders("duboku.tv"))
+        val result = OkHttp.string("$host/vodtype/2.html", Utils.webHeaders("duboku.tv"))
         val document = Jsoup.parse(result)
         val select = document.select("ul.nav-list > li")
 
@@ -32,7 +42,7 @@ class DUB: Spider() {
     }
 
     override fun categoryContent(tid: String?, pg: String?, filter: Boolean, extend: HashMap<String, String>?): String {
-        var url = ""
+        var url: String
         if(pg == "1"){
             url = cateFormat.format(tid)
         }else{
@@ -50,7 +60,7 @@ class DUB: Spider() {
             vod.apply {
                 setVodRemarks(fa.text())
                 setVodId(fa.attr("href"))
-                setVodPic(fa.attr("data-original"))
+                setVodPic(Image.UrlHeaderBuilder(fa.attr("data-original")).referer(referer).build())
                 setVodName(fa.attr("title"))
             }
             vodList.add(vod)
@@ -59,7 +69,9 @@ class DUB: Spider() {
     }
 
     override fun detailContent(ids: MutableList<String>): String {
-        val string = OkHttp.string("$host${ids[0]}", Utils.webHeaders(referer))
+        val u = "$host${ids[0]}"
+        val string = OkHttp.string(u, Utils.webHeaders(referer))
+        referer = u
         val document = Jsoup.parse(string)
         val detail = document.select(".myui-content__detail")
         val vod = Vod()
@@ -106,15 +118,56 @@ class DUB: Spider() {
 
 
     override fun searchContent(key: String?, quick: Boolean): String {
-        return super.searchContent(key, quick)
+        val string =
+            OkHttp.string("$host${searchUrl.format(URLEncoder.encode(key, "UTF-8"))}", Utils.webHeaders(referer))
+        val document = Jsoup.parse(string)
+        val select = document.select("ul#searchList > li")
+        val vodList = mutableListOf<Vod>()
+        for (element in select) {
+            vodList.add(Vod().apply {
+                val text = element.select("a.searchKey")
+                setVodName(text.text())
+                setVodId(text.attr("href"))
+                val thumb = element.select(".thumb > a")
+                setVodPic(Image.UrlHeaderBuilder(thumb.attr("data-original")).referer(referer).build())
+                setVodRemarks(thumb.select(".tag").text())
+            })
+        }
+        return Result.string(vodList)
     }
 
     override fun searchContent(key: String?, quick: Boolean, pg: String?): String {
         return super.searchContent(key, quick, pg)
     }
 
-    override fun playerContent(flag: String?, id: String?, vipFlags: MutableList<String>?): String {
-        return super.playerContent(flag, id, vipFlags)
+    @OptIn(ExperimentalStdlibApi::class)
+    override fun playerContent(flag: String?, id: String, vipFlags: MutableList<String>?): String {
+        val string = OkHttp.string("$host$id")
+        val regex = Regex("var\\s*player_[a-z]{0,4}\\s*=\\s*([^<]+)")
+        val data = regex.find(string)
+        var url = ""
+        if((data?.groupValues?.size ?: 0) > 0){
+            val parse = Json.parse(data!!.groupValues[1])
+            val rst = parse.asJsonObject
+            val encrypt = rst.get("encrypt").asInt
+            url = if(encrypt == 2){
+                URLDecoder.decode(Base64.decodeStr(rst.get("url").asString), "UTF-8")
+            }else{
+                URLDecoder.decode(rst.get("url").asString, "UTF-8")
+            }
+        }else{
+            SpiderDebug.log("DUB 获取播放链接失败 $string")
+        }
+
+        val signDocument = OkHttp.string("$host$signUrl", Utils.webHeaders(referer))
+        val signRegx = Regex("encodeURIComponent\\s*\\(\\s*[\"']([^\"']+)[\"']\\s*\\)")
+        val find = signRegx.find(signDocument)
+        if((find?.groupValues?.size ?: 0) > 0){
+            val sign = find!!.groupValues[1]
+            return Result.get().url("$url?sign=${URLEncoder.encode(sign, "UTF-8")}").string()
+        }
+        SpiderDebug.log("DUB 获取签名失败")
+        return Result.error("获取播放链接失败")
     }
 
 }
