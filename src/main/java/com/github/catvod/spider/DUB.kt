@@ -1,6 +1,7 @@
 package com.github.catvod.spider
 
 import cn.hutool.core.codec.Base64
+import cn.hutool.core.util.URLUtil
 import com.github.catvod.bean.Class
 import com.github.catvod.bean.Result
 import com.github.catvod.bean.Vod
@@ -11,18 +12,18 @@ import com.github.catvod.net.OkHttp
 import com.github.catvod.utils.Image
 import com.github.catvod.utils.Json
 import com.github.catvod.utils.Utils
+import com.google.common.net.HttpHeaders
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.net.URLDecoder
 import java.net.URLEncoder
-import java.util.*
 
 class DUB: Spider() {
     private val host = Utils.base64Decode("aHR0cHM6Ly90di5nYm9rdS5jb20v")
 
     private val cateFormat = "/vodtype/%s.html" // tid-page
     private val cateFormat2 = "/vodtype/%s-%s.html" // tid-page
-    private var referer = Utils.base64Decode("YzNSaGRHbGpMM0JzWVhsbGNpOTJhV1JxY3pJMUxuQm9jQT09")
+    private var referer = Utils.base64Decode("aHR0cHM6Ly93d3cuZHVib2t1LnR2Lw==")
     private val signUrl = Utils.base64Decode("c3RhdGljL3BsYXllci92aWRqczI1LnBocA==")
     private val searchUrl = Utils.base64Decode("L3ZvZHNlYXJjaC8tLS0tLS0tLS0tLS0tLmh0bWw/d2Q9JXMmc3VibWl0PQ==")
 
@@ -140,7 +141,6 @@ class DUB: Spider() {
         return super.searchContent(key, quick, pg)
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     override fun playerContent(flag: String?, id: String, vipFlags: MutableList<String>?): String {
         val string = OkHttp.string("$host$id")
         val regex = Regex("var\\s*player_[a-z]{0,4}\\s*=\\s*([^<]+)")
@@ -164,6 +164,16 @@ class DUB: Spider() {
         val find = signRegx.find(signDocument)
         if((find?.groupValues?.size ?: 0) > 0){
             val sign = find!!.groupValues[1]
+            val m3u = OkHttp.string("$url?sign=${URLEncoder.encode(sign, "UTF-8")}", Utils.webHeaders(host).apply { put(HttpHeaders.HOST, URLUtil.url(url).host) })
+            val m3uRegx = Regex("/\\d{8}/[A-Za-z0-9]+/hls/index\\.m3u8\\?sign=[A-Za-z0-9+=%]+")
+            val matchResult = m3uRegx.find(m3u)
+            if((matchResult?.groupValues?.size ?: 0) > 0){
+                val toHttpUrl = URLUtil.url(url)
+                return Result.get().url(toHttpUrl.protocol + "://" + toHttpUrl.host + "/" + matchResult!!.value).string()
+            }else{
+                SpiderDebug.log("DUB 解析m3u地址失败")
+            }
+
             return Result.get().url("$url?sign=${URLEncoder.encode(sign, "UTF-8")}").string()
         }
         SpiderDebug.log("DUB 获取签名失败")

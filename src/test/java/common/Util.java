@@ -21,7 +21,7 @@ public class Util {
 
     @Test
     public void strDecode(){
-        String s = "eyJVc2VyLUFnZW50IjoiIERhbHZpay8yLjEuMCAoTGludXg7IFU7IGlQaG9uZSAxMjsgVjQxQSBCdWlsZC9TUDFBLjIxMDgxMi4wMDMpIiwiYWxsb3dDcm9zc1Byb3RvY29sUmVkaXJlY3RzIjoiIHRydWUiLCJBY2NlcHQiOiIgKi8qIiwiQ29udGVudC10eXBlIjoiIHZpZGVvL21wMnQiLCJDb25uZWN0aW9uIjoiIGtlZXAtYWxpdmUifQ==";
+        String s = "YzNSaGRHbGpMM0JzWVhsbGNpOTJhV1JxY3pJMUxuQm9jQT09";
         System.out.println(Utils.base64Decode(s));
     }
 
@@ -38,6 +38,14 @@ public class Util {
     @Test
     public void decodeTest(){
         String s = "JTY4JTc0JTc0JTcwJTczJTNBJTJGJTJGJTc0JTMyJTMwJTZEJTJFJTZFJTYyJTZGJTZCJTc1JTJFJTYzJTZGJTZEJTJGJTMyJTMwJTMyJTM0JTMxJTMyJTMwJTM2JTJGJTRGJTQzJTZGJTU3JTM1JTUyJTU2JTU0JTJGJTY5JTZFJTY0JTY1JTc4JTJFJTZEJTMzJTc1JTM4";
+        String s1 = Base64.decodeStr(s);
+        System.out.println(s1);
+    }
+    @Test
+    public void parseTest(){
+        String s = "#EXTM3U\n" +
+                "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1893000,RESOLUTION=1920x800\n" +
+                "/20241206/OCoW5RVT/hls/index.m3u8?sign=PVsk2rfMzhALh4dgnAfOyUG%2B9%2BfweU4WFP%2FADswYaH8%3D\n";
         String s1 = Base64.decodeStr(s);
         System.out.println(s1);
     }

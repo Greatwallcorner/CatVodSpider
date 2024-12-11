@@ -29,19 +29,32 @@ class DUBTest:TestInterface<DUB> {
 
     @Test
     override fun detailTest() {
-        val detailContent = t.detailContent(mutableListOf("/voddetail/5067.html"))
+        val detailContent = t.detailContent(mutableListOf("/voddetail/5075.html"))
         assert(detailContent)
     }
 
     @Test
     override fun playTest() {
-        val playerContent = t.playerContent("", "/vodplay/5067-1-1.html", mutableListOf())
+        val playerContent = t.playerContent("", "/vodplay/5075-1-1.html", mutableListOf())
         assert(playerContent)
     }
 
     @Test
     override fun searchTest() {
-        val searchContent = t.searchContent("庆余年", false)
+        val searchContent = t.searchContent("我和我爸的18岁", false)
         assert(searchContent)
+    }
+
+    @Test
+    fun test(){
+        val s = """
+            #EXTM3U
+            #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1893000,RESOLUTION=1920x800
+            /20241206/OCoW5RVT/hls/index.m3u8?sign=PVsk2rfMzhALh4dgnAfOyUG%2B9%2BfweU4WFP%2FADswYaH8%3D
+            
+            """.trimIndent()
+        val m3uRegx= Regex("/\\d{8}/[A-Za-z0-9]+/hls/index\\.m3u8\\?sign=[A-Za-z0-9+=]+")
+        val matchResult = m3uRegx.find(s)
+        println(matchResult?.value)
     }
 }
