@@ -4,7 +4,6 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.spider.Init;
 import com.github.catvod.spider.Proxy;
-import io.ktor.http.ContentType;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
@@ -358,8 +357,8 @@ public class Utils {
             synchronized (Utils.class) {
                 if (webHttpHeaderMap == null || webHttpHeaderMap.isEmpty()) {
                     webHttpHeaderMap = new HashMap<>();
-                    webHttpHeaderMap.put(HttpHeaders.CONTENT_TYPE, ContentType.Application.INSTANCE.getJson().getContentType());
-                    webHttpHeaderMap.put(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
+//                    webHttpHeaderMap.put(HttpHeaders.CONTENT_TYPE, ContentType.Application.INSTANCE.getJson().getContentType());
+//                    webHttpHeaderMap.put(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
                     webHttpHeaderMap.put(HttpHeaders.CONNECTION, "keep-alive");
                     webHttpHeaderMap.put(HttpHeaders.USER_AGENT, CHROME);
                     webHttpHeaderMap.put(HttpHeaders.ACCEPT, "*/*");

@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;ddc5607ab73d89dee419455f9ec5b884",
+  "spider": "../jar/spider.jar;md5;92ca9354dbc6a80563a500663ed2491e",
   "sites": [
     {
       "key": "Douban",
@@ -44,7 +44,16 @@
       "api": "csp_BD",
       "searchable": 1,
       "changeable": 0,
-      "ext": "aHR0cHM6Ly93d3cueWp5czA1LmNvbS8="
+      "ext": "aHR0cHM6Ly93d3cueGx5czAxLmNvbS8="
+    },
+    {
+      "key": "xb6v",
+      "name": "xb6v",
+      "type": 3,
+      "api": "csp_Xb6v",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": ""
     },
     {
       "key": "NCat",
@@ -60,6 +69,15 @@
       "name": "金牌 | 影视",
       "type": 3,
       "api": "csp_Glod",
+      "searchable": 0,
+      "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "DUB",
+      "name": "DUB",
+      "type": 3,
+      "api": "csp_DUB",
       "searchable": 0,
       "changeable": 0,
       "ext": {}
