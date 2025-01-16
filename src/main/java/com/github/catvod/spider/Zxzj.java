@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 
 public class Zxzj extends Spider {
 
-    private final String siteUrl = "https://www.zxzj.pro";
+    private final String siteUrl = "https://www.zxzjhd.com";
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
