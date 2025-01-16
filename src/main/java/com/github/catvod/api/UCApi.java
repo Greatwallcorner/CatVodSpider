@@ -172,8 +172,11 @@ public class UCApi {
         List<Map<String, Object>> listData = listFile(1, shareData, files, subs, shareData.getShareId(), shareData.getFolderId(), 1);
 
         List<String> playFrom = UCApi.get().getPlayFormatList();
-        playFrom = new ArrayList<>(playFrom);
-        playFrom.add("原画");
+        List<String> playFromtmp = new ArrayList<>();
+        playFromtmp.add("uc原画");
+        for (String s : playFrom) {
+            playFromtmp.add("uc" + s);
+        }
 
         List<String> playUrl = new ArrayList<>();
 
@@ -181,7 +184,7 @@ public class UCApi {
             return null;
         }
         for (int i = 0; i < files.get(files.size() - 1).getShareIndex(); i++) {
-            for (int index = 0; index < playFrom.size(); index++) {
+            for (int index = 0; index < playFromtmp.size(); index++) {
                 List<String> vodItems = new ArrayList<>();
                 for (Item video_item : files) {
                     if (video_item.getShareIndex() == i + 1) {
@@ -199,7 +202,7 @@ public class UCApi {
         vod.setVodPic("");
         vod.setVodName("");
         vod.setVodPlayUrl(StringUtils.join(playUrl, "$$$"));
-        vod.setVodPlayFrom(StringUtils.join(playFrom, "$$$"));
+        vod.setVodPlayFrom(StringUtils.join(playFromtmp, "$$$"));
         vod.setTypeName("uc云盘");
         return vod;
     }

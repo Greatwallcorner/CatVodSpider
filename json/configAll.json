@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;5343a854d25016e7a669da09d1dd3aeb",
+  "spider": "../jar/spider.jar;md5;8ebc68f78911a0f4e565b84df4bd2e80",
   "sites": [
     {
       "key": "Douban",
@@ -8,6 +8,33 @@
       "api": "csp_Douban",
       "searchable": 0,
       "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "KuaKeBa",
+      "name": "夸克吧",
+      "type": 3,
+      "api": "csp_KuaKeBa",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
+    },
+    {
+      "key": "DianYingYunJi",
+      "name": "电影云集",
+      "type": 3,
+      "api": "csp_DianYingYunJi",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
+    },
+    {
+      "key": "KuaKeS",
+      "name": "夸克网盘社",
+      "type": 3,
+      "api": "csp_KuaKeS",
+      "searchable": 1,
+      "changeable": 1,
       "ext": {}
     },
     {
@@ -94,7 +121,7 @@
       "type": 3,
       "api": "csp_PanSou",
       "searchable": 1,
-      "changeable": 0,
+      "changeable": 1,
       "timeout": 30
     },
     {
@@ -103,7 +130,7 @@
       "type": 3,
       "api": "csp_PanSearch",
       "searchable": 1,
-      "changeable": 0,
+      "changeable": 1,
       "timeout": 30
     },
     {
@@ -112,8 +139,16 @@
       "type": 3,
       "api": "csp_YiSo",
       "searchable": 1,
-      "changeable": 0,
+      "changeable": 1,
       "ext": "http://127.0.0.1:9978/file/tvfan/token.txt+4k|auto|fhd",
+      "timeout": 30
+    },
+    {
+      "key": "QiLeSo",
+      "name": "奇乐搜┃搜索",
+      "type": 3,
+      "api": "csp_QiLeSo",
+      "searchable": 1,
       "timeout": 30
     },
     {
@@ -122,7 +157,7 @@
       "type": 3,
       "api": "csp_Zhaozy",
       "searchable": 1,
-      "changeable": 0,
+      "changeable": 1,
       "ext": "$$$fanty$$$qqq111"
     },
     {
@@ -131,7 +166,7 @@
       "type": 3,
       "api": "csp_Yingso",
       "searchable": 1,
-      "changeable": 0
+      "changeable": 1
     },
     {
       "key": "yppan",
@@ -139,7 +174,7 @@
       "type": 3,
       "api": "csp_YpPan",
       "searchable": 1,
-      "changeable": 0
+      "changeable": 1
     }
   ]
 }
