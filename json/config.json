@@ -241,7 +241,7 @@
       "type": 3,
       "api": "csp_PanSou",
       "searchable": 1,
-      "changeable": 1,
+      "changeable": 0,
       "timeout": 30
     },
     {
@@ -250,7 +250,7 @@
       "type": 3,
       "api": "csp_PanSearch",
       "searchable": 1,
-      "changeable": 1,
+      "changeable": 0,
       "timeout": 30
     },
     {
@@ -259,7 +259,7 @@
       "type": 3,
       "api": "csp_YiSo",
       "searchable": 1,
-      "changeable": 1,
+      "changeable": 0,
       "ext": "http://127.0.0.1:9978/file/tvfan/token.txt+4k|auto|fhd",
       "timeout": 30
     },
@@ -268,7 +268,7 @@
       "name": "奇乐搜┃搜索",
       "type": 3,
       "api": "csp_QiLeSo",
-      "searchable": 1,
+      "searchable": 0,
       "timeout": 30
     },
     {
@@ -277,7 +277,7 @@
       "type": 3,
       "api": "csp_Zhaozy",
       "searchable": 1,
-      "changeable": 1,
+      "changeable": 0,
       "ext": "$$$fanty$$$qqq111"
     },
     {
@@ -286,7 +286,7 @@
       "type": 3,
       "api": "csp_Yingso",
       "searchable": 1,
-      "changeable": 1
+      "changeable": 0
     },
     {
       "key": "yppan",
@@ -294,7 +294,7 @@
       "type": 3,
       "api": "csp_YpPan",
       "searchable": 1,
-      "changeable": 1
+      "changeable": 0
     }
   ]
 }

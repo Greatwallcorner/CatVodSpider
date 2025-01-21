@@ -1,0 +1,32 @@
+{
+  "spider": "../jar/spider.jar;md5;f7455695682bd0f4607a8a094839b7c9",
+  "sites": [
+    {
+      "key": "Douban",
+      "name": "豆瓣|首页",
+      "type": 3,
+      "api": "csp_Douban",
+      "searchable": 0,
+      "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "glod",
+      "name": "金牌 | 影视",
+      "type": 3,
+      "api": "csp_Glod",
+      "searchable": 0,
+      "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "DUB",
+      "name": "DUB",
+      "type": 3,
+      "api": "csp_DUB",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": {}
+    }
+  ]
+}
