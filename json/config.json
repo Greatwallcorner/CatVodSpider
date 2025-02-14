@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;f2403bd2c862ad606234dae51cafea71",
+  "spider": "../jar/spider.jar;md5;65ac46325a31f9edc1fb147c24a1d3bf",
   "sites": [
     {
       "key": "Douban",
@@ -47,10 +47,30 @@
       "ext": "aHR0cHM6Ly93d3cueGx5czAxLmNvbS8="
     },
     {
+      "key": "Ddrk",
+      "name": "低端|首页",
+      "type": 3,
+      "api": "csp_Ddrk",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": {
+        "site": "https://ddys.info/"
+      }
+    },
+    {
       "key": "xb6v",
       "name": "xb6v",
       "type": 3,
       "api": "csp_Xb6v",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": ""
+    },
+    {
+      "key": "YHDM",
+      "name": "樱花",
+      "type": 3,
+      "api": "csp_YHDM",
       "searchable": 1,
       "changeable": 0,
       "ext": ""

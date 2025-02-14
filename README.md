@@ -5,6 +5,7 @@ https://github.com/FongMi/CatVodSpider
 ## 爬虫来源
 https://github.com/bizhangjie/CatVodSpider
 https://github.com/lushunming/AndroidCatVodSpider
+https://github.com/mymine/CatVodSpider
 
 # 声明
 

@@ -24,7 +24,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Utils {
-
+    public static final String patternAli = "(https:\\/\\/www\\.aliyundrive\\.com\\/s\\/[^\"]+|https:\\/\\/www\\.alipan\\.com\\/s\\/[^\"]+)";
+    public static final String patternQuark = "(https:\\/\\/pan\\.quark\\.cn\\/s\\/[^\"]+)";
+    public static final String patternUC = "(https:\\/\\/drive\\.uc\\.cn\\/s\\/[^\"]+)";
     public static final Pattern RULE = Pattern.compile("http((?!http).){12,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)|http((?!http).)*?video/tos*");
     public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36";
     public static final String SAFARI = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.33";
@@ -52,6 +54,19 @@ public class Utils {
         if (url.contains("url=http") || url.contains(".js") || url.contains(".css") || url.contains(".html"))
             return false;
         return RULE.matcher(url).find();
+    }
+
+    public static String findByRegex(String regex, String content, Integer groupCount) {
+        // 创建 Pattern 对象
+        Pattern r = Pattern.compile(regex);
+
+        // 现在创建 matcher 对象
+        Matcher m = r.matcher(content);
+        if (m.find()) {
+            return m.group(groupCount);
+        } else {
+            return "";
+        }
     }
 
     public static byte[] toUtf8(byte[] bytes) {
