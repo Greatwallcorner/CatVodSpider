@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;65ac46325a31f9edc1fb147c24a1d3bf",
+  "spider": "../jar/spider.jar;md5;66731a6de2db9507e87b152718a4213c",
   "sites": [
     {
       "key": "Douban",
@@ -52,10 +52,18 @@
       "type": 3,
       "api": "csp_Ddrk",
       "searchable": 1,
-      "changeable": 0,
+      "changeable": 1,
       "ext": {
         "site": "https://ddys.info/"
       }
+    },
+    {
+      "key": "Tvb",
+      "name": "Tvb|首页",
+      "type": 3,
+      "api": "csp_HkTv",
+      "searchable": 1,
+      "changeable": 1
     },
     {
       "key": "xb6v",
