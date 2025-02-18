@@ -1,11 +1,14 @@
 package com.github.catvod.spider;
 
+import cn.hutool.core.text.UnicodeUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Utils;
+import com.google.gson.JsonElement;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,7 +23,8 @@ import java.util.regex.Pattern;
 
 public class NCat extends Spider {
 
-    private static final String siteUrl = "https://www.ncat3.com:51111";
+    private static final String siteUrl = "https://www.ncat3.app";
+//    private static final String siteUrl = "https://www.ncat3.com:51111";
     private static final String picUrl = "https://61.147.93.252:15002";
     private static final String cateUrl = siteUrl + "/show/";
     private static final String detailUrl = siteUrl + "/detail/";
@@ -153,14 +157,16 @@ public class NCat extends Spider {
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         Document doc = Jsoup.parse(OkHttp.string(playUrl.concat(id), getHeaders()));
-        String regex = "src: \"(.*?)m3u8\",";
+//        String regex = "src: \"(.*?)m3u8\",";
+        String regex = "const playSource=(.*?);";
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(doc.html());
         String url = "";
         if (matcher.find()) {
             url = matcher.group(1);
-            url = url.replace("\\/", "/") + "m3u8";
+            JsonElement parse = Json.parse(UnicodeUtil.toString(url));
+            url = parse.getAsJsonObject().get("src").getAsString();
         }
         return Result.get().url(url).header(getHeaders()).string();
     }
