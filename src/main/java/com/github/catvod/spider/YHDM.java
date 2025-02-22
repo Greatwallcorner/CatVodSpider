@@ -7,15 +7,12 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Utils;
-import org.apache.http.client.utils.URIUtils;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URI;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
@@ -102,6 +99,7 @@ public class YHDM extends Spider {
                 vod_play_url.append(notLastEpisode ? "#" : "$$$");
             }
         }
+        String title = doc.select(".myui-content__detail h1.title").text();
         String text = doc.select(".myui-content__detail").text();
         String classifyName = matcher(text, "类型：(.*?)分类");
         String area = matcher(text, "地区：(.*?)年份");
@@ -112,6 +110,7 @@ public class YHDM extends Spider {
         Vod vod = new Vod();
         vod.setVodId(ids.get(0));
         vod.setVodArea(area);
+        vod.setVodName(title);
         vod.setVodYear(year);
         vod.setVodRemarks(remark);
         vod.setVodContent(brief);

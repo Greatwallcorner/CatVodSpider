@@ -17,12 +17,18 @@ class YhdmTest:TestInterface<YHDM> {
         TODO("Not yet implemented")
     }
 
+    @Test
     override fun detailTest() {
-        TODO("Not yet implemented")
+        val detailContent = t.detailContent(listOf("/video/9167.html"))
+        println(detailContent)
+        AssertUtil.assertResult(detailContent)
     }
 
+    @Test
     override fun playTest() {
-        TODO("Not yet implemented")
+        val playerContent = t.playerContent("", "/video/9167.html", listOf())
+        println(playerContent)
+        AssertUtil.assertResult(playerContent)
     }
 
     override fun searchTest() {
