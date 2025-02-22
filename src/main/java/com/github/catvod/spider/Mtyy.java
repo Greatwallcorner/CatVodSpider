@@ -2,7 +2,6 @@ package com.github.catvod.spider;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.net.URLEncodeUtil;
-import cn.hutool.json.JSONUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
 import com.github.catvod.bean.Result;
@@ -21,7 +20,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -196,19 +194,19 @@ public class Mtyy extends Spider {
         String url = player.getString("url");
         String urlNext = player.getString("url_next");
         SpiderDebug.log("++++++++++++麦田-playerContent" + Json.toJson(url));
-        if (player.getInt("encrypt") == 1) {
-            url = URLDecoder.decode(url);
-            urlNext = URLDecoder.decode(urlNext);
-        } else if (player.getInt("encrypt") == 2) {
-            url = URLDecoder.decode(Base64.decodeStr(url));
-            urlNext = URLDecoder.decode(Base64.decodeStr(urlNext));
-        }
-
-        String iframeUrl = this.siteUrl + "/static/player/ffzy.php?url=" + url + "&jump=" + urlNext + "&thumb=" + player.getString("vod_pic_thumb") + "&id=" + player.getString("id") + "&nid=" + player.getInt("nid");
-        String iframeContent = OkHttp.string(iframeUrl);
-        String encodeUrl = Utils.getVar(iframeContent, "urls");
-        String realUrl = getVideoInfo(encodeUrl);
-        return Result.get().url(realUrl).header(getHeader()).string();
+//        if (player.getInt("encrypt") == 1) {
+//            url = URLDecoder.decode(url);
+//            urlNext = URLDecoder.decode(urlNext);
+//        } else if (player.getInt("encrypt") == 2) {
+//            url = URLDecoder.decode(Base64.decodeStr(url));
+//            urlNext = URLDecoder.decode(Base64.decodeStr(urlNext));
+//        }
+//
+//        String iframeUrl = this.siteUrl + "/static/player/ffzy.php?url=" + url + "&jump=" + urlNext + "&thumb=" + player.getString("vod_pic_thumb") + "&id=" + player.getString("id") + "&nid=" + player.getInt("nid");
+//        String iframeContent = OkHttp.string(iframeUrl);
+//        String encodeUrl = Utils.getVar(iframeContent, "urls");
+//        String realUrl = getVideoInfo(encodeUrl);
+        return Result.get().url(url).header(getHeader()).string();
     }
 
     String getVideoInfo(String _0x38afx2) {
