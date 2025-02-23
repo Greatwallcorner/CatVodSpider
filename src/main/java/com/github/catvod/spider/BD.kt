@@ -111,7 +111,7 @@ class BD : Spider() {
         reference = "$host$id"
         val string = OkHttp.string(reference, Utils.webHeaders(host, session))
         val document = Jsoup.parse(string)
-        val card = document.select("div.card > div.card-body").first()!!
+        val card = document.select("div.card-body:nth-child(1)").first()!!
         val head = card.select("div.col")
         val vod = Vod()
         vod.setVodName(head.select("h1").text())

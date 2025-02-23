@@ -14,7 +14,7 @@ class DBTest {
     private val bd: BD = BD()
 
     init {
-        bd.init("aHR0cHM6Ly93d3cueWp5czAyLmNvbS8=")
+        bd.init("aHR0cHM6Ly92LnhseXMubHRkLnVhLw==")
     }
 
     @Test
