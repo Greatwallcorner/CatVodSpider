@@ -21,14 +21,14 @@ class GlodTest() :TestInterface<Glod> {
 
     @Test
     override fun detailTest() {
-        val detailContent = t.detailContent(mutableListOf("/detail/123962"))
+        val detailContent = t.detailContent(mutableListOf("133698"))
         println(detailContent)
         AssertUtil.assertResult(detailContent)
     }
 
     @Test
     override fun playTest() {
-        val playerContent = t.playerContent("", "/vod/play/125013/1/1048499", mutableListOf())
+        val playerContent = t.playerContent("", "134340/1165560", mutableListOf())
         println(playerContent)
         AssertUtil.assertResult(playerContent)
     }
