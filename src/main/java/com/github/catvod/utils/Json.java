@@ -2,11 +2,13 @@ package com.github.catvod.utils;
 
 import com.github.catvod.crawler.SpiderDebug;
 import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
 
+import java.io.StringReader;
 import java.lang.reflect.Type;
 
 public class Json {
-    private static Gson gson = new Gson();
+    private static Gson gson = new GsonBuilder().setLenient().create();
 
     public static Gson get(){
         return gson;
@@ -14,7 +16,11 @@ public class Json {
 
     public static JsonElement parse(String json) {
         try {
-            return JsonParser.parseString(json);
+            JsonReader reader = new JsonReader(new StringReader(json));
+            reader.setLenient(true);
+
+            return JsonParser.parseReader(reader);
+//            return JsonParser.parseString(json);
         } catch (Throwable e) {
             return new JsonParser().parse(json);
         }

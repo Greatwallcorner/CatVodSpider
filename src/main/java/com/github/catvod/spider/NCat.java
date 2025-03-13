@@ -9,8 +9,6 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.AESEncryption;
 import com.github.catvod.utils.Utils;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -27,6 +25,7 @@ import java.util.regex.Pattern;
 public class NCat extends Spider {
 
     private static final String siteUrl = "https://www.ncat3.app";
+
     //    private static final String siteUrl = "https://www.ncat3.com:51111";
     private static final String picUrl = "https://vres.wbadl.cn";
     private static final String cateUrl = siteUrl + "/show/";
@@ -35,9 +34,8 @@ public class NCat extends Spider {
     private static final String playUrl = siteUrl + "/play/";
 
     private HashMap<String, String> getHeaders() {
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", Utils.CHROME);
-        return headers;
+        HashMap<String, String> map = Utils.webHeaders(siteUrl);
+        return map;
     }
 
     @Override
@@ -52,9 +50,9 @@ public class NCat extends Spider {
         Document doc = Jsoup.parse(OkHttp.string(siteUrl, getHeaders()));
         for (Element element : doc.select("div.module-item")) {
             try {
-                String pic = element.select("img").attr("data-original");
+                String pic = picUrl + element.select("img:not([id])").attr("data-original");
                 String url = element.select("a").attr("href");
-                String name = element.select("img").attr("title");
+                String name = element.select("div[class=v-item-title]:not([style])").text();
                 if (!pic.startsWith("http")) {
                     pic = picUrl + pic;
                 }
@@ -179,9 +177,13 @@ public class NCat extends Spider {
             if (!b1) {
                 SpiderDebug.log("获取播放链接 方式2 失败");
             } else {
-                String group = matcher1.group(1);
-                JsonElement jsonElement = JsonParser.parseString(group);
-                url = jsonElement.getAsJsonObject().get("src").getAsString();
+                String group = matcher1.group(1).replaceAll("\\s", "");
+                Pattern compile1 = Pattern.compile("src:\"([^\"]+)\"");
+                Matcher matcher2 = compile1.matcher(group);
+                boolean b2 = matcher2.find();
+                if(b2){
+                    url = matcher2.group(1);
+                }
             }
         } else {
             if (matcher.find()) {
