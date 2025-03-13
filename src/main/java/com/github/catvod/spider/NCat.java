@@ -72,9 +72,9 @@ public class NCat extends Spider {
         Document doc = Jsoup.parse(OkHttp.string(target, getHeaders()));
         for (Element element : doc.select("div.module-item")) {
             try {
-                String pic = element.select("img").attr("data-original");
+                String pic = picUrl + element.select("img:not([id])").attr("data-original");
                 String url = element.select("a").attr("href");
-                String name = element.select("img").attr("title");
+                String name = element.select("div[class=v-item-title]:not([style])").text();
                 if (!pic.startsWith("http")) {
                     pic = picUrl + pic;
                 }
