@@ -47,7 +47,11 @@ public class NCatTest {
 
     @Test
     public void playTest() throws Exception {
-        String s = nCat.playerContent("", "257902-4-1191383.html", Lists.newArrayList());
+        // way 1
+        String s = nCat.playerContent("", "21459-32-502.html", Lists.newArrayList());
+        // way 2
+//        String s = nCat.playerContent("", "257902-4-1191383.html", Lists.newArrayList());
+
         System.out.println(s);
         AssertUtil.INSTANCE.assertResult(s);
     }

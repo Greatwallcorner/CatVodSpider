@@ -27,6 +27,15 @@
       "searchable": 1,
       "changeable": 0,
       "ext": {}
+    },
+    {
+      "key": "test",
+      "name": "DUB1",
+      "type": 4,
+      "api": "https://huaren.live/api.php/tvbox",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": {}
     }
   ]
 }

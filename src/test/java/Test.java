@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Test {
     public static void main(String[] args) throws Exception {
@@ -53,6 +54,26 @@ public class Test {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    public void test2() throws Exception {
+        String input = "const playSource = {\n" +
+                "    src: \"https://vip.ffzy-video.com/20250220/12513_38da0530/index.m3u8\",\n" +
+                "    type: \"application/x-mpegURL\",\n" +
+                "};";
+
+        // Java 需要双反斜杠进行转义
+        String regex = "playSource\\s*=\\s*\\{[^{}]*\\}";
+
+        Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.find()) {
+            System.out.println("匹配结果: " + matcher.group());
+        } else {
+            System.out.println("未匹配到目标对象");
         }
     }
 

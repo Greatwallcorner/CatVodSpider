@@ -5,9 +5,12 @@ import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
+import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.AESEncryption;
 import com.github.catvod.utils.Utils;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,11 +27,11 @@ import java.util.regex.Pattern;
 public class NCat extends Spider {
 
     private static final String siteUrl = "https://www.ncat3.app";
-//    private static final String siteUrl = "https://www.ncat3.com:51111";
+    //    private static final String siteUrl = "https://www.ncat3.com:51111";
     private static final String picUrl = "https://vres.wbadl.cn";
     private static final String cateUrl = siteUrl + "/show/";
     private static final String detailUrl = siteUrl + "/detail/";
-    private static final String searchUrl = siteUrl + "/search?k=";
+    private static final String searchUrl = siteUrl + "/search?os=pc&k=";
     private static final String playUrl = siteUrl + "/play/";
 
     private HashMap<String, String> getHeaders() {
@@ -102,7 +105,7 @@ public class NCat extends Spider {
         String PlayUrl = "";
         for (int i = 0; i < tabs.size(); i++) {
             String tabName = tabs.get(i).text();
-            if(Arrays.asList("超清", "4K(高峰不卡)").contains(tabName)) continue;
+            if (Arrays.asList("超清", "4K(高峰不卡)").contains(tabName)) continue;
             if (!"".equals(PlayFrom)) {
                 PlayFrom = PlayFrom + "$$$" + tabName;
             } else {
@@ -159,27 +162,44 @@ public class NCat extends Spider {
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         Document doc = Jsoup.parse(OkHttp.string(playUrl.concat(id), getHeaders()));
         String regex = "window.whatTMDwhatTMDPPPP = '(.*?)'";
+        // way1
         String playSource = "playSource=\\{(.+)\\}";
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(doc.html());
         String url = "";
-        if (matcher.find()) {
-            url = matcher.group(1);
-            Pattern playSourcePattern = Pattern.compile(playSource);
-            Matcher playSourceMatcher = playSourcePattern.matcher(doc.html());
-            playSourceMatcher.find();
-            String js = playSourceMatcher.group(1);
-
-            String regex1 = "KKYS\\['safePlay'\\]\\(\\)\\['url'\\]\\(\"([^\"]+)\"\\)";
-//            String regex1 = "KKYS\\.safePlay\\(\\)\\.url(\"(.*?)\"),";
-            Pattern pattern1 = Pattern.compile(regex1);
-            Matcher matcher1 = pattern1.matcher(UnicodeUtil.toString(js));
-            String iv = "VNF9aVQF!G*0ux@2hAigUeH3";
-            if (matcher1.find()) {
-                iv = matcher1.group(1);
+        Pattern playSourcePattern = Pattern.compile(playSource);
+        Matcher playSourceMatcher = playSourcePattern.matcher(doc.html());
+        boolean b = playSourceMatcher.find();
+        if (!b) {
+            playSource = "playSource\\s*=\\s*(\\{[^{}]*\\});";
+            Pattern compile = Pattern.compile(playSource);
+            Matcher matcher1 = compile.matcher(doc.html());
+            boolean b1 = matcher1.find();
+            if (!b1) {
+                SpiderDebug.log("获取播放链接 方式2 失败");
+            } else {
+                String group = matcher1.group(1);
+                JsonElement jsonElement = JsonParser.parseString(group);
+                url = jsonElement.getAsJsonObject().get("src").getAsString();
             }
-            url = decryptUrl(url, iv);
+        } else {
+            if (matcher.find()) {
+                url = matcher.group(1);
+                String js = playSourceMatcher.group(1);
+
+                String regex1 = "KKYS\\['safePlay'\\]\\(\\)\\['url'\\]\\(\"([^\"]+)\"\\)";
+//            String regex1 = "KKYS\\.safePlay\\(\\)\\.url(\"(.*?)\"),";
+                Pattern pattern1 = Pattern.compile(regex1);
+                Matcher matcher1 = pattern1.matcher(UnicodeUtil.toString(js));
+                String iv = "VNF9aVQF!G*0ux@2hAigUeH3";
+                if (matcher1.find()) {
+                    iv = matcher1.group(1);
+                }
+                url = decryptUrl(url, iv);
+            }else{
+                SpiderDebug.log("方式1 匹配链接失败");
+            }
         }
         return Result.get().url(url).header(getHeaders()).string();
     }
@@ -188,7 +208,7 @@ public class NCat extends Spider {
         try {
             String encryptedKey = "VNF9aVQF!G*0ux@2hAigUeH3";
 
-            return AESEncryption.decrypt(encryptedData, iv, "",AESEncryption.ECB_PKCS_7_PADDING);
+            return AESEncryption.decrypt(encryptedData, iv, "", AESEncryption.ECB_PKCS_7_PADDING);
         } catch (Exception e) {
             e.printStackTrace();
             return "123456";
