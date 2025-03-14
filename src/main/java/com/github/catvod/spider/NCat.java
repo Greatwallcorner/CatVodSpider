@@ -142,7 +142,7 @@ public class NCat extends Spider {
         Document doc = Jsoup.parse(OkHttp.string(searchUrl.concat(URLEncoder.encode(key)).concat(".html"), getHeaders()));
         for (Element element : doc.select("a.search-result-item")) {
             try {
-                String pic = element.select("div img:nth-child(2)").attr("data-original");
+                String pic = picUrl + element.select("img:not([id])").attr("data-original");
                 String url = element.attr("href");
                 String name = element.select("img").attr("title");
                 if (!pic.startsWith("http")) {
@@ -160,9 +160,7 @@ public class NCat extends Spider {
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         Document doc = Jsoup.parse(OkHttp.string(playUrl.concat(id), getHeaders()));
         String regex = "window.whatTMDwhatTMDPPPP = '(.*?)'";
-        // way1
-        String playSource = "playSource=\\{(.+)\\}";
-
+        String playSource = "playSource=\\{(.*?)\\}";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(doc.html());
         String url = "";
@@ -189,9 +187,7 @@ public class NCat extends Spider {
             if (matcher.find()) {
                 url = matcher.group(1);
                 String js = playSourceMatcher.group(1);
-
                 String regex1 = "KKYS\\['safePlay'\\]\\(\\)\\['url'\\]\\(\"([^\"]+)\"\\)";
-//            String regex1 = "KKYS\\.safePlay\\(\\)\\.url(\"(.*?)\"),";
                 Pattern pattern1 = Pattern.compile(regex1);
                 Matcher matcher1 = pattern1.matcher(UnicodeUtil.toString(js));
                 String iv = "VNF9aVQF!G*0ux@2hAigUeH3";
