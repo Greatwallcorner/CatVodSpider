@@ -9,6 +9,7 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.AESEncryption;
 import com.github.catvod.utils.Utils;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -40,37 +41,27 @@ public class NCat extends Spider {
 
     @Override
     public String homeContent(boolean filter) throws Exception {
-        List<Vod> list = new ArrayList<>();
         List<Class> classes = new ArrayList<>();
         String[] typeIdList = {"1", "2", "3", "4", "6"};
         String[] typeNameList = {"电影", "连续剧", "动漫", "综艺", "短剧"};
         for (int i = 0; i < typeNameList.length; i++) {
             classes.add(new Class(typeIdList[i], typeNameList[i]));
         }
-        Document doc = Jsoup.parse(OkHttp.string(siteUrl, getHeaders()));
-        for (Element element : doc.select("div.module-item")) {
-            try {
-                String pic = picUrl + element.select("img:not([id])").attr("data-original");
-                String url = element.select("a").attr("href");
-                String name = element.select("div[class=v-item-title]:not([style])").text();
-                if (!pic.startsWith("http")) {
-                    pic = picUrl + pic;
-                }
-                String id = url.split("/")[2];
-                list.add(new Vod(id, name, pic));
-            } catch (Exception e) {
-
-            }
-        }
+        List<Vod> list = getVodList(siteUrl);
         return Result.string(classes, list);
     }
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
-        List<Vod> list = new ArrayList<>();
         String target = cateUrl + tid + "-----3-" + pg + ".html";
-        Document doc = Jsoup.parse(OkHttp.string(target, getHeaders()));
-        for (Element element : doc.select("div.module-item")) {
+        List<Vod> list = getVodList(target);
+        return Result.string(list);
+    }
+
+    private @NotNull List<Vod> getVodList(String link) {
+        List<Vod> list = new ArrayList<>();
+        Document doc = Jsoup.parse(OkHttp.string(link, getHeaders()));
+        for (Element element : doc.select("div.module-item > a.v-item")) {
             try {
                 String pic = picUrl + element.select("img:not([id])").attr("data-original");
                 String url = element.select("a").attr("href");
@@ -84,8 +75,7 @@ public class NCat extends Spider {
 
             }
         }
-//        Integer total = (Integer.parseInt(pg) + 1) * 20;
-        return Result.string(list);
+        return list;
     }
 
     @Override
