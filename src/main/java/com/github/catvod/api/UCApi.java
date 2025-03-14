@@ -17,6 +17,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -131,7 +132,7 @@ public class UCApi {
                 for (String cookie : cookies) {
                     cookieList.add(cookie.split(";")[0]);
                 }
-                this.cookie += StringUtils.join(cookieList, ";");
+                this.cookie += Util.stringJoin(cookieList, ";");
 
                 cache.setUser(User.objectFrom(this.cookie));
                 if (cache.getUser().getCookie().isEmpty()) throw new Exception(this.cookie);
@@ -190,7 +191,7 @@ public class UCApi {
                         vodItems.add(video_item.getEpisodeUrl("电影"));// + findSubs(video_item.getName(), subs));
                     }
                 }
-                playUrl.add(StringUtils.join(vodItems, "#"));
+                playUrl.add(Util.stringJoin(vodItems, "#"));
             }
         }
 
@@ -200,8 +201,8 @@ public class UCApi {
         vod.setVodContent("");
         vod.setVodPic("");
         vod.setVodName("");
-        vod.setVodPlayUrl(StringUtils.join(playUrl, "$$$"));
-        vod.setVodPlayFrom(StringUtils.join(playFromtmp, "$$$"));
+        vod.setVodPlayUrl(Util.stringJoin(playUrl, "$$$"));
+        vod.setVodPlayFrom(Util.stringJoin(playFromtmp, "$$$"));
         vod.setTypeName("uc云盘");
         return vod;
     }
@@ -258,7 +259,7 @@ public class UCApi {
         if (Util.getExt(url).contains("m3u8")) {
             return getM3u8(url, header);
         }
-        return ProxyVideo.proxy(url, header);
+        return new Object[]{ProxyVideo.proxyResponse(url, header)};
     }
 
     /**
@@ -288,7 +289,7 @@ public class UCApi {
             }
             listM3u8.add(thisOne);
         }
-        String m3u8Str = TextUtils.join("\n", listM3u8);
+        String m3u8Str = Util.stringJoin("\n", listM3u8);
         String contentType = result.getResp().get("Content-Type").get(0);
 
         Map<String, String> respHeaders = new HashMap<>();
@@ -324,7 +325,7 @@ public class UCApi {
             okResult = OkHttp.post(this.apiUrl + url, Json.toJson(data), getHeaders());
         }
         if (okResult.getResp().get("Set-Cookie") != null) {
-            Matcher matcher = Pattern.compile("__puus=([^;]+)").matcher(StringUtils.join(okResult.getResp().get("Set-Cookie"), ";;;"));
+            Matcher matcher = Pattern.compile("__puus=([^;]+)").matcher(Util.stringJoin(okResult.getResp().get("Set-Cookie"), ";;;"));
             if (matcher.find()) {
                 Matcher cookieMatcher = Pattern.compile("__puus=([^;]+)").matcher(this.cookie);
                 if (cookieMatcher.find() && !cookieMatcher.group(1).equals(matcher.group(1))) {
@@ -361,7 +362,7 @@ public class UCApi {
             for (String cookie : cookies) {
                 cookieList.add(cookie.split(";")[0]);
             }
-            this.cookie = StringUtils.join(cookieList, ";");
+            this.cookie = Util.stringJoin(cookieList, ";");
         }
         Map<String, Object> json = Json.parseSafe(res.getBody(), Map.class);
         if (Objects.equals(json.get("message"), "ok")) {
@@ -386,20 +387,44 @@ public class UCApi {
     }
 
     private void startFlow() {
-        Init.run(this::showInput);
+        Init.execute(this::showInput);
     }
 
     private void showInput() {
         try {
-            int margin = ResUtil.dp2px(16);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            FrameLayout frame = new FrameLayout(Init.context());
-            params.setMargins(margin, margin, margin, margin);
-            EditText input = new EditText(Init.context());
-            frame.addView(input, params);
-            dialog = new AlertDialog.Builder(Init.getActivity()).setTitle("请输入UC cookie").setView(frame).setNeutralButton("QRCode", (dialog, which) -> onNeutral()).setNegativeButton(android.R.string.cancel, null).setPositiveButton(android.R.string.ok, (dialog, which) -> onPositive(input.getText().toString())).show();
+            JPanel jPanel = new JPanel();
+            jPanel.setSize(Swings.dp2px(200), Swings.dp2px(80));
+
+            JTextField textField = new JTextField();
+            textField.setName("token");
+            textField.setColumns(Swings.dp2px(38));
+            JButton button = new JButton("Ok");
+            jPanel.add(textField);
+            jPanel.add(button);
+
+            JButton qrButton = new JButton("QRCode");
+            jPanel.add(qrButton);
+            JDialog jDialog = Util.showDialog(jPanel, "输入token");
+            button.addActionListener((event) -> {
+                onPositive(textField.getText());
+                jDialog.dispose();
+            });
+            qrButton.addActionListener((event) -> {
+                SwingUtilities.invokeLater(this::getQRCode);
+                jDialog.dispose();
+            });
         } catch (Exception ignored) {
         }
+//        try {
+//            int margin = ResUtil.dp2px(16);
+//            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//            FrameLayout frame = new FrameLayout(Init.context());
+//            params.setMargins(margin, margin, margin, margin);
+//            EditText input = new EditText(Init.context());
+//            frame.addView(input, params);
+//            dialog = new AlertDialog.Builder(Init.getActivity()).setTitle("请输入UC cookie").setView(frame).setNeutralButton("QRCode", (dialog, which) -> onNeutral()).setNegativeButton(android.R.string.cancel, null).setPositiveButton(android.R.string.ok, (dialog, which) -> onPositive(input.getText().toString())).show();
+//        } catch (Exception ignored) {
+//        }
     }
 
     private void onNeutral() {
@@ -423,11 +448,6 @@ public class UCApi {
 
     private void openApp(String token) {
         try {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setClassName("com.alicloud.databox", "com.taobao.login4android.scan.QrScanActivity");
-            intent.putExtra("key_scanParam", token);
-            Init.getActivity().startActivity(intent);
-        } catch (Exception e) {
             showQRCode("https://su.uc.cn/1_n0ZCv?uc_param_str=dsdnfrpfbivesscpgimibtbmnijblauputogpintnwktprchmt&token=" + token + "&client_id=381&uc_biz_str=S%3Acustom%7CC%3Atitlebar_fix");
         } finally {
             Map<String, String> map = new HashMap<>();
@@ -438,17 +458,15 @@ public class UCApi {
 
     private void showQRCode(String content) {
         try {
-            int size = ResUtil.dp2px(240);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size);
-            ImageView image = new ImageView(Init.context());
-            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            image.setImageBitmap(QRCode.getBitmap(content, size, 2));
-            FrameLayout frame = new FrameLayout(Init.context());
-            params.gravity = Gravity.CENTER;
-            frame.addView(image, params);
-            dialog = new AlertDialog.Builder(Init.getActivity()).setView(frame).setOnCancelListener(this::dismiss).setOnDismissListener(this::dismiss).show();
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            Notify.show("请使用uc网盘App扫描二维码");
+            int size = 300;
+            SwingUtilities.invokeLater(() -> {
+                BufferedImage bitmap = QRCode.getBitmap(content, size, 2);
+                JPanel jPanel = new JPanel();
+                jPanel.setSize(Swings.dp2px(size), Swings.dp2px(size));
+                jPanel.add(new JLabel(new ImageIcon(bitmap)));
+                dialog = Util.showDialog(jPanel, "请使用UC网盘app扫描");
+            });
+            Util.notify("请使用uc网盘App扫描二维码");
         } catch (Exception ignored) {
         }
     }
@@ -464,7 +482,7 @@ public class UCApi {
             SpiderDebug.log("----scheduleAtFixedRate" + new Date().toString());
             String result = OkHttp.string("https://api.open.uc.cn/cas/ajax/getServiceTicketByQrcodeToken?__dt=" + RandomUtils.nextInt(1000, 100000) + "&__t=" + new Date().getTime(), params, getWebHeaders());
             Map<String, Object> json = Json.parseSafe(result, Map.class);
-            if (json.get("status").equals(new Double(2000000))) {
+            if (json.get("status").equals(Double.valueOf(2000000))) {
                 setToken((String) ((Map<String, Object>) ((Map<String, Object>) json.get("data")).get("members")).get("service_ticket"));
 
             }
@@ -487,13 +505,13 @@ public class UCApi {
         Init.run(this::dismiss);
     }
 
-    private void dismiss(DialogInterface dialog) {
-        stopService();
-    }
+//    private void dismiss(DialogInterface dialog) {
+//        stopService();
+//    }
 
     private void dismiss() {
         try {
-            if (dialog != null) dialog.dismiss();
+            if (dialog != null) dialog.dispose();
         } catch (Exception ignored) {
         }
     }

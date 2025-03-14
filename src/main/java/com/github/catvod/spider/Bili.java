@@ -209,7 +209,7 @@ public class Bili extends Spider {
         Resp resp = Resp.objectFrom(json);
         Response response = null;
         try {
-            response = ProxyVideo.proxy(resp.getData().getDurl()[0].getUrl(), getHeader());
+            response = ProxyVideo.proxyResponse(resp.getData().getDurl()[0].getUrl(), getHeader());
         } catch (Exception e) {
             SpiderDebug.log("bili playurl proxy err: "+e.getMessage());
         }

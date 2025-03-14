@@ -3,12 +3,17 @@ package com.github.catvod.spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.utils.Util;
 
+import javax.swing.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Init {
 
     private final ExecutorService executor;
+
+    public static void run(Runnable runnable) {
+        SwingUtilities.invokeLater(runnable);
+    }
 //    private final Handler handler;
 //    private Application app;
 

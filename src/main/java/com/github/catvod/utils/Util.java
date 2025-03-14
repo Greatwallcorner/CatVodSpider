@@ -9,8 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 
-import javax.swing.Timer;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.IOException;
@@ -18,8 +18,8 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -403,4 +403,83 @@ public class Util {
         if(StringUtils.isBlank(str)) return "";
         return new String(Base64.getDecoder().decode(str));
     }
+
+    public static String stringJoin(String separate, List<String> list) {
+        return StringUtils.join(list, separate);
+    }
+
+    public static String stringJoin(List<String> list, String separate) {
+        return StringUtils.join(list, separate);
+    }
+
+    /**
+     * 字符串相似度匹配
+     *
+     * @returns
+     */
+
+    public static LCSResult lcs(String str1, String str2) {
+        if (str1 == null || str2 == null) {
+            return new LCSResult(0, "", 0);
+        }
+
+        StringBuilder sequence = new StringBuilder();
+        int str1Length = str1.length();
+        int str2Length = str2.length();
+        int[][] num = new int[str1Length][str2Length];
+        int maxlen = 0;
+        int lastSubsBegin = 0;
+
+        for (int i = 0; i < str1Length; i++) {
+            for (int j = 0; j < str2Length; j++) {
+                if (str1.charAt(i) != str2.charAt(j)) {
+                    num[i][j] = 0;
+                } else {
+                    if (i == 0 || j == 0) {
+                        num[i][j] = 1;
+                    } else {
+                        num[i][j] = 1 + num[i - 1][j - 1];
+                    }
+
+                    if (num[i][j] > maxlen) {
+                        maxlen = num[i][j];
+                        int thisSubsBegin = i - num[i][j] + 1;
+                        if (lastSubsBegin == thisSubsBegin) {
+                            // if the current LCS is the same as the last time this block ran
+                            sequence.append(str1.charAt(i));
+                        } else {
+                            // this block resets the string builder if a different LCS is found
+                            lastSubsBegin = thisSubsBegin;
+                            sequence.setLength(0); // clear it
+                            sequence.append(str1.substring(lastSubsBegin, i + 1));
+                        }
+                    }
+                }
+            }
+        }
+        return new LCSResult(maxlen, sequence.toString(), lastSubsBegin);
+    }
+
+    public static class LCSResult {
+        public int length;
+        public String sequence;
+        public int offset;
+
+        public LCSResult(int length, String sequence, int offset) {
+            this.length = length;
+            this.sequence = sequence;
+            this.offset = offset;
+        }
+    }
+
+    public static Integer findAllIndexes(List<String> arr, String value) {
+
+        for (int i = 0; i < arr.size(); i++) {
+            if (arr.get(i).equals(value)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
 }

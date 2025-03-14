@@ -1,16 +1,13 @@
 package com.github.catvod.utils;
 
-import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
-
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import com.github.catvod.spider.Proxy;
 import io.ktor.http.HttpStatusCode;
 import okhttp3.Response;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProxyVideo {
 
@@ -47,6 +44,11 @@ public class ProxyVideo {
         //   SpiderDebug.log("++proxy res body:" + response.body());
         SpiderDebug.log("++proxy res respHeaders:" + Json.toJson(respHeaders));
         return new Object[]{response.code(), contentType, response.body().byteStream(), respHeaders};
+    }
+
+    public static Response proxyResponse(String url, Map<String, String> headers) throws Exception {
+        SpiderDebug.log("proxy url："+ url + " headers" + Json.toJson(headers));
+        return OkHttp.newCall(url, headers);
     }
 
     public static class ProxyRespBuilder{

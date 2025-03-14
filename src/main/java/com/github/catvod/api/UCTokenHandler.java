@@ -13,12 +13,14 @@ import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -272,11 +274,11 @@ public class UCTokenHandler {
         try {
             int size = 300;
             SwingUtilities.invokeLater(() -> {
-                BufferedImage bitmap = QRCode.getBitmap(Base64.decodeStr(base64Str), 200, 2);
+                BufferedImage bitmap = QRCode.getBitmap(Base64.decodeStr(base64Str), size, 2);
                 JPanel jPanel = new JPanel();
                 jPanel.setSize(Swings.dp2px(size), Swings.dp2px(size));
                 jPanel.add(new JLabel(new ImageIcon(bitmap)));
-                dialog = Util.showDialog(jPanel, "请使用阿里云盘app扫描");
+                dialog = Util.showDialog(jPanel, "请使用uc网盘App扫描");
             });
             Util.notify("请使用uc网盘App扫描二维码");
         } catch (Exception ignored) {
