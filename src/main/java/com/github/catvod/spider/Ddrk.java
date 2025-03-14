@@ -7,7 +7,7 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.ProxyVideo;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.gson.JsonElement;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -337,7 +337,7 @@ public class Ddrk extends Cloud {
             if (!clouds.isEmpty()) {
                 for (Element cloud : clouds) {
                     String cloudUrl = cloud.attr("href");
-                    if (!Utils.findByRegex(Utils.patternQuark, cloudUrl, 0).isBlank() || !Utils.findByRegex(Utils.patternUC, cloudUrl, 0).isBlank()) {
+                    if (!Util.findByRegex(Util.patternQuark, cloudUrl, 0).isBlank() || !Util.findByRegex(Util.patternUC, cloudUrl, 0).isBlank()) {
                         shareLinks.add(cloudUrl);
                     }
 
@@ -385,7 +385,7 @@ public class Ddrk extends Cloud {
                 String pzm = getPlayUrl(adk);
                 Vod.VodPlayBuilder.PlayUrl playUrl = new Vod.VodPlayBuilder.PlayUrl();
                 playUrl.name = vodName;
-                playUrl.url = ProxyVideo.buildCommonProxyUrl(pzm, Utils.webHeaders(siteUrl));
+                playUrl.url = ProxyVideo.buildCommonProxyUrl(pzm, Util.webHeaders(siteUrl));
                 list.add(playUrl);
             }
             builder.append(sourceName, list);
@@ -415,7 +415,7 @@ public class Ddrk extends Cloud {
         if (flag.contains("quark")||flag.contains("uc")) {
             return super.playerContent(flag, id, vipFlags);
         } else {
-            return Result.get().url(ProxyVideo.buildCommonProxyUrl(id, Utils.webHeaders(siteUrl))).string();
+            return Result.get().url(ProxyVideo.buildCommonProxyUrl(id, Util.webHeaders(siteUrl))).string();
         }
     }
 

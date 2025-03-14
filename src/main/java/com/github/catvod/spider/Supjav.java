@@ -7,7 +7,7 @@ import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.util.TextUtils;
@@ -41,7 +41,7 @@ public class Supjav extends Spider {
     private HashMap<String, String> getTVVideoHeaders(String referer) {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Referer", referer);
-        headers.put("User-Agent", Utils.CHROME);
+        headers.put("User-Agent", Util.CHROME);
         return headers;
     }
 
@@ -166,7 +166,7 @@ public class Supjav extends Spider {
 
     private String parseTV(String redirect) throws MalformedURLException {
         String data = OkHttp.string(redirect, getTVVideoHeaders(URLUtil.getHost(new URL(redirect)).toString()));
-        return Result.get().url(Utils.getVar(data, "urlPlay")).header(getTVVideoHeaders(URLUtil.getHost(new URL(redirect)).toString())).string();
+        return Result.get().url(Util.getVar(data, "urlPlay")).header(getTVVideoHeaders(URLUtil.getHost(new URL(redirect)).toString())).string();
     }
 
     private String parseST(String redirect) throws IOException {

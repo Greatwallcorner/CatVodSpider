@@ -7,7 +7,7 @@ import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.ProxyVideo;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,7 +32,7 @@ public class Ikanbot extends Spider {
 
     private HashMap<String, String> getHeaders() {
         HashMap<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", Utils.CHROME);
+        headers.put("User-Agent", Util.CHROME);
         return headers;
     }
 
@@ -43,7 +43,7 @@ public class Ikanbot extends Spider {
             String url = element.attr("href");
             String name = element.select("img").attr("alt");
             String id = url.split("/")[2];
-            list.add(new Vod(id, name, ProxyVideo.buildCommonProxyUrl(pic, Utils.webHeaders(pic))));
+            list.add(new Vod(id, name, ProxyVideo.buildCommonProxyUrl(pic, Util.webHeaders(pic))));
         }
         return list;
     }
@@ -64,7 +64,7 @@ public class Ikanbot extends Spider {
             String name = element.select("img").attr("alt");
             try {
                 String id = url.split("/")[2];
-                list.add(new Vod(id, name, ProxyVideo.buildCommonProxyUrl(pic, Utils.webHeaders(pic))));
+                list.add(new Vod(id, name, ProxyVideo.buildCommonProxyUrl(pic, Util.webHeaders(pic))));
             } catch (Exception e) {
 
             }
@@ -132,7 +132,7 @@ public class Ikanbot extends Spider {
         }
         Vod vod = new Vod();
         vod.setVodId(ids.get(0));
-        vod.setVodPic(ProxyVideo.buildCommonProxyUrl(pic, Utils.webHeaders(pic)));
+        vod.setVodPic(ProxyVideo.buildCommonProxyUrl(pic, Util.webHeaders(pic)));
         vod.setVodYear(year);
         vod.setVodActor(actor);
         vod.setVodArea(area);
@@ -152,7 +152,7 @@ public class Ikanbot extends Spider {
             String name = element.select("img").attr("alt");
             String id = url.split("/")[2];
 
-            list.add(new Vod(id, name, ProxyVideo.buildCommonProxyUrl(pic, Utils.webHeaders(pic))));
+            list.add(new Vod(id, name, ProxyVideo.buildCommonProxyUrl(pic, Util.webHeaders(pic))));
         }
         return Result.string(list);
     }

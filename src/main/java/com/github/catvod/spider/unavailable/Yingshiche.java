@@ -5,7 +5,7 @@ import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.spider.Ali;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -25,7 +25,7 @@ public class Yingshiche extends Ali {
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", Utils.CHROME);
+        header.put("User-Agent", Util.CHROME);
         return header;
     }
 

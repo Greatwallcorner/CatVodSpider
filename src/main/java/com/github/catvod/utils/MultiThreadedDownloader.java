@@ -91,7 +91,7 @@ public class MultiThreadedDownloader {
         //获取header
         String contentType = response.headers().get("Content-Type");
         String contentDisposition = response.headers().get("Content-Disposition");
-        if (contentDisposition != null) contentType = Utils.getMimeType(contentDisposition);
+        if (contentDisposition != null) contentType = Util.getMimeType(contentDisposition);
         if (contentType == null) throw new Exception("missing response header: Content-Type");
         String hContentLength = response.headers().get("Content-Length");
         if (hContentLength == null) throw new Exception("missing response header: Content-Length");
@@ -182,7 +182,7 @@ public class MultiThreadedDownloader {
                 currentOffset += buffer.length;
                 return buffer;
             } else {
-                Utils.sleep(100);
+                Util.sleep(100);
             }
         }
 
@@ -214,7 +214,7 @@ public class MultiThreadedDownloader {
             while (running) {
                 //过多的数据未被取走，先休息一下，避免内存溢出
                 if (chunk.startOffset - currentOffset >= (long) chunkSize * maxBufferedChunk) {
-                    Utils.sleep(1000);
+                    Util.sleep(1000);
                 } else {
                     break;
                 }
@@ -247,7 +247,7 @@ public class MultiThreadedDownloader {
                     break;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Utils.sleep(1000);
+                    Util.sleep(1000);
                 }
             }
         }

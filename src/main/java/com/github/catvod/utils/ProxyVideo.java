@@ -5,6 +5,7 @@ import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.github.catvod.spider.Proxy;
@@ -14,12 +15,38 @@ import okhttp3.Response;
 public class ProxyVideo {
 
     public static String buildCommonProxyUrl(String url, Map<String, String> headers){
-        return Proxy.getProxyUrl()+"?do=proxy&url="+Utils.base64Encode(url)+"&header="+Utils.base64Encode(Json.toJson(headers));
+        return Proxy.getProxyUrl()+"?do=proxy&url="+ Util.base64Encode(url)+"&header="+ Util.base64Encode(Json.toJson(headers));
     }
 
-    public static Response proxy(String url, Map<String, String> headers) throws Exception {
-        SpiderDebug.log("proxy url："+ url + " headers" + Json.toJson(headers));
-        return OkHttp.newCall(url, headers);
+//    public static Response proxy(String url, Map<String, String> headers) throws Exception {
+//        SpiderDebug.log("proxy url："+ url + " headers" + Json.toJson(headers));
+//        return OkHttp.newCall(url, headers);
+//    }
+
+    public static Object[] proxy(String url, Map<String, String> headers) throws Exception {
+        SpiderDebug.log(" ++start proxy:");
+        SpiderDebug.log(" ++proxy url:" + url);
+        SpiderDebug.log(" ++proxy header:" + Json.toJson(headers));
+
+        Response response = OkHttp.newCall(url, headers);
+        SpiderDebug.log(" ++end proxy:");
+        SpiderDebug.log(" ++proxy res code:" + response.code());
+        SpiderDebug.log(" ++proxy res header:" + Json.toJson(response.headers()));
+        //    SpiderDebug.log(" ++proxy res data:" + Json.toJson(response.body()));
+        String contentType = response.headers().get("Content-Type");
+        String contentDisposition = response.headers().get("Content-Disposition");
+        if (contentDisposition != null) contentType = getMimeType(contentDisposition);
+        Map<String, String> respHeaders = new HashMap<>();
+       /* respHeaders.put("Access-Control-Allow-Credentials", "true");
+        respHeaders.put("Access-Control-Allow-Origin", "*");*/
+
+        for (String key : response.headers().names()) {
+            respHeaders.put(key, response.headers().get(key));
+        }
+        SpiderDebug.log("++proxy res contentType:" + contentType);
+        //   SpiderDebug.log("++proxy res body:" + response.body());
+        SpiderDebug.log("++proxy res respHeaders:" + Json.toJson(respHeaders));
+        return new Object[]{response.code(), contentType, response.body().byteStream(), respHeaders};
     }
 
     public static class ProxyRespBuilder{

@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Utils {
+public class Util {
     public static final String patternAli = "(https:\\/\\/www\\.aliyundrive\\.com\\/s\\/[^\"]+|https:\\/\\/www\\.alipan\\.com\\/s\\/[^\"]+)";
     public static final String patternQuark = "(https:\\/\\/pan\\.quark\\.cn\\/s\\/[^\"]+)";
     public static final String patternUC = "(https:\\/\\/drive\\.uc\\.cn\\/s\\/[^\"]+)";
@@ -285,7 +285,7 @@ public class Utils {
         JLabel jLabel = new JLabel(msg);
         jLabel.setBounds(0, 0, width, height);
         jLabel.setVerticalAlignment(SwingConstants.CENTER);
-        jLabel.setIcon(new ImageIcon(Utils.class.getResource("/TV-icon_1_s.png")));
+        jLabel.setIcon(new ImageIcon(Util.class.getResource("/TV-icon_1_s.png")));
         jLabel.setFont(jLabel.getFont().deriveFont(Float.valueOf(Swings.dp2px(25))));
         jLabel.setForeground(Color.white);
         jPanel.add(jLabel);
@@ -369,7 +369,7 @@ public class Utils {
 
     public static HashMap<String, String> webHeaders(String referer) {
         if (webHttpHeaderMap == null || webHttpHeaderMap.isEmpty()) {
-            synchronized (Utils.class) {
+            synchronized (Util.class) {
                 if (webHttpHeaderMap == null || webHttpHeaderMap.isEmpty()) {
                     webHttpHeaderMap = new HashMap<>();
 //                    webHttpHeaderMap.put(HttpHeaders.CONTENT_TYPE, ContentType.Application.INSTANCE.getJson().getContentType());
@@ -393,6 +393,10 @@ public class Utils {
 
     public static String base64Encode(String str) {
         return new String(Base64.getEncoder().encode(str.getBytes()));
+    }
+
+    public static String base64Encode(byte[] str) {
+        return new String(Base64.getEncoder().encode(str));
     }
 
     public static String base64Decode(String str) {

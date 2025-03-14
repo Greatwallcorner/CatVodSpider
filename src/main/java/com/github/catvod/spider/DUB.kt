@@ -11,7 +11,7 @@ import com.github.catvod.crawler.SpiderDebug
 import com.github.catvod.net.OkHttp
 import com.github.catvod.utils.Image
 import com.github.catvod.utils.Json
-import com.github.catvod.utils.Utils
+import com.github.catvod.utils.Util
 import com.google.common.net.HttpHeaders
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
@@ -19,18 +19,18 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 class DUB: Spider() {
-    private val host = Utils.base64Decode("aHR0cHM6Ly90di5nYm9rdS5jb20v")
+    private val host = Util.base64Decode("aHR0cHM6Ly90di5nYm9rdS5jb20v")
 
     private val cateFormat = "/vodtype/%s.html" // tid-page
     private val cateFormat2 = "/vodtype/%s-%s.html" // tid-page
-    private var referer = Utils.base64Decode("aHR0cHM6Ly93d3cuZHVib2t1LnR2Lw==")
-    private val signUrl = Utils.base64Decode("c3RhdGljL3BsYXllci92aWRqczI1LnBocA==")
-    private val searchUrl = Utils.base64Decode("L3ZvZHNlYXJjaC8tLS0tLS0tLS0tLS0tLmh0bWw/d2Q9JXMmc3VibWl0PQ==")
+    private var referer = Util.base64Decode("aHR0cHM6Ly93d3cuZHVib2t1LnR2Lw==")
+    private val signUrl = Util.base64Decode("c3RhdGljL3BsYXllci92aWRqczI1LnBocA==")
+    private val searchUrl = Util.base64Decode("L3ZvZHNlYXJjaC8tLS0tLS0tLS0tLS0tLmh0bWw/d2Q9JXMmc3VibWl0PQ==")
 
 //    private val classList = Class.parseFromFormatStr("")
     override fun homeContent(filter: Boolean): String {
 //        val result = OkHttp.string("https://tv.gboku.com/vodtype/1.html", Utils.webHeaders("duboku.tv"))
-        val result = OkHttp.string("$host/vodtype/2.html", Utils.webHeaders("duboku.tv"))
+        val result = OkHttp.string("$host/vodtype/2.html", Util.webHeaders("duboku.tv"))
         val document = Jsoup.parse(result)
         val select = document.select("ul.nav-list > li")
 
@@ -50,7 +50,7 @@ class DUB: Spider() {
             url = cateFormat2.format(tid, pg)
         }
         url = "$host$url"
-        val string = OkHttp.string(url, Utils.webHeaders(referer))
+        val string = OkHttp.string(url, Util.webHeaders(referer))
         referer = url
         val document = Jsoup.parse(string)
         val boxList = document.select(".myui-vodlist__box")
@@ -71,7 +71,7 @@ class DUB: Spider() {
 
     override fun detailContent(ids: MutableList<String>): String {
         val u = "$host${ids[0]}"
-        val string = OkHttp.string(u, Utils.webHeaders(referer))
+        val string = OkHttp.string(u, Util.webHeaders(referer))
         referer = u
         val document = Jsoup.parse(string)
         val detail = document.select(".myui-content__detail")
@@ -120,7 +120,7 @@ class DUB: Spider() {
 
     override fun searchContent(key: String?, quick: Boolean): String {
         val string =
-            OkHttp.string("$host${searchUrl.format(URLEncoder.encode(key, "UTF-8"))}", Utils.webHeaders(referer))
+            OkHttp.string("$host${searchUrl.format(URLEncoder.encode(key, "UTF-8"))}", Util.webHeaders(referer))
         val document = Jsoup.parse(string)
         val select = document.select("ul#searchList > li")
         val vodList = mutableListOf<Vod>()
@@ -159,12 +159,12 @@ class DUB: Spider() {
             SpiderDebug.log("DUB 获取播放链接失败 $string")
         }
 
-        val signDocument = OkHttp.string("$host$signUrl", Utils.webHeaders(referer))
+        val signDocument = OkHttp.string("$host$signUrl", Util.webHeaders(referer))
         val signRegx = Regex("encodeURIComponent\\s*\\(\\s*[\"']([^\"']+)[\"']\\s*\\)")
         val find = signRegx.find(signDocument)
         if((find?.groupValues?.size ?: 0) > 0){
             val sign = find!!.groupValues[1]
-            val m3u = OkHttp.string("$url?sign=${URLEncoder.encode(sign, "UTF-8")}", Utils.webHeaders(host).apply { put(HttpHeaders.HOST, URLUtil.url(url).host) })
+            val m3u = OkHttp.string("$url?sign=${URLEncoder.encode(sign, "UTF-8")}", Util.webHeaders(host).apply { put(HttpHeaders.HOST, URLUtil.url(url).host) })
             val m3uRegx = Regex("/\\d{8}/[A-Za-z0-9]+/hls/index\\.m3u8\\?sign=[A-Za-z0-9+=%]+")
             val matchResult = m3uRegx.find(m3u)
             if((matchResult?.groupValues?.size ?: 0) > 0){

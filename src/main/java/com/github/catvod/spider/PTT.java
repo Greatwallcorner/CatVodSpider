@@ -1,6 +1,5 @@
 package com.github.catvod.spider;
 
-import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.net.url.UrlBuilder;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
@@ -9,17 +8,13 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 
-import com.github.catvod.utils.Utils;
-import com.google.common.net.UrlEscapers;
+import com.github.catvod.utils.Util;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.client.utils.URIUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,7 +30,7 @@ public class PTT extends Spider {
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", Utils.CHROME);
+        header.put("User-Agent", Util.CHROME);
         header.put("Accept-Language", "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7");
         return header;
     }

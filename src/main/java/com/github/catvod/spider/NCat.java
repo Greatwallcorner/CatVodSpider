@@ -8,7 +8,7 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.AESEncryption;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -35,7 +35,7 @@ public class NCat extends Spider {
     private static final String playUrl = siteUrl + "/play/";
 
     private HashMap<String, String> getHeaders() {
-        HashMap<String, String> map = Utils.webHeaders(siteUrl);
+        HashMap<String, String> map = Util.webHeaders(siteUrl);
         return map;
     }
 

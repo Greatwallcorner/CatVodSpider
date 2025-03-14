@@ -19,7 +19,6 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -47,8 +46,8 @@ public class QuarkApi {
     private String serviceTicket;
 
     public Object[] proxyVideo(Map<String, String> params) throws Exception {
-        String url = Utils.base64Decode(params.get("url"));
-        Map header = new Gson().fromJson(Utils.base64Decode(params.get("header")), Map.class);
+        String url = Util.base64Decode(params.get("url"));
+        Map header = new Gson().fromJson(Util.base64Decode(params.get("header")), Map.class);
         if (header == null) header = new HashMap<>();
         List<String> arr = ImmutableList.of("Range", "Accept", "Accept-Encoding", "Accept-Language", "Cookie", "Origin", "Referer", "Sec-Ch-Ua", "Sec-Ch-Ua-Mobile", "Sec-Ch-Ua-Platform", "Sec-Fetch-Dest", "Sec-Fetch-Mode", "Sec-Fetch-Site", "User-Agent");
         for (String key : params.keySet()) {
@@ -59,7 +58,7 @@ public class QuarkApi {
             }
 
         }
-        if (Utils.getExt(url).contains("m3u8")) {
+        if (Util.getExt(url).contains("m3u8")) {
             return getM3u8(url, header);
         }
         return new Object[]{ProxyVideo.proxy(url, header)};
@@ -134,7 +133,7 @@ public class QuarkApi {
     }
 
     public void initQuark(String cookie) throws Exception {
-        this.ckey = Utils.MD5(cookie);
+        this.ckey = Util.MD5(cookie);
         this.cookie = cookie;
         this.isVip = getVip();
     }
@@ -206,7 +205,7 @@ public class QuarkApi {
     }
 
     private String proxyVideoUrl(String url, Map<String, String> header) {
-        return String.format(Proxy.getProxyUrl() + "?do=quark&type=video&url=%s&header=%s", Utils.base64Encode(url), Utils.base64Encode(Json.toJson(header)));
+        return String.format(Proxy.getProxyUrl() + "?do=quark&type=video&url=%s&header=%s", Util.base64Encode(url), Util.base64Encode(Json.toJson(header)));
     }
 
     /**
@@ -404,7 +403,7 @@ public class QuarkApi {
                 if ((Double) item.get("size") < 1024 * 1024 * 5) continue;
                 item.put("stoken", this.shareTokenCache.get(shareData.getShareId()).get("stoken"));
                 videos.add(Item.objectFrom(item, shareData.getShareId(), shareIndex));
-            } else if ("file".equals(item.get("type")) && this.subtitleExts.contains("." + Utils.getExt((String) item.get("file_name")))) {
+            } else if ("file".equals(item.get("type")) && this.subtitleExts.contains("." + Util.getExt((String) item.get("file_name")))) {
                 subtitles.add(Item.objectFrom(item, shareData.getShareId(), shareIndex));
             }
         }
@@ -649,7 +648,7 @@ public class QuarkApi {
 
             JButton qrButton = new JButton("QRCode");
             jPanel.add(qrButton);
-            JDialog jDialog = Utils.showDialog(jPanel, "请输入夸克cookie");
+            JDialog jDialog = Util.showDialog(jPanel, "请输入夸克cookie");
             button.addActionListener((event) -> {
                 onPositive(textField.getText());
                 jDialog.dispose();
@@ -701,9 +700,9 @@ public class QuarkApi {
                 JPanel jPanel = new JPanel();
                 jPanel.setSize(Swings.dp2px(size), Swings.dp2px(size));
                 jPanel.add(new JLabel(new ImageIcon(image)));
-                dialog = Utils.showDialog(jPanel, "请使用夸克网盘App扫描二维码");
+                dialog = Util.showDialog(jPanel, "请使用夸克网盘App扫描二维码");
             });
-            Utils.notify("请使用夸克网盘App扫描二维码");
+            Util.notify("请使用夸克网盘App扫描二维码");
         } catch (Exception ignored) {
         }
     }
@@ -730,7 +729,7 @@ public class QuarkApi {
     private void setToken(String value) {
         this.serviceTicket = value;
         SpiderDebug.log("ServiceTicket:" + value);
-        Utils.notify("ServiceTicket:" + value);
+        Util.notify("ServiceTicket:" + value);
         initUserInfo();
         stopService();
     }

@@ -10,12 +10,11 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
 
 
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +32,7 @@ public class JustLive extends Spider {
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", Utils.CHROME);
+        header.put("User-Agent", Util.CHROME);
         return header;
     }
 

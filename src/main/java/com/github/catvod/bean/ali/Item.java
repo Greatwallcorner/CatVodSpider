@@ -1,6 +1,6 @@
 package com.github.catvod.bean.ali;
 
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +69,7 @@ public class Item implements Comparable<Item> {
     }
 
     public String getSize() {
-        return size == 0 ? "" : "[" + Utils.getSize(size) + "]";
+        return size == 0 ? "" : "[" + Util.getSize(size) + "]";
     }
 
     public String getParent() {
@@ -86,7 +86,7 @@ public class Item implements Comparable<Item> {
     }
 
     public String getSortName() {
-        return StringUtils.join(Arrays.asList(getParent(), Utils.getDigit(getName())), " ").trim();
+        return StringUtils.join(Arrays.asList(getParent(), Util.getDigit(getName())), " ").trim();
     }
 
     @Override

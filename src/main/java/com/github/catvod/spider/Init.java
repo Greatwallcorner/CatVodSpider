@@ -1,7 +1,7 @@
 package com.github.catvod.spider;
 
 import com.github.catvod.crawler.SpiderDebug;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,7 +27,7 @@ public class Init {
 
     public static void init() {
         SpiderDebug.log("自定義爬蟲代碼載入成功！");
-        Utils.notify("加载成功");
+        Util.notify("加载成功");
     }
 
     public static void execute(Runnable runnable) {

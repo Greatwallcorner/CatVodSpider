@@ -6,7 +6,7 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.MultiThread;
 import com.github.catvod.utils.ProxyVideo;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import org.apache.http.HttpHeaders;
 
 import java.io.ByteArrayInputStream;
@@ -46,8 +46,8 @@ public class Proxy extends Spider {
 
     private static final List<String> keys = Arrays.asList("url", "header", "do", HttpHeaders.USER_AGENT, HttpHeaders.CONTENT_TYPE, HttpHeaders.HOST);
     private static Object[] commonProxy(Map<String, String> params) throws Exception {
-        String url = Utils.base64Decode(params.get("url"));
-        Map<String,String> header = Json.parseSafe(Utils.base64Decode(params.get("header")), Map.class);
+        String url = Util.base64Decode(params.get("url"));
+        Map<String,String> header = Json.parseSafe(Util.base64Decode(params.get("header")), Map.class);
         if(header == null) header = new HashMap<>();
         for (Map.Entry<String, String> entry : params.entrySet()) {
             if(!keys.contains(entry.getKey())) header.put(entry.getKey(), entry.getValue());

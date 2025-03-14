@@ -3,7 +3,6 @@ package common;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HtmlUtil;
-import com.github.catvod.utils.Utils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,13 +15,13 @@ public class Util {
     @Test
     public void strEncode(){
         String s = "/vodsearch/-------------.html?wd=%s&submit=";
-        System.out.println(Utils.base64Encode(s));
+        System.out.println(com.github.catvod.utils.Util.base64Encode(s));
     }
 
     @Test
     public void strDecode(){
         String s = "YzNSaGRHbGpMM0JzWVhsbGNpOTJhV1JxY3pJMUxuQm9jQT09";
-        System.out.println(Utils.base64Decode(s));
+        System.out.println(com.github.catvod.utils.Util.base64Decode(s));
     }
 
 
@@ -75,6 +74,6 @@ public class Util {
     @Test
     public void StrDecode(){
         String s = "";
-        System.out.println(Utils.base64Decode(s));
+        System.out.println(com.github.catvod.utils.Util.base64Decode(s));
     }
 }

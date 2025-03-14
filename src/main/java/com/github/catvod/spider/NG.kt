@@ -12,7 +12,7 @@ import com.github.catvod.crawler.SpiderDebug
 import com.github.catvod.net.OkHttp
 import com.github.catvod.utils.Json
 import com.github.catvod.utils.ProxyVideo
-import com.github.catvod.utils.Utils
+import com.github.catvod.utils.Util
 import com.google.common.net.HttpHeaders
 import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
@@ -20,7 +20,7 @@ import com.google.gson.reflect.TypeToken
 
 
 class NG: Spider() {
-    private var COMMON_URL: String = Utils.base64Decode("aHR0cDovL3lzLmNoYW5nbWVuZ3l1bi5jb20=")
+    private var COMMON_URL: String = Util.base64Decode("aHR0cDovL3lzLmNoYW5nbWVuZ3l1bi5jb20=")
     private val FIND_VIDEO_VOD_LIST: String = "/api.php/provide/vod_list"
     private val FIND_CLASSIFICATION: String = "/api.php/provide/home_nav"
     private val VIDEO_DETAIL: String = "/api.php/provide/vod_detail"
@@ -52,7 +52,7 @@ class NG: Spider() {
         headers.put("timeMillis", currentTimeMillis.toString())
         headers.put(
             "sign",
-            DigestUtil.md5Hex(Utils.base64Decode("I3VCRnN6ZEVNMG9MMEpSbkA=")+"$currentTimeMillis")
+            DigestUtil.md5Hex(Util.base64Decode("I3VCRnN6ZEVNMG9MMEpSbkA=")+"$currentTimeMillis")
         )
         return headers
     }

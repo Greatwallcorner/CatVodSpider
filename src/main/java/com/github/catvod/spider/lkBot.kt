@@ -14,14 +14,14 @@ import com.github.catvod.utils.Image
 import com.github.catvod.utils.Image.UrlHeaderBuilder
 import com.github.catvod.utils.Json
 import com.github.catvod.utils.Json.parse
-import com.github.catvod.utils.Utils
+import com.github.catvod.utils.Util
 import org.jsoup.Jsoup
 import org.jsoup.internal.StringUtil
 
 class IkBot: Spider() {
-    private val host = Utils.base64Decode("aHR0cHM6Ly92LmlrYW5ib3QuY29tLw==")
+    private val host = Util.base64Decode("aHR0cHM6Ly92LmlrYW5ib3QuY29tLw==")
 
-    private val detail = Utils.base64Decode("YXBpL2dldFJlc04/dmlkZW9JZD0lcyZtdHlwZT0lcyZ0b2tlbj0lcw==")
+    private val detail = Util.base64Decode("YXBpL2dldFJlc04/dmlkZW9JZD0lcyZtdHlwZT0lcyZ0b2tlbj0lcw==")
 
 //    private val tkJsMd = "fc0c1b33cb7815632b5448782aac3d6a"
 
@@ -29,16 +29,17 @@ class IkBot: Spider() {
 
     private val home = ""
 
-    private val cateMap = Filter.fromJson(Utils.base64Decode(
+    private val cateMap = Filter.fromJson(
+        Util.base64Decode(
         "ewogICAgImthbmxpc3Qv5YWo6YOoIjogWwogICAgICAgIHsKICAgICAgICAgICAgIm5hbWUiOiAi5YiG57G7IiwKICAgICAgICAgICAgInZhbHVlIjogWwogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogIiIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5YWo6YOoIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJrYW5saXN0L+WJp+aDhSIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5Ymn5oOFIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJrYW5saXN0L+aDheaEnyIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5oOF5oSfIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJrYW5saXN0L+ayu+aEiCIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5rK75oSIIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJrYW5saXN0L+eIseaDhSIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi54ix5oOFIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJrYW5saXN0L+migeWlliIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi6aKB5aWWIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJrYW5saXN0L+WWnOWJpyIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5Zac5YmnIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJrYW5saXN0L+iOt+WlliIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi6I635aWWIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJrYW5saXN0LyDnp5HlubsiLAogICAgICAgICAgICAgICAgICAgICJuIjogIuenkeW5uyIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAia2FubGlzdC/mvKvlqIEiLAogICAgICAgICAgICAgICAgICAgICJuIjogIua8q+WogSIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAia2FubGlzdC/nlJzonJwiLAogICAgICAgICAgICAgICAgICAgICJuIjogIueUnOicnCIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAia2FubGlzdC/mgqznlpEiLAogICAgICAgICAgICAgICAgICAgICJuIjogIuaCrOeWkSIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAia2FubGlzdC/lirHlv5ciLAogICAgICAgICAgICAgICAgICAgICJuIjogIuWKseW/lyIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAia2FubGlzdC/ng6fohJEiLAogICAgICAgICAgICAgICAgICAgICJuIjogIueDp+iEkSIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAia2FubGlzdC/lj4vmg4UiLAogICAgICAgICAgICAgICAgICAgICJuIjogIuWPi+aDhSIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgXSwKICAgICAgICAgICAgImtleSI6ICJjYXRlSWQiCiAgICAgICAgfQogICAgXSwKICAgICJiaWxsYm9hcmQiOiBbXSwKICAgICJob3QvaW5kZXgtbW92aWUt54Ot6ZeoIjogWwogICAgICAgIHsKICAgICAgICAgICAgIm5hbWUiOiAi5YiG57G7IiwKICAgICAgICAgICAgInZhbHVlIjogWwogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogIiIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5YWo6YOoIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJob3QvaW5kZXgtbW92aWUt5pyA5pawIiwKICAgICAgICAgICAgICAgICAgICAibiI6ICLmnIDmlrAiCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogImhvdC9pbmRleC1tb3ZpZS3nu4/lhbgiLAogICAgICAgICAgICAgICAgICAgICJuIjogIue7j+WFuCIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAiaG90L2luZGV4LW1vdmllLeixhueTo+mrmOWIhiIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi6LGG55Oj6auY5YiGIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJob3QvaW5kZXgtbW92aWUt5Ya36Zeo5L2z54mHIiwKICAgICAgICAgICAgICAgICAgICAibiI6ICLlhrfpl6jkvbPniYciCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogImhvdC9pbmRleC1tb3ZpZS3ljY7or60iLAogICAgICAgICAgICAgICAgICAgICJuIjogIuWNjuivrSIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAiaG90L2luZGV4LW1vdmllLeasp+e+jiIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5qyn576OIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJob3QvaW5kZXgtbW92aWUt6Z+p5Zu9IiwKICAgICAgICAgICAgICAgICAgICAibiI6ICLpn6nlm70iCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogImhvdC9pbmRleC1tb3ZpZS3ml6XmnKwiLAogICAgICAgICAgICAgICAgICAgICJuIjogIuaXpeacrCIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAiaG90L2luZGV4LW1vdmllLeWKqOS9nCIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5Yqo5L2cIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJob3QvaW5kZXgtbW92aWUt5Zac5YmnIiwKICAgICAgICAgICAgICAgICAgICAibiI6ICLllpzliaciCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogImhvdC9pbmRleC1tb3ZpZS3niLHmg4UiLAogICAgICAgICAgICAgICAgICAgICJuIjogIueIseaDhSIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAiaG90L2luZGV4LW1vdmllLeenkeW5uyIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi56eR5bm7IgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJob3QvaW5kZXgtbW92aWUt5oKs55aRIiwKICAgICAgICAgICAgICAgICAgICAibiI6ICLmgqznlpEiCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogImhvdC9pbmRleC1tb3ZpZS3mgZDmgJYiLAogICAgICAgICAgICAgICAgICAgICJuIjogIuaBkOaAliIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAiaG90L2luZGV4LW1vdmllLeaIkOmVvyIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5oiQ6ZW/IgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJob3QvaW5kZXgtbW92aWUt6LGG55OjdG9wMjUwIiwKICAgICAgICAgICAgICAgICAgICAibiI6ICLosYbnk6N0b3AyNTAiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIF0sCiAgICAgICAgICAgICJrZXkiOiAiY2F0ZUlkIgogICAgICAgIH0KICAgIF0sCiAgICAiaG90L2luZGV4LXR2LeeDremXqCI6IFsKICAgICAgICB7CiAgICAgICAgICAgICJuYW1lIjogIuWIhuexuyIsCiAgICAgICAgICAgICJ2YWx1ZSI6IFsKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICIiLAogICAgICAgICAgICAgICAgICAgICJuIjogIuWFqOmDqCIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAiaG90L2luZGV4LXR2Lee+juWJpyIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi576O5YmnIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJob3QvaW5kZXgtdHYt6Iux5YmnIiwKICAgICAgICAgICAgICAgICAgICAibiI6ICLoi7HliaciCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogImhvdC9pbmRleC10di3pn6nliaciLAogICAgICAgICAgICAgICAgICAgICJuIjogIumfqeWJpyIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAiaG90L2luZGV4LXR2LeaXpeWJpyIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5pel5YmnIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJob3QvaW5kZXgtdHYt5Zu95Lqn5YmnIiwKICAgICAgICAgICAgICAgICAgICAibiI6ICLlm73kuqfliaciCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogImhvdC9pbmRleC10di3muK/liaciLAogICAgICAgICAgICAgICAgICAgICJuIjogIua4r+WJpyIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgInYiOiAiaG90L2luZGV4LXR2LeaXpeacrOWKqOeUuyIsCiAgICAgICAgICAgICAgICAgICAgIm4iOiAi5pel5pys5Yqo55S7IgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAidiI6ICJob3QvaW5kZXgtdHYt57u86Im6IiwKICAgICAgICAgICAgICAgICAgICAibiI6ICLnu7zoiboiCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICJ2IjogImhvdC9pbmRleC10di3nuqrlvZXniYciLAogICAgICAgICAgICAgICAgICAgICJuIjogIue6quW9leeJhyIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgXSwKICAgICAgICAgICAgImtleSI6ICJjYXRlSWQiCiAgICAgICAgfQogICAgXQp9"
     ))
 
 //    private val classList = Class.parseFromFormatStr(Utils.base64Decode("55S15b2xPWhvdC9pbmRleC1tb3ZpZS3ng63pl6gm5Ymn6ZuGPWhvdC9pbmRleC10di3ng63pl6gm5qac5Y2VPWJpbGxib2FyZC8qJueJh+WNlT1rYW5saXN0L+WFqOmDqCov"))
-    private val classList = Class.parseFromFormatStr(Utils.base64Decode("55S15b2xPWhvdC9pbmRleC1tb3ZpZS3ng63pl6gm5Ymn6ZuGPWhvdC9pbmRleC10di3ng63pl6g="))
+    private val classList = Class.parseFromFormatStr(Util.base64Decode("55S15b2xPWhvdC9pbmRleC1tb3ZpZS3ng63pl6gm5Ymn6ZuGPWhvdC9pbmRleC10di3ng63pl6g="))
     private val classMap = classList.mapIndexed{ index, item -> index to item}.toMap()
 
     override fun homeContent(filter: Boolean): String {
-        val string = OkHttp.string(host, Utils.webHeaders(host))
+        val string = OkHttp.string(host, Util.webHeaders(host))
         val vodList = parseVod(string)
         return Result.string(classList, vodList.toList(), cateMap)
     }
@@ -51,7 +52,7 @@ class IkBot: Spider() {
             val item = element.select("div > img")
             val name = item.attr("alt")
             val image = item.attr("data-src")
-            val imageUrl = UrlHeaderBuilder(image).referer(host).userAgent(Utils.CHROME).build()
+            val imageUrl = UrlHeaderBuilder(image).referer(host).userAgent(Util.CHROME).build()
             vodList.add(Vod(id, name, imageUrl))
         }
         return vodList
@@ -68,7 +69,7 @@ class IkBot: Spider() {
                     val a = item.select("img")
                     val name = a.attr("alt")
                     val pic = a.attr("data-src")
-                    val vod = Vod(id, name, Image.UrlHeaderBuilder(pic).referer(ref).userAgent(Utils.CHROME).build())
+                    val vod = Vod(id, name, Image.UrlHeaderBuilder(pic).referer(ref).userAgent(Util.CHROME).build())
                     vodList.add(vod)
                 }
             }
@@ -84,12 +85,12 @@ class IkBot: Spider() {
             val cateId = extend["cateId"]
             if(cateId.isNullOrBlank()) return ""
             url = getUrl(pg, cateId)
-            val string = OkHttp.string(url, Utils.webHeaders(url))
+            val string = OkHttp.string(url, Util.webHeaders(url))
             val vodList = cateParseVod(string, tid, url)
             return Result.string(classList, vodList.toList(), cateMap)
         }else{
             url = getUrl(pg, tid)
-            val string = OkHttp.string(url, Utils.webHeaders(url))
+            val string = OkHttp.string(url, Util.webHeaders(url))
             val vodList = cateParseVod(string, tid, url)
             return Result.string(classList, vodList.toList(), cateMap)
         }
@@ -107,7 +108,7 @@ class IkBot: Spider() {
     override fun detailContent(ids: MutableList<String>): String {
         val id = ids[0]
         val url = URLUtil.completeUrl(host, id)
-        val string = OkHttp.string(url, Utils.webHeaders(host))
+        val string = OkHttp.string(url, Util.webHeaders(host))
         val parse = Jsoup.parse(string)
         val cid = parse.select("input#current_id").attr("value")
         val tk = parse.select("input#e_token").attr("value")
@@ -124,7 +125,7 @@ class IkBot: Spider() {
 
         val t = getTk(cid, tk)
         val video = id.split("/").last()
-        val vd = OkHttp.string(String.format(host + detail, video, ty, t), Utils.webHeaders(url))
+        val vd = OkHttp.string(String.format(host + detail, video, ty, t), Util.webHeaders(url))
         SpiderDebug.log("Ik 请求返回: $vd")
         val r = Json.parseSafe<Rst>(vd, Rst::class.java)
         if(r.state != 1){
@@ -139,7 +140,7 @@ class IkBot: Spider() {
             }
         }
         val buildResult = vodPlayBuilder.build()
-        val vod = Vod(id, name, Image.UrlHeaderBuilder(img).userAgent(Utils.CHROME).referer(url).build(), remark)
+        val vod = Vod(id, name, Image.UrlHeaderBuilder(img).userAgent(Util.CHROME).referer(url).build(), remark)
         vod.let {
             it.setVodYear(year)
             it.setVodActor(actor)
@@ -165,7 +166,7 @@ class IkBot: Spider() {
 
     override fun searchContent(key: String, quick: Boolean): String {
         val url = "${host}search?q=${URLEncodeUtil.encode(key)}"
-        val string = OkHttp.string(url, Utils.webHeaders(host))
+        val string = OkHttp.string(url, Util.webHeaders(host))
         val parse = Jsoup.parse(string)
         val items = parse.select("div.media")
         val vodList = mutableListOf<Vod>()
@@ -174,7 +175,7 @@ class IkBot: Spider() {
             val id = head.attr("href")
             val name = head.text()
             val pic = item.select("div > a > img").attr("data-src")
-            vodList.add(Vod(id, name, Image.UrlHeaderBuilder(pic).userAgent(Utils.CHROME).referer(url).build()))
+            vodList.add(Vod(id, name, Image.UrlHeaderBuilder(pic).userAgent(Util.CHROME).referer(url).build()))
         }
         return Result.string(vodList)
     }
@@ -186,7 +187,7 @@ class IkBot: Spider() {
 //            "application/vnd.apple.mpegurl",
 //            id
 //            )
-        return Result.get().url(id).header(Utils.webHeaders(host)).string()
+        return Result.get().url(id).header(Util.webHeaders(host)).string()
     }
 }
 

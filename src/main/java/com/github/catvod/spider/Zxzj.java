@@ -5,15 +5,10 @@ package com.github.catvod.spider;/*
 */
 
 
-import cn.hutool.core.net.URLEncodeUtil;
-import cn.hutool.core.net.url.UrlBuilder;
-import cn.hutool.core.net.url.UrlQuery;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.Mode;
 import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.symmetric.AES;
-import cn.hutool.json.JSONUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Filter;
 import com.github.catvod.bean.Result;
@@ -23,13 +18,7 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.ProxyVideo;
-import com.github.catvod.utils.Utils;
-import com.google.common.collect.Maps;
-import org.apache.commons.lang3.RegExUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
+import com.github.catvod.utils.Util;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -37,8 +26,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -175,7 +162,7 @@ public class Zxzj extends Spider {
         String searchUrl = siteUrl + "/vodsearch/-------------.html?wd=" + key + "&submit=";
         String html = OkHttp.string(searchUrl);
         if (html.contains("Just a moment")) {
-            Utils.notify("在线之家资源需要人机验证");
+            Util.notify("在线之家资源需要人机验证");
         }
         Document document = Jsoup.parse(html);
         List<Vod> list = new ArrayList<>();

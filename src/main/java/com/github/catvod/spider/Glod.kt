@@ -10,14 +10,14 @@ import com.github.catvod.crawler.Spider
 import com.github.catvod.crawler.SpiderDebug
 import com.github.catvod.net.OkHttp
 import com.github.catvod.utils.Json
-import com.github.catvod.utils.Utils
+import com.github.catvod.utils.Util
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.jsoup.Jsoup
 import java.util.*
 
 class Glod:Spider() {
-    private val host = Utils.base64Decode("aHR0cHM6Ly93d3cuY2Zrajg2LmNvbS8=")
+    private val host = Util.base64Decode("aHR0cHM6Ly93d3cuY2Zrajg2LmNvbS8=")
 
     private val detailUrl = host + "api/mw-movie/anonymous/video/detail?id=%s"
 
@@ -36,7 +36,7 @@ class Glod:Spider() {
     }
 
     override fun homeContent(filter: Boolean): String {
-        val string = OkHttp.string(host, Utils.webHeaders("https://www.bing.com"))
+        val string = OkHttp.string(host, Util.webHeaders("https://www.bing.com"))
         val vodList = parseFromJson(string, "home")
 //        val vodList = parseVodList(string)
         return Result.string(classList, vodList)
@@ -108,7 +108,7 @@ class Glod:Spider() {
     }
 
     private fun genHeaders(signKey:String, time:String = Date().time.toString()): HashMap<String, String>? {
-        val webHeaders = Utils.webHeaders(host)
+        val webHeaders = Util.webHeaders(host)
         val sign = genSign(signKey)
         webHeaders["t"] = time
         webHeaders["deviceId"] = deviceId
@@ -124,13 +124,13 @@ class Glod:Spider() {
 
     override fun categoryContent(tid: String, pg: String, filter: Boolean, extend: HashMap<String, String>): String {
         val url = "$host/type/$tid"
-        val string = OkHttp.string(url, Utils.webHeaders(host))
+        val string = OkHttp.string(url, Util.webHeaders(host))
         val vodList = parseFromJson(string, "cate")
         return Result.string(classList, vodList)
     }
 
     override fun searchContent(key: String, quick: Boolean): String {
-        val string = OkHttp.string("${host}vod/search/$key", Utils.webHeaders(host))
+        val string = OkHttp.string("${host}vod/search/$key", Util.webHeaders(host))
         val vodList = parseFromJson(string, "search")
         return Result.string(vodList)
     }

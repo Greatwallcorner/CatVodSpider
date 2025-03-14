@@ -5,22 +5,22 @@ import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Yingso extends Ali {
-    private static final String siteUrl = Utils.base64Decode("aHR0cHM6Ly95aW5nc28uZnVuOjMwMDEv");
+    private static final String siteUrl = Util.base64Decode("aHR0cHM6Ly95aW5nc28uZnVuOjMwMDEv");
 
-    private static final String searchUrl = Utils.base64Decode("aHR0cHM6Ly95cy5hcGkueWluZ3NvLmZ1bi92My9hbGkvc2VhcmNo");
+    private static final String searchUrl = Util.base64Decode("aHR0cHM6Ly95cy5hcGkueWluZ3NvLmZ1bi92My9hbGkvc2VhcmNo");
 
     private static final String shareUrl = "https://www.aliyundrive.com/s/";
 
     @Override
     public String searchContent(String key, boolean quick) throws Exception {
-        String data = OkHttp.post(searchUrl, new Req(30, 1, key).toJson(), Utils.webHeaders(siteUrl)).getBody();
+        String data = OkHttp.post(searchUrl, new Req(30, 1, key).toJson(), Util.webHeaders(siteUrl)).getBody();
         Res res = Res.fromJson(data);
         if (res == null || res.code != 200) {
             SpiderDebug.log("yingso error:" + res.msg + "data: " + data);

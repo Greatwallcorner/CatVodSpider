@@ -12,24 +12,14 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.unit.dp
-import cn.hutool.captcha.generator.RandomGenerator
-import cn.hutool.core.codec.Base64
 import cn.hutool.core.util.RandomUtil
-import cn.hutool.crypto.Mode
-import cn.hutool.crypto.Padding
-import cn.hutool.crypto.digest.DigestUtil
-import cn.hutool.crypto.symmetric.AES
 import cn.hutool.json.JSONUtil
-import com.github.catvod.bean.Class
 import com.github.catvod.crawler.SpiderDebug
 import com.github.catvod.net.OkHttp
 import com.github.catvod.utils.DialogUtil
-import com.github.catvod.utils.Json
-import com.github.catvod.utils.ProxyVideo
-import com.github.catvod.utils.Utils
+import com.github.catvod.utils.Util
 import com.google.common.collect.ImmutableMap
 import okhttp3.Response
-import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 
@@ -41,7 +31,7 @@ class MtyyKT {
 
         @JvmStatic
         fun init(): String {
-            val res = OkHttp.newCall("${MtyyKT.siteUrl}/vodsearch/-------------.html?wd=1", Utils.webHeaders(siteUrl))
+            val res = OkHttp.newCall("${MtyyKT.siteUrl}/vodsearch/-------------.html?wd=1", Util.webHeaders(siteUrl))
             var session = "";
             if (res.isSuccessful) {
                 val c = res.headers[com.google.common.net.HttpHeaders.SET_COOKIE]
@@ -79,7 +69,7 @@ class MtyyKT {
                                 )
                             } else {
                                 SpiderDebug.log("麦田验证：" + JSONUtil.parseObj(res).getStr("msg"))
-                                Utils.notify(JSONUtil.parseObj(res).getStr("msg"));
+                                Util.notify(JSONUtil.parseObj(res).getStr("msg"));
                             }
                             SpiderDebug.log("麦田 code confirm end")
                         }, session)
@@ -93,7 +83,7 @@ class MtyyKT {
         public fun verifying(
             url: String, session: String, it: String
         ): String? {
-            val header = Utils.webHeaders(
+            val header = Util.webHeaders(
                 url, session
             )
             header["X-Requested-With"] = "XMLHttpRequest"
@@ -116,11 +106,11 @@ class MtyyKT {
             val codeUrl = "${siteUrl}/verify/index.html?r=0.6416516521737"+RandomUtil.randomInt(0,9)
             var resp: Response? = null
             try {
-                val header = Utils.webHeaders(url)
+                val header = Util.webHeaders(url)
                 header["Sec-Fetch-Dest"] = "image";
                 header["Sec-Fetch-Mode"] = "no-cors";
                 header["Sec-Fetch-Site"] = "same-origin";
-                resp = OkHttp.newCall(codeUrl, Utils.webHeaders(url))
+                resp = OkHttp.newCall(codeUrl, Util.webHeaders(url))
                 var session = "";
                 if (resp.isSuccessful) {
                     val c = resp.headers[com.google.common.net.HttpHeaders.SET_COOKIE]
@@ -138,7 +128,7 @@ class MtyyKT {
             val codeUrl = "${siteUrl}/verify/index.html?"
             var resp: Response? = null
             try {
-                resp = OkHttp.newCall(codeUrl, Utils.webHeaders(url, session))
+                resp = OkHttp.newCall(codeUrl, Util.webHeaders(url, session))
                 return resp?.body?.bytes() ?: byteArrayOf()
             } finally {
                 resp?.close()

@@ -1,7 +1,7 @@
 package com.github.catvod.bean.jianpian;
 
 import com.github.catvod.bean.Vod;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.StringUtils;
 
@@ -90,13 +90,13 @@ public class Data {
     public String getValues(List<Value> items, boolean link) {
         StringBuilder sb = new StringBuilder();
         for (Value value : items) sb.append(value.getValue(link)).append(" ");
-        return Utils.substring(sb.toString());
+        return Util.substring(sb.toString());
     }
 
     public String getPlayUrl() {
         StringBuilder sb = new StringBuilder();
         for (BtboDown value : getBtboDownlist()) sb.append(value.getVal()).append("#");
-        return Utils.substring(sb.toString());
+        return Util.substring(sb.toString());
     }
 
     public static class Value {

@@ -1,9 +1,7 @@
 package com.github.catvod.api;
 
-
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
-import com.github.catvod.bean.quark.LCSResult;
 import com.github.catvod.bean.uc.Cache;
 import com.github.catvod.bean.uc.Item;
 import com.github.catvod.bean.uc.ShareData;
@@ -14,14 +12,11 @@ import com.github.catvod.net.OkResult;
 import com.github.catvod.spider.Init;
 import com.github.catvod.spider.Proxy;
 import com.github.catvod.utils.*;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -32,12 +27,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.github.catvod.api.QuarkApi.findAllIndexes;
-import static com.github.catvod.api.QuarkApi.lcs;
-
 public class UCApi {
     private String apiUrl = "https://pc-api.uc.cn/1/clouddrive/";
     private String cookie = "";
+    private String cookieToken = "";
     private String ckey = "";
     private Map<String, Map<String, Object>> shareTokenCache = new HashMap<>();
     private String pr = "pr=UCBrowser&fr=pc";
@@ -47,89 +40,13 @@ public class UCApi {
     private final String saveDirName = "TV";
     private boolean isVip = false;
     private final Cache cache;
+    private final Cache tokenCache;
     private ScheduledExecutorService service;
+
+
     private JDialog dialog;
-
-
     private String serviceTicket;
-
-    public Object[] proxyVideo(Map<String, String> params) throws Exception {
-        String url = base64Decode(params.get("url"));
-        SpiderDebug.log("uc proxy param url :" + url);
-        Map header = new Gson().fromJson(base64Decode(params.get("header")), Map.class);
-        SpiderDebug.log("uc proxy param header :" + Json.toJson(header));
-
-        if (header == null) header = new HashMap<>();
-        List<String> arr = ImmutableList.of("Range", "Accept", "Accept-Encoding", "Accept-Language", "Cookie", "Origin", "Referer", "Sec-Ch-Ua", "Sec-Ch-Ua-Mobile", "Sec-Ch-Ua-Platform", "Sec-Fetch-Dest", "Sec-Fetch-Mode", "Sec-Fetch-Site", "User-Agent");
-        for (String key : params.keySet()) {
-            for (String s : arr) {
-                if (s.toLowerCase().equals(key.toLowerCase())) {
-                    header.put(key, params.get(key));
-                }
-            }
-
-        }
-
-        SpiderDebug.log("uc proxy used header :" + Json.toJson(header));
-        if (Utils.getExt(url).contains("m3u8")) {
-            return getM3u8(url, header);
-        }
-        return new Object[]{ProxyVideo.proxy(url, header)};
-    }
-
-    /**
-     * 代理m3u8
-     *
-     * @param url
-     * @param header
-     * @return
-     */
-    private Object[] getM3u8(String url, Map header) {
-        SpiderDebug.log("uc m3u8 url  :" + url);
-        OkResult result = OkHttp.get(url, new HashMap<>(), header);
-        String[] m3u8Arr = result.getBody().split("\n");
-        List<String> listM3u8 = new ArrayList<>();
-
-        String site = url.substring(0, url.lastIndexOf("/")) + "/";
-        int mediaId = 0;
-        for (String oneLine : m3u8Arr) {
-            String thisOne = oneLine;
-
-            if (oneLine.contains(".ts")) {
-                mediaId++;
-                thisOne = proxyVideoUrl(site + thisOne, header);
-                SpiderDebug.log("uc m3u8 line " + mediaId + ":" + oneLine);
-                SpiderDebug.log("uc m3u8 proxyed line " + mediaId + " :" + thisOne);
-
-            }
-            listM3u8.add(thisOne);
-        }
-        String m3u8Str = StringUtils.join(listM3u8, "\n");
-        String contentType = result.getResp().get("Content-Type").get(0);
-
-        Map<String, String> respHeaders = new HashMap<>();
-        //  respHeaders.put("Access-Control-Allow-Origin","*");
-        //    respHeaders.put("Access-Control-Allow-Credentials","true");
-        for (String key : result.getResp().keySet()) {
-            respHeaders.put(key, result.getResp().get(key).get(0));
-        }
-        return new Object[]{result.getCode(), contentType, new ByteArrayInputStream(m3u8Str.getBytes(Charset.defaultCharset())), respHeaders};
-    }
-
-    private static class Loader {
-        static volatile UCApi INSTANCE = new UCApi();
-    }
-
-    public static UCApi get() {
-        return Loader.INSTANCE;
-    }
-
-    public void setCookie(String token) throws Exception {
-        if (StringUtils.isNoneBlank(token)) {
-            this.cookie = token;
-            initUserInfo();
-        }
-    }
+    private UCTokenHandler qrCodeHandler;
 
     private Map<String, String> getHeaders() {
         Map<String, String> headers = new HashMap<>();
@@ -149,138 +66,39 @@ public class UCApi {
         return headers;
     }
 
-    public void initUc(String cookie) throws Exception {
-        this.ckey = Utils.MD5(cookie);
-        this.cookie = cookie;
-        this.isVip = getVip();
-    }
+    /* cookieToken = qrCodeHandler.startUC_TOKENScan();
+             SpiderDebug.log("扫码登录获取到的cookieToken: " + cookieToken);*/
+
 
     private UCApi() {
-
-
+        qrCodeHandler = new UCTokenHandler();
         cache = Cache.objectFrom(Path.read(getCache()));
+        tokenCache = Cache.objectFrom(Path.read(qrCodeHandler.getCache()));
+
+        this.cookieToken = tokenCache.getUser().getCookie();
+        SpiderDebug.log("UC初始化获取到的cookieToken: " + cookieToken);
     }
 
-    public File getCache() {
-        return Path.tv("uc");
+    private static class Loader {
+        static volatile UCApi INSTANCE = new UCApi();
     }
 
-    public Vod getVod(ShareData shareData) throws Exception {
-        getShareToken(shareData);
-        List<Item> files = new ArrayList<>();
-        List<Item> subs = new ArrayList<>();
-        List<Map<String, Object>> listData = listFile(1, shareData, files, subs, shareData.getShareId(), shareData.getFolderId(), 1);
+    public static UCApi get() {
+        return Loader.INSTANCE;
+    }
 
-        List<String> playFrom = UCApi.get().getPlayFormatList();
-        List<String> playFromtmp = new ArrayList<>();
-        playFromtmp.add("uc原画");
-        for (String s : playFrom) {
-            playFromtmp.add("uc" + s);
+    //从配置中获取cookie
+    public void setCookie(String token) throws Exception {
+        if (StringUtils.isNoneBlank(token)) {
+            this.cookie = token;
+            initUserInfo();
+
         }
-
-        List<String> playUrl = new ArrayList<>();
-
-        if (files.isEmpty()) {
-            return null;
-        }
-        for (int i = 0; i < files.get(files.size() - 1).getShareIndex(); i++) {
-            for (int index = 0; index < playFromtmp.size(); index++) {
-                List<String> vodItems = new ArrayList<>();
-                for (Item video_item : files) {
-                    if (video_item.getShareIndex() == i + 1) {
-                        vodItems.add(video_item.getEpisodeUrl("电影"));// + findSubs(video_item.getName(), subs));
-                    }
-                }
-                playUrl.add(StringUtils.join(vodItems, "#"));
-            }
-        }
-
-
-        Vod vod = new Vod();
-        vod.setVodId("");
-        vod.setVodContent("");
-        vod.setVodPic("");
-        vod.setVodName("");
-        vod.setVodPlayUrl(StringUtils.join(playUrl, "$$$"));
-        vod.setVodPlayFrom(StringUtils.join(playFromtmp, "$$$"));
-        vod.setTypeName("uc云盘");
-        return vod;
-    }
-
-    public String playerContent(String[] split, String flag) throws Exception {
-        SpiderDebug.log("uc flag:" + flag);
-        String fileId = split[0], fileToken = split[1], shareId = split[2], stoken = split[3];
-        String playUrl = "";
-        if (flag.contains("uc原画")) {
-            playUrl = this.getDownload(shareId, stoken, fileId, fileToken, true);
-        } else {
-            playUrl = this.getLiveTranscoding(shareId, stoken, fileId, fileToken, flag);
-        }
-        SpiderDebug.log("uc origin playUrl:" + playUrl);
-        Map<String, String> header = getHeaders();
-        header.remove("Host");
-        header.remove("Content-Type");
-        SpiderDebug.log("uc origin header:" + Json.toJson(header));
-
-        return Result.get().url(proxyVideoUrl(playUrl, header)).octet().header(header).string();
-    }
-
-    private String proxyVideoUrl(String url, Map<String, String> header) {
-        return String.format(Proxy.getProxyUrl() + "?do=uc&type=video&url=%s&header=%s", base64Encode(url), base64Encode(Json.toJson(header)));
-    }
-
-    public String base64Encode(String str) {
-        return new String(Base64.getUrlEncoder().withoutPadding().encode(str.getBytes()));
-    }
-
-    public String base64Decode(String str) {
-        if (StringUtils.isBlank(str)) return "";
-        return new String(Base64.getUrlDecoder().decode(str));
     }
 
     /**
-     * @param url
-     * @param params get 参数
-     * @param data   post json
-     * @param retry
-     * @param method
-     * @return
-     * @throws Exception
+     * 初始化UC信息
      */
-    private String api(String url, Map<String, String> params, Map<String, Object> data, Integer retry, String method) throws Exception {
-
-
-        int leftRetry = retry != null ? retry : 3;
-        if (StringUtils.isAllBlank(cookie)) {
-            this.initUserInfo();
-            return api(url, params, data, leftRetry - 1, method);
-        }
-        OkResult okResult;
-        if ("GET".equals(method)) {
-            okResult = OkHttp.get(this.apiUrl + url, params, getHeaders());
-        } else {
-            okResult = OkHttp.post(this.apiUrl + url, Json.toJson(data), getHeaders());
-        }
-        if (okResult.getResp().get("Set-Cookie") != null) {
-            Matcher matcher = Pattern.compile("__puus=([^;]+)").matcher(StringUtils.join(okResult.getResp().get("Set-Cookie"), ";;;"));
-            if (matcher.find()) {
-                Matcher cookieMatcher = Pattern.compile("__puus=([^;]+)").matcher(this.cookie);
-                if (cookieMatcher.find() && !cookieMatcher.group(1).equals(matcher.group(1))) {
-                    this.cookie = this.cookie.replaceAll("__puus=[^;]+", "__puus=" + matcher.group(1));
-                } else {
-                    this.cookie = this.cookie + ";__puus=" + matcher.group(1);
-                }
-            }
-        }
-
-        if (okResult.getCode() != 200 && leftRetry > 0) {
-            SpiderDebug.log("api error code:" + okResult.getCode());
-            Thread.sleep(1000);
-            return api(url, params, data, leftRetry - 1, method);
-        }
-        return okResult.getBody();
-    }
-
     private void initUserInfo() {
         try {
             SpiderDebug.log("uc initUserInfo...");
@@ -326,13 +144,205 @@ public class UCApi {
             stopService();
             startFlow();
         } finally {
-            try {
-                while (cache.getUser().getCookie().isEmpty()) Thread.sleep(250);
-            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
+            while (cache.getUser().getCookie().isEmpty()) {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                }
             }
         }
     }
+
+    public void initUc(String cookie) throws Exception {
+        this.ckey = Util.MD5(cookie);
+        this.cookie = cookie;
+        this.isVip = getVip();
+    }
+
+
+    public File getCache() {
+        return Path.tv("uc");
+    }
+
+
+    public Vod getVod(ShareData shareData) throws Exception {
+        getShareToken(shareData);
+        List<Item> files = new ArrayList<>();
+        List<Item> subs = new ArrayList<>();
+        List<Map<String, Object>> listData = listFile(1, shareData, files, subs, shareData.getShareId(), shareData.getFolderId(), 1);
+
+        List<String> playFrom = UCApi.get().getPlayFormatList();
+        List<String> playFromtmp = new ArrayList<>();
+        playFromtmp.add("uc原画");
+        for (String s : playFrom) {
+            playFromtmp.add("uc" + s);
+        }
+        List<String> playUrl = new ArrayList<>();
+
+        if (files.isEmpty()) {
+            return null;
+        }
+        for (int i = 0; i < files.get(files.size() - 1).getShareIndex(); i++) {
+            for (int index = 0; index < playFromtmp.size(); index++) {
+                List<String> vodItems = new ArrayList<>();
+                for (Item video_item : files) {
+                    if (video_item.getShareIndex() == i + 1) {
+                        vodItems.add(video_item.getEpisodeUrl("电影"));// + findSubs(video_item.getName(), subs));
+                    }
+                }
+                playUrl.add(StringUtils.join(vodItems, "#"));
+            }
+        }
+
+
+        Vod vod = new Vod();
+        vod.setVodId("");
+        vod.setVodContent("");
+        vod.setVodPic("");
+        vod.setVodName("");
+        vod.setVodPlayUrl(StringUtils.join(playUrl, "$$$"));
+        vod.setVodPlayFrom(StringUtils.join(playFromtmp, "$$$"));
+        vod.setTypeName("uc云盘");
+        return vod;
+    }
+
+    public String playerContent(String[] split, String flag) throws Exception {
+        SpiderDebug.log("flag:" + flag);
+        String fileId = split[0], fileToken = split[1], shareId = split[2], stoken = split[3];
+        String playUrl = "";
+        if (flag.contains("uc原画")) {
+            playUrl = this.getDownload(shareId, stoken, fileId, fileToken, true);
+        } else {
+            playUrl = this.getLiveTranscoding(shareId, stoken, fileId, fileToken, flag);
+        }
+        SpiderDebug.log("origin playUrl:" + playUrl);
+        Map<String, String> header = getHeaders();
+        header.remove("Host");
+        header.remove("Content-Type");
+
+        //UCTV 可以直接播放，不需要代理
+        if (testVideo(playUrl)) {
+            SpiderDebug.log("UCTV 可以直接播放，不需要代理" );
+
+            return Result.get().url(playUrl).string();
+        }
+        return Result.get().url(proxyVideoUrl(playUrl, header)).octet().header(header).string();
+    }
+
+    private boolean testVideo(String url) {
+
+        OkResult okResult1 = OkHttp.get(url, new HashMap<>(), Map.of("Range", "bytes=0-0"));
+        return okResult1.getCode() == 206;
+
+    }
+
+    private String proxyVideoUrl(String url, Map<String, String> header) {
+        return String.format(Proxy.getProxyUrl() + "?do=uc&type=video&url=%s&header=%s", Util.base64Encode(url.getBytes(Charset.defaultCharset())), Util.base64Encode(Json.toJson(header).getBytes(Charset.defaultCharset())));
+    }
+
+    public Object[] proxyVideo(Map<String, String> params) throws Exception {
+        String url = Util.base64Decode(params.get("url"));
+        SpiderDebug.log("proxy url :" + url);
+        SpiderDebug.log("proxy header :" + Util.base64Decode(params.get("header")));
+        Map header = new Gson().fromJson(Util.base64Decode(params.get("header")), Map.class);
+        if (header == null) header = new HashMap<>();
+        List<String> arr = List.of("Range", "Accept", "Accept-Encoding", "Accept-Language", "Cookie", "Origin", "Referer", "Sec-Ch-Ua", "Sec-Ch-Ua-Mobile", "Sec-Ch-Ua-Platform", "Sec-Fetch-Dest", "Sec-Fetch-Mode", "Sec-Fetch-Site", "User-Agent");
+        for (String key : params.keySet()) {
+            for (String s : arr) {
+                if (s.toLowerCase().equals(key.toLowerCase())) {
+                    header.put(key, params.get(key));
+                }
+            }
+
+        }
+        if (Util.getExt(url).contains("m3u8")) {
+            return getM3u8(url, header);
+        }
+        return ProxyVideo.proxy(url, header);
+    }
+
+    /**
+     * 代理m3u8
+     *
+     * @param url
+     * @param header
+     * @return
+     */
+    private Object[] getM3u8(String url, Map header) {
+        SpiderDebug.log("m3u8 url  :" + url);
+        OkResult result = OkHttp.get(url, new HashMap<>(), header);
+        String[] m3u8Arr = result.getBody().split("\n");
+        List<String> listM3u8 = new ArrayList<>();
+
+        String site = url.substring(0, url.lastIndexOf("/")) + "/";
+        int mediaId = 0;
+        for (String oneLine : m3u8Arr) {
+            String thisOne = oneLine;
+
+            if (oneLine.contains(".ts")) {
+                mediaId++;
+                thisOne = proxyVideoUrl(site + thisOne, header);
+                SpiderDebug.log("m3u8 line " + mediaId + ":" + oneLine);
+                SpiderDebug.log("m3u8 proxyed line " + mediaId + " :" + thisOne);
+
+            }
+            listM3u8.add(thisOne);
+        }
+        String m3u8Str = TextUtils.join("\n", listM3u8);
+        String contentType = result.getResp().get("Content-Type").get(0);
+
+        Map<String, String> respHeaders = new HashMap<>();
+        //  respHeaders.put("Access-Control-Allow-Origin","*");
+        //    respHeaders.put("Access-Control-Allow-Credentials","true");
+        for (String key : result.getResp().keySet()) {
+            respHeaders.put(key, result.getResp().get(key).get(0));
+        }
+        return new Object[]{result.getCode(), contentType, new ByteArrayInputStream(m3u8Str.getBytes(Charset.defaultCharset())), respHeaders};
+    }
+
+    /**
+     * @param url
+     * @param params get 参数
+     * @param data   post json
+     * @param retry
+     * @param method
+     * @return
+     * @throws Exception
+     */
+    private String api(String url, Map<String, String> params, Map<String, Object> data, Integer retry, String method) throws Exception {
+
+
+        int leftRetry = retry != null ? retry : 3;
+        if (StringUtils.isAllBlank(cookie)) {
+            this.initUserInfo();
+            return api(url, params, data, leftRetry - 1, method);
+        }
+        OkResult okResult;
+        if ("GET".equals(method)) {
+            okResult = OkHttp.get(this.apiUrl + url, params, getHeaders());
+        } else {
+            okResult = OkHttp.post(this.apiUrl + url, Json.toJson(data), getHeaders());
+        }
+        if (okResult.getResp().get("Set-Cookie") != null) {
+            Matcher matcher = Pattern.compile("__puus=([^;]+)").matcher(StringUtils.join(okResult.getResp().get("Set-Cookie"), ";;;"));
+            if (matcher.find()) {
+                Matcher cookieMatcher = Pattern.compile("__puus=([^;]+)").matcher(this.cookie);
+                if (cookieMatcher.find() && !cookieMatcher.group(1).equals(matcher.group(1))) {
+                    this.cookie = this.cookie.replaceAll("__puus=[^;]+", "__puus=" + matcher.group(1));
+                } else {
+                    this.cookie = this.cookie + ";__puus=" + matcher.group(1);
+                }
+            }
+        }
+
+        if (okResult.getCode() != 200 && leftRetry > 0) {
+            SpiderDebug.log("api error code:" + okResult.getCode());
+            Thread.sleep(1000);
+            return api(url, params, data, leftRetry - 1, method);
+        }
+        return okResult.getBody();
+    }
+
 
     /**
      * 获取二维码登录的令牌
@@ -376,37 +386,21 @@ public class UCApi {
     }
 
     private void startFlow() {
-        this.showInput();
+        Init.run(this::showInput);
     }
 
     private void showInput() {
-
         try {
-            JPanel jPanel = new JPanel();
-            jPanel.setSize(Swings.dp2px(200), Swings.dp2px(80));
-
-            JTextField textField = new JTextField();
-            textField.setName("UC cookie");
-            textField.setColumns(Swings.dp2px(38));
-            JButton button = new JButton("Ok");
-            jPanel.add(textField);
-            jPanel.add(button);
-
-            JButton qrButton = new JButton("QRCode");
-            jPanel.add(qrButton);
-            JDialog jDialog = Utils.showDialog(jPanel, "请输入UC cookie");
-            button.addActionListener((event) -> {
-                onPositive(textField.getText());
-                jDialog.dispose();
-            });
-            qrButton.addActionListener((event) -> {
-                SwingUtilities.invokeLater(this::getQRCode);
-                jDialog.dispose();
-            });
+            int margin = ResUtil.dp2px(16);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            FrameLayout frame = new FrameLayout(Init.context());
+            params.setMargins(margin, margin, margin, margin);
+            EditText input = new EditText(Init.context());
+            frame.addView(input, params);
+            dialog = new AlertDialog.Builder(Init.getActivity()).setTitle("请输入UC cookie").setView(frame).setNeutralButton("QRCode", (dialog, which) -> onNeutral()).setNegativeButton(android.R.string.cancel, null).setPositiveButton(android.R.string.ok, (dialog, which) -> onPositive(input.getText().toString())).show();
         } catch (Exception ignored) {
         }
     }
-
 
     private void onNeutral() {
         dismiss();
@@ -424,14 +418,17 @@ public class UCApi {
     private void getQRCode() {
         String token = getQrCodeToken();
 
-        openApp(token);
+        Init.run(() -> openApp(token));
     }
 
     private void openApp(String token) {
         try {
-            showQRCode("https://su.uc.cn/1_n0ZCv?uc_param_str=dsdnfrpfbivesscpgimibtbmnijblauputogpintnwktprchmt&token=" + token + "&client_id=381&uc_biz_str=S%3Acustom%7CC%3Atitlebar_fix");
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setClassName("com.alicloud.databox", "com.taobao.login4android.scan.QrScanActivity");
+            intent.putExtra("key_scanParam", token);
+            Init.getActivity().startActivity(intent);
         } catch (Exception e) {
-
+            showQRCode("https://su.uc.cn/1_n0ZCv?uc_param_str=dsdnfrpfbivesscpgimibtbmnijblauputogpintnwktprchmt&token=" + token + "&client_id=381&uc_biz_str=S%3Acustom%7CC%3Atitlebar_fix");
         } finally {
             Map<String, String> map = new HashMap<>();
             map.put("token", token);
@@ -441,15 +438,17 @@ public class UCApi {
 
     private void showQRCode(String content) {
         try {
-            final int size = 300;
-            SwingUtilities.invokeLater(() -> {
-                BufferedImage image = QRCode.getBitmap(content, size, 2);
-                JPanel jPanel = new JPanel();
-                jPanel.setSize(Swings.dp2px(size), Swings.dp2px(size));
-                jPanel.add(new JLabel(new ImageIcon(image)));
-                dialog = Utils.showDialog(jPanel, "请使用uc网盘App扫描二维码");
-            });
-            Utils.notify("请使用uc网盘App扫描二维码");
+            int size = ResUtil.dp2px(240);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size);
+            ImageView image = new ImageView(Init.context());
+            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            image.setImageBitmap(QRCode.getBitmap(content, size, 2));
+            FrameLayout frame = new FrameLayout(Init.context());
+            params.gravity = Gravity.CENTER;
+            frame.addView(image, params);
+            dialog = new AlertDialog.Builder(Init.getActivity()).setView(frame).setOnCancelListener(this::dismiss).setOnDismissListener(this::dismiss).show();
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Notify.show("请使用uc网盘App扫描二维码");
         } catch (Exception ignored) {
         }
     }
@@ -476,7 +475,7 @@ public class UCApi {
     private void setToken(String value) {
         this.serviceTicket = value;
         SpiderDebug.log("ServiceTicket:" + value);
-        Utils.notify("ServiceTicket:" + value);
+        Notify.show("ServiceTicket:" + value);
         initUserInfo();
         stopService();
     }
@@ -485,16 +484,16 @@ public class UCApi {
         if (service != null) service.shutdownNow();
 
 
-        this.dismiss();
+        Init.run(this::dismiss);
     }
 
+    private void dismiss(DialogInterface dialog) {
+        stopService();
+    }
 
     private void dismiss() {
         try {
-            if (dialog != null) {
-                dialog.setVisible(false);
-                dialog.dispose();
-            }
+            if (dialog != null) dialog.dismiss();
         } catch (Exception ignored) {
         }
     }
@@ -533,7 +532,7 @@ public class UCApi {
     private void getShareToken(ShareData shareData) throws Exception {
         if (!this.shareTokenCache.containsKey(shareData.getShareId())) {
             this.shareTokenCache.remove(shareData.getShareId());
-            Map<String, Object> shareToken = Json.parseSafe(api("share/sharepage/token?" + this.pr, Collections.emptyMap(), ImmutableMap.of("pwd_id", shareData.getShareId(), "passcode", shareData.getSharePwd() == null ? "" : shareData.getSharePwd()), 0, "POST"), Map.class);
+            Map<String, Object> shareToken = Json.parseSafe(api("share/sharepage/token?" + this.pr, Collections.emptyMap(), Map.of("pwd_id", shareData.getShareId(), "passcode", shareData.getSharePwd() == null ? "" : shareData.getSharePwd()), 0, "POST"), Map.class);
             if (shareToken.containsKey("data") && ((Map<String, Object>) shareToken.get("data")).containsKey("stoken")) {
                 this.shareTokenCache.put(shareData.getShareId(), (Map<String, Object>) shareToken.get("data"));
             }
@@ -556,7 +555,7 @@ public class UCApi {
                 if ((Double) item.get("size") < 1024 * 1024 * 5) continue;
                 item.put("stoken", this.shareTokenCache.get(shareData.getShareId()).get("stoken"));
                 videos.add(Item.objectFrom(item, shareData.getShareId(), shareIndex));
-            } else if ("file".equals(item.get("type")) && this.subtitleExts.contains("." + Utils.getExt((String) item.get("file_name")))) {
+            } else if ("file".equals(item.get("type")) && this.subtitleExts.contains("." + Util.getExt((String) item.get("file_name")))) {
                 subtitles.add(Item.objectFrom(item, shareData.getShareId(), shareIndex));
             }
         }
@@ -575,7 +574,7 @@ public class UCApi {
         List<Map<String, Object>> results = new ArrayList<>();
         int bestMatchIndex = 0;
         for (int i = 0; i < targetItems.size(); i++) {
-            LCSResult currentLCS = lcs(mainItem.getName(), targetItems.get(i).getName());
+            Util.LCSResult currentLCS = Util.lcs(mainItem.getName(), targetItems.get(i).getName());
             Map<String, Object> result = new HashMap<>();
             result.put("target", targetItems.get(i));
             result.put("lcs", currentLCS);
@@ -620,7 +619,7 @@ public class UCApi {
             for (Map<String, Object> stringStringMap : ((List<Map<String, Object>>) ((Map<String, Object>) listData.get("data")).get("list"))) {
                 list.add((String) stringStringMap.get("fid"));
             }
-            api("file/delete?" + this.pr, Collections.emptyMap(), ImmutableMap.of("action_type", "2", "filelist", Json.toJson(list), "exclude_fids", ""), 0, "POST");
+            api("file/delete?" + this.pr, Collections.emptyMap(), Map.of("action_type", "2", "filelist", Json.toJson(list), "exclude_fids", ""), 0, "POST");
         }
     }
 
@@ -641,7 +640,7 @@ public class UCApi {
             }
         }
         if (this.saveDirId == null) {
-            Map<String, Object> create = Json.parseSafe(api("file?" + this.pr, Collections.emptyMap(), ImmutableMap.of("pdir_fid", "0", "file_name", this.saveDirName, "dir_path", "", "dir_init_lock", "false"), 0, "POST"), Map.class);
+            Map<String, Object> create = Json.parseSafe(api("file?" + this.pr, Collections.emptyMap(), Map.of("pdir_fid", "0", "file_name", this.saveDirName, "dir_path", "", "dir_init_lock", "false"), 0, "POST"), Map.class);
             if (create.get("data") != null && ((Map<String, Object>) create.get("data")).get("fid") != null) {
                 this.saveDirId = ((Map<String, Object>) create.get("data")).get("fid").toString();
             }
@@ -659,7 +658,7 @@ public class UCApi {
             if (!this.shareTokenCache.containsKey(shareId)) return null;
         }
 
-        Map<String, Object> saveResult = Json.parseSafe(api("share/sharepage/save?" + this.pr, null, ImmutableMap.of("fid_list", ImmutableList.of(fileId), "fid_token_list", ImmutableList.of(fileToken), "to_pdir_fid", this.saveDirId, "pwd_id", shareId, "stoken", stoken != null ? stoken : (String) this.shareTokenCache.get(shareId).get("stoken"), "pdir_fid", "0", "scene", "link"), 0, "POST"), Map.class);
+        Map<String, Object> saveResult = Json.parseSafe(api("share/sharepage/save?" + this.pr, null, Map.of("fid_list", List.of(fileId), "fid_token_list", List.of(fileToken), "to_pdir_fid", this.saveDirId, "pwd_id", shareId, "stoken", stoken != null ? stoken : (String) this.shareTokenCache.get(shareId).get("stoken"), "pdir_fid", "0", "scene", "link"), 0, "POST"), Map.class);
         if (saveResult.get("data") != null && ((Map<Object, Object>) saveResult.get("data")).get("task_id") != null) {
             int retry = 0;
             while (true) {
@@ -683,10 +682,10 @@ public class UCApi {
             this.saveFileIdCaches.put(fileId, saveFileId);
         }
 
-        Map<String, Object> transcoding = Json.parseSafe(api("file/v2/play?" + this.pr, Collections.emptyMap(), ImmutableMap.of("fid", this.saveFileIdCaches.get(fileId), "resolutions", "normal,low,high,super,2k,4k", "supports", "fmp4"), 0, "POST"), Map.class);
+        Map<String, Object> transcoding = Json.parseSafe(api("file/v2/play?" + this.pr, Collections.emptyMap(), Map.of("fid", this.saveFileIdCaches.get(fileId), "resolutions", "normal,low,high,super,2k,4k", "supports", "fmp4"), 0, "POST"), Map.class);
         if (transcoding.get("data") != null && ((Map<Object, Object>) transcoding.get("data")).get("video_list") != null) {
             String flagId = flag.split("-")[flag.split("-").length - 1];
-            int index = findAllIndexes(getPlayFormatList(), flagId);
+            int index = Util.findAllIndexes(getPlayFormatList(), flagId);
             String ucFormat = getPlayFormatUcList().get(index);
             for (Map<String, Object> video : (List<Map<String, Object>>) ((Map<Object, Object>) transcoding.get("data")).get("video_list")) {
                 if (video.get("resolution").equals(ucFormat)) {
@@ -704,10 +703,19 @@ public class UCApi {
             if (saveFileId == null) return null;
             this.saveFileIdCaches.put(fileId, saveFileId);
         }
-        Map<String, Object> down = Json.parseSafe(api("file/download?" + this.pr + "&uc_param_str=", Collections.emptyMap(), ImmutableMap.of("fids", ImmutableList.of(this.saveFileIdCaches.get(fileId))), 0, "POST"), Map.class);
-        if (down.get("data") != null) {
-            return ((List<Map<String, Object>>) down.get("data")).get(0).get("download_url").toString();
+
+        //token不为空
+        if (StringUtils.isNoneBlank(cookieToken)) {
+            SpiderDebug.log("cookieToken不为空: " + cookieToken + ";开始下载");
+            return qrCodeHandler.download(cookieToken, this.saveFileIdCaches.get(fileId));
+        } else {
+            Map<String, Object> down = Json.parseSafe(api("file/download?" + this.pr + "&uc_param_str=", Collections.emptyMap(), Map.of("fids", List.of(this.saveFileIdCaches.get(fileId))), 0, "POST"), Map.class);
+            if (down.get("data") != null) {
+                return ((List<Map<String, Object>>) down.get("data")).get(0).get("download_url").toString();
+            }
         }
+
+
         return null;
     }
 

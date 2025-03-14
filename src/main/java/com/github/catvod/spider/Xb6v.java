@@ -6,7 +6,7 @@ import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -27,20 +27,20 @@ import java.util.regex.Pattern;
  */
 public class Xb6v extends Spider {
 
-    private final String siteUrl = Utils.base64Decode("aHR0cHM6Ly93d3cueGI2di5jb20=");
+    private final String siteUrl = Util.base64Decode("aHR0cHM6Ly93d3cueGI2di5jb20=");
     private String nextSearchUrlPrefix;
     private String nextSearchUrlSuffix;
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", Utils.CHROME);
+        header.put("User-Agent", Util.CHROME);
         header.put("Referer", siteUrl + "/");
         return header;
     }
 
     private Map<String, String> getDetailHeader() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", Utils.CHROME);
+        header.put("User-Agent", Util.CHROME);
         return header;
     }
 
@@ -201,7 +201,7 @@ public class Xb6v extends Spider {
 
     @Override
     public String searchContent(String key, boolean quick, String pg) throws Exception {
-        String searchUrl = siteUrl + Utils.base64Decode("L2Uvc2VhcmNoLzFpbmRleC5waHA=");
+        String searchUrl = siteUrl + Util.base64Decode("L2Uvc2VhcmNoLzFpbmRleC5waHA=");
         if (pg.equals("1")) {
             RequestBody formBody = new FormBody.Builder()
                     .add("show", "title")
@@ -213,7 +213,7 @@ public class Xb6v extends Spider {
                     .addEncoded("keyboard", key)
                     .build();
             Request request = new Request.Builder().url(searchUrl)
-                    .addHeader("User-Agent", Utils.CHROME)
+                    .addHeader("User-Agent", Util.CHROME)
                     .addHeader("Origin", siteUrl)
                     .addHeader("Referer", siteUrl + "/")
                     .post(formBody)

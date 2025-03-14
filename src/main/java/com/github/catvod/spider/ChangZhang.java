@@ -21,7 +21,7 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -140,7 +140,7 @@ public class ChangZhang extends Spider {
         String searchUrl = siteUrl + "/daoyongjiekoshibushiyoubing?q=";
         String html = OkHttp.string(searchUrl + key);
         if (html.contains("Just a moment")) {
-            Utils.notify("厂长资源需要人机验证");
+            Util.notify("厂长资源需要人机验证");
         }
         Document document = Jsoup.parse(html);
         List<Vod> list = new ArrayList<>();
@@ -163,8 +163,8 @@ public class ChangZhang extends Spider {
         String player = "";
         for (Element element : script) {
             if (StringUtils.isNoneBlank(element.data())) {
-                rand = Utils.getVar(element.data(), "rand");
-                player = Utils.getVar(element.data(), "player");
+                rand = Util.getVar(element.data(), "rand");
+                player = Util.getVar(element.data(), "player");
             }
         }
 

@@ -5,7 +5,7 @@ import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import org.jsoup.Jsoup;
@@ -31,13 +31,13 @@ public class KuaKeS extends Cloud {
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", Utils.CHROME);
+        header.put("User-Agent", Util.CHROME);
         return header;
     }
 
     private Map<String, String> getHeaderWithCookie() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", Utils.CHROME);
+        header.put("User-Agent", Util.CHROME);
         header.put("cookie", "esc_search_captcha=1; result=43");
         return header;
     }

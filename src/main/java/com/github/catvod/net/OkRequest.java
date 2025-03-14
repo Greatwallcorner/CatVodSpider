@@ -1,7 +1,7 @@
 package com.github.catvod.net;
 
 import com.github.catvod.crawler.SpiderDebug;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -60,7 +60,7 @@ class OkRequest {
     private void setParams() {
         url = url + "?";
         for (String key : params.keySet()) url = url.concat(key + "=" + params.get(key) + "&");
-        url = Utils.substring(url);
+        url = Util.substring(url);
     }
 
     public OkResult execute(OkHttpClient client) {

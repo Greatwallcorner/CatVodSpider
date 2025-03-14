@@ -72,7 +72,7 @@ public class AliYun {
 
     public HashMap<String, String> getHeader() {
         HashMap<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", Utils.CHROME);
+        headers.put("User-Agent", Util.CHROME);
         headers.put("Referer", "https://www.aliyundrive.com/");
         return headers;
     }
@@ -118,7 +118,7 @@ public class AliYun {
         url = url.startsWith("https") ? url : "https://api.aliyundrive.com/" + url;
         OkResult result = OkHttp.post(url, json, url.contains("file/list") ? getHeaders() : getHeaderAuth());
         SpiderDebug.log(result.getCode() + "," + url + "," + result.getBody());
-        if(result.getBody().contains("TooManyRequests")) Utils.notify("阿里： 太多请求, 请稍后再试");
+        if(result.getBody().contains("TooManyRequests")) Util.notify("阿里： 太多请求, 请稍后再试");
         if (retry && result.getCode() == 401 && refreshAccessToken()) return auth(url, json, false);
         if (retry && result.getCode() == 429) return auth(url, json, false);
         return result.getBody();
@@ -135,7 +135,7 @@ public class AliYun {
 
     private boolean isManyRequest(String result) {
         if (!result.contains("Too Many Requests")) return false;
-        Utils.notify("洗洗睡吧，Too Many Requests");
+        Util.notify("洗洗睡吧，Too Many Requests");
         cache.getOAuth().clean();
         return true;
     }
@@ -153,7 +153,7 @@ public class AliYun {
         param.addProperty("share_pwd", "");
         String json = post("v2/share_link/get_share_token", param);
         share = Share.objectFrom(json).setShareId(shareId).setTime();
-        if (share.getShareToken().isEmpty()) Utils.notify("來晚啦，該分享已失效。");
+        if (share.getShareToken().isEmpty()) Util.notify("來晚啦，該分享已失效。");
     }
 
     private boolean refreshAccessToken() {
@@ -196,7 +196,7 @@ public class AliYun {
         JsonObject param = new JsonObject();
         param.addProperty("authorize", 1);
         param.addProperty("scope", "user:base,file:all:read,file:all:write");
-        String url = "https://open.aliyundrive.com/oauth/users/authorize?client_id=" + Utils.CLIENT_ID + "&redirect_uri=https://alist.nn.ci/tool/aliyundrive/callback&scope=user:base,file:all:read,file:all:write&state=";
+        String url = "https://open.aliyundrive.com/oauth/users/authorize?client_id=" + Util.CLIENT_ID + "&redirect_uri=https://alist.nn.ci/tool/aliyundrive/callback&scope=user:base,file:all:read,file:all:write&state=";
         String json = auth(url, param.toString(), true);
         SpiderDebug.log(json);
         return oauthRedirect(Code.objectFrom(json).getCode());
@@ -225,7 +225,7 @@ public class AliYun {
         param.addProperty("share_id", shareId);
         Share share = Share.objectFrom(post("adrive/v3/share_link/get_share_by_anonymous", param));
 //        if(StringUtils.isNoneBlank(share.getCode()) && share.getCode().equals("ShareLink.Cancelled")) Utils.notify("该分享已取消");
-        if(StringUtils.isNoneBlank(share.getCode()) && share.getCode().equals("TooManyRequests")) Utils.notify("阿里："+share.getDisplayMessage());
+        if(StringUtils.isNoneBlank(share.getCode()) && share.getCode().equals("TooManyRequests")) Util.notify("阿里："+share.getDisplayMessage());
         List<Item> files = new ArrayList<>();
         List<Item> subs = new ArrayList<>();
         listFiles(shareId, new Item(getParentFileId(fileId, share)), files, subs);
@@ -266,7 +266,7 @@ public class AliYun {
                 folders.add(file);
             } else if (file.getCategory().equals("video") || file.getCategory().equals("audio")) {
                 files.add(file.parent(parent.getName()));
-            } else if (Utils.isSub(file.getExt())) {
+            } else if (Util.isSub(file.getExt())) {
                 subs.add(file);
             }
         }
@@ -287,18 +287,18 @@ public class AliYun {
 
     private void pair(String name1, List<Item> items, List<Item> subs) {
         for (Item item : items) {
-            String name2 = Utils.removeExt(item.getName()).toLowerCase();
+            String name2 = Util.removeExt(item.getName()).toLowerCase();
             if (name1.contains(name2) || name2.contains(name1)) subs.add(item);
         }
     }
 
     private String findSubs(String name1, List<Item> items) {
         List<Item> subs = new ArrayList<>();
-        pair(Utils.removeExt(name1).toLowerCase(), items, subs);
+        pair(Util.removeExt(name1).toLowerCase(), items, subs);
         if (subs.isEmpty()) subs.addAll(items);
         StringBuilder sb = new StringBuilder();
         for (Item sub : subs)
-            sb.append("+").append(Utils.removeExt(sub.getName())).append("@@@").append(sub.getExt()).append("@@@").append(sub.getFileId());
+            sb.append("+").append(Util.removeExt(sub.getName())).append("@@@").append(sub.getExt()).append("@@@").append(sub.getFileId());
         return sb.toString();
     }
 
@@ -505,7 +505,7 @@ public class AliYun {
         List<String> keys = Arrays.asList("templateId", "shareId", "mediaId", "fileId", "cate", "do", "type");
 
         for (String key : params.keySet()) if (!keys.contains(key)) headers.put(key, params.get(key));
-        headers.put(HttpHeaders.USER_AGENT, Utils.CHROME);
+        headers.put(HttpHeaders.USER_AGENT, Util.CHROME);
         headers.remove(HttpHeaders.ACCEPT_ENCODING);
         headers.remove(HttpHeaders.REFERER);
         headers.remove(HttpHeaders.HOST);
@@ -554,7 +554,7 @@ public class AliYun {
         String fileId = params.get("fileId");
         String shareId = params.get("shareId");
         Response res = OkHttp.newCall(getDownloadUrl(shareId, fileId), getHeaderAuth());
-        byte[] body = Utils.toUtf8(res.body().bytes());
+        byte[] body = Util.toUtf8(res.body().bytes());
         Object[] result = new Object[3];
         result[0] = 200;
         result[1] = "application/octet-stream";
@@ -580,7 +580,7 @@ public class AliYun {
 
             JButton qrButton = new JButton("QRCode");
             jPanel.add(qrButton);
-            JDialog jDialog = Utils.showDialog(jPanel, "输入token");
+            JDialog jDialog = Util.showDialog(jPanel, "输入token");
             button.addActionListener((event) -> {
                 onPositive(textField.getText());
                 jDialog.dispose();
@@ -614,9 +614,9 @@ public class AliYun {
                 JPanel jPanel = new JPanel();
                 jPanel.setSize(Swings.dp2px(size), Swings.dp2px(size));
                 jPanel.add(new JLabel(new ImageIcon(image)));
-                dialog = Utils.showDialog(jPanel, "请使用阿里云盘app扫描");
+                dialog = Util.showDialog(jPanel, "请使用阿里云盘app扫描");
             });
-            Utils.notify("請使用阿里雲盤 App 掃描二維碼");
+            Util.notify("請使用阿里雲盤 App 掃描二維碼");
         } catch (Exception ignored) {
         } finally {
             Init.execute(() -> startService(data.getParams()));
@@ -635,7 +635,7 @@ public class AliYun {
     private void setToken(String value) {
         cache.getUser().setRefreshToken(value);
         SpiderDebug.log("Token:" + value);
-        Utils.notify("Token:" + value);
+        Util.notify("Token:" + value);
         refreshAccessToken();
         stopService();
     }

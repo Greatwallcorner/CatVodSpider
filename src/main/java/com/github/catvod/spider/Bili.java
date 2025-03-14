@@ -11,7 +11,7 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.ProxyVideo;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import okhttp3.Response;
@@ -37,7 +37,7 @@ public class Bili extends Spider {
 
     private static Map<String, String> getHeader() {
         Map<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", Utils.CHROME);
+        headers.put("User-Agent", Util.CHROME);
         headers.put("Referer", "https://www.bilibili.com");
         if (cookie != null) headers.put("cookie", cookie);
         return headers;

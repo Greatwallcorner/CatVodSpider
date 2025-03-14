@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicReference
 class BD : Spider() {
 
     override fun init() {
-        val res = OkHttp.newCall("$host$ad", Utils.webHeaders(host))
+        val res = OkHttp.newCall("$host$ad", Util.webHeaders(host))
         if (res.isSuccessful) {
             val c = res.headers[com.google.common.net.HttpHeaders.SET_COOKIE]
             val split = c?.split(";")
@@ -53,13 +53,13 @@ class BD : Spider() {
     }
 
     override fun init(extend: String?) {
-        host = Utils.base64Decode(extend)
+        host = Util.base64Decode(extend)
         SpiderDebug.log("域名：" + host)
         init()
     }
 
     override fun homeContent(filter: Boolean): String {
-        val string = OkHttp.string(host, Utils.webHeaders(host, session))
+        val string = OkHttp.string(host, Util.webHeaders(host, session))
         val body = Jsoup.parse(string).body()
         val vodList = mutableListOf<Vod>()
         val cons = body.select("div[class*=page-header] ~ div > div[class*=row-cards]")
@@ -86,7 +86,7 @@ class BD : Spider() {
                 pic = img.attr("src")
             }
             vod.setVodPic(
-                Image.UrlHeaderBuilder(pic).referer(host).userAgent(Utils.CHROME)
+                Image.UrlHeaderBuilder(pic).referer(host).userAgent(Util.CHROME)
                     .build()
             )
             vod.setVodName(card.select("h3[class*=card-title]").text())
@@ -96,7 +96,7 @@ class BD : Spider() {
 
     override fun categoryContent(tid: String, pg: String, filter: Boolean, extend: HashMap<String, String>): String {
         val url = "$host$tid/$pg"
-        val string = OkHttp.string(url, Utils.webHeaders(host, session))
+        val string = OkHttp.string(url, Util.webHeaders(host, session))
         val parse = Jsoup.parse(string)
         val cons = parse.select("div[class=card-body]")
         val list = mutableListOf<Vod>()
@@ -109,7 +109,7 @@ class BD : Spider() {
     override fun detailContent(ids: MutableList<String>): String {
         val id = ids[0]
         reference = "$host$id"
-        val string = OkHttp.string(reference, Utils.webHeaders(host, session))
+        val string = OkHttp.string(reference, Util.webHeaders(host, session))
         val document = Jsoup.parse(string)
         val card = document.select("div.card-body:nth-child(1)").first()!!
         val head = card.select("div.col")
@@ -150,7 +150,7 @@ class BD : Spider() {
     }
 
     // var js 变量
-    private val pattern = Utils.base64Decode("dmFyICVzID0gKFxkKyk=")
+    private val pattern = Util.base64Decode("dmFyICVzID0gKFxkKyk=")
 
     data class Resp(
         val code: Int,
@@ -166,17 +166,17 @@ class BD : Spider() {
         val url3: String
     )
 
-    private val bdFourHost = Utils.base64Decode("d3d3LmJkZTQuY2M=")
+    private val bdFourHost = Util.base64Decode("d3d3LmJkZTQuY2M=")
     override fun playerContent(flag: String, id: String, vipFlags: MutableList<String>): String {
         val s = "$host$id"
-        val string = OkHttp.string(s, Utils.webHeaders(reference))
+        val string = OkHttp.string(s, Util.webHeaders(reference))
         val doc = Jsoup.parse(string)
         val sc = doc.select("script:containsData(pid)").html()
         val idRegex = String.format(pattern, "pid").toRegex()
         val pid = idRegex.find(sc)?.groups?.get(1)?.value ?: ""
         val time = Date().time.toString()
         val map = mutableMapOf("t" to time, "pid" to pid, "sg" to getSg(pid, time))
-        val resp = OkHttp.string("${host}lines", map, Utils.webHeaders(reference))
+        val resp = OkHttp.string("${host}lines", map, Util.webHeaders(reference))
         val res = Json.parseSafe<Resp>(resp, Resp::class.java)
         SpiderDebug.log("BD lines res:$resp")
         if (res.code != 0) {
@@ -210,13 +210,13 @@ class BD : Spider() {
             .header(mutableMapOf(HttpHeaders.Referrer to s, HttpHeaders.Cookie to session)).string()
     }
 
-    private val js = Utils.base64Decode("djQvanMvc2VhcmNoLWpjYXJvdXNlbC5yZXNwb25zaXZlLmpzOw==")
+    private val js = Util.base64Decode("djQvanMvc2VhcmNoLWpjYXJvdXNlbC5yZXNwb25zaXZlLmpzOw==")
 
     override fun searchContent(key: String, quick: Boolean): String {
         val url = "${host}search/${URLEncodeUtil.encode(key)}"
-        val string = AtomicReference<String>(OkHttp.string(url, Utils.webHeaders(host, session)))
+        val string = AtomicReference<String>(OkHttp.string(url, Util.webHeaders(host, session)))
         if (string.get().contains("验证码")) {
-            val jsResp = OkHttp.string("$host$js${session.split(";")[0]}", Utils.webHeaders(url))
+            val jsResp = OkHttp.string("$host$js${session.split(";")[0]}", Util.webHeaders(url))
             val resp = getVerifyCodePic(url)
             if (resp.isNotEmpty()) {
                 DialogUtil.showDialog(content =
@@ -224,7 +224,7 @@ class BD : Spider() {
                         verifyCode(resp, url, onClose = { DialogUtil.close() }, onConfirm = {
                             SpiderDebug.log("Bd code confirm start")
                             DialogUtil.close()
-                            string.set(OkHttp.string("$url?code=$it", Utils.webHeaders(url, session)))
+                            string.set(OkHttp.string("$url?code=$it", Util.webHeaders(url, session)))
                             SpiderDebug.log("Bd code confirm end")
                         })
                     },
@@ -258,7 +258,7 @@ class BD : Spider() {
         val codeUrl = "${host}search/verifyCode?t=${Date().time}"
         var resp:Response? = null
         try {
-            resp = OkHttp.newCall(codeUrl, Utils.webHeaders(url, session))
+            resp = OkHttp.newCall(codeUrl, Util.webHeaders(url, session))
             return resp?.body?.bytes() ?: byteArrayOf()
         } finally {
             resp?.close()
@@ -311,8 +311,8 @@ class BD : Spider() {
     }
 
     private fun buildUrl(url: String, id: String, session: String, ref: String): String {
-        return "${Proxy.getProxyUrl()}?do=bd&url=${Utils.base64Encode(url)}&id=${Utils.base64Encode(id)}&session=${Utils.base64Encode(session)}&ref=${
-            Utils.base64Encode(
+        return "${Proxy.getProxyUrl()}?do=bd&url=${Util.base64Encode(url)}&id=${Util.base64Encode(id)}&session=${Util.base64Encode(session)}&ref=${
+            Util.base64Encode(
                 ref
             )
         }"
@@ -321,28 +321,29 @@ class BD : Spider() {
     companion object {
         private var session: String = ""
 
-        private var host = Utils.base64Decode("aHR0cHM6Ly93d3cueWp5czA1LmNvbS8=")
+        private var host = Util.base64Decode("aHR0cHM6Ly93d3cueWp5czA1LmNvbS8=")
 
         private val classList =
-            Class.parseFromFormatStr(Utils.base64Decode("5Yqo5L2cPS9zL2Rvbmd6dW8m54ix5oOFPS9zL2FpcWluZybllpzliac9L3MveGlqdSbnp5Hlubs9L3Mva2VodWFuJuaBkOaAlj0vcy9rb25nYnUm5oiY5LqJPS9zL3poYW56aGVuZybmrabkvqA9L3Mvd3V4aWEm6a2U5bm7PS9zL21vaHVhbibliafmg4U9L3MvanVxaW5nJuWKqOeUuz0vcy9kb25naHVhJuaDiuaCmj0vcy9qaW5nc29uZyYzRD0vcy8zRCbngb7pmr49L3MvemFpbmFuJuaCrOeWkT0vcy94dWFueWkm6K2m5YyqPS9zL2ppbmdmZWkm5paH6Im6PS9zL3dlbnlpJumdkuaYpT0vcy9xaW5nY2h1biblhpLpmak9L3MvbWFveGlhbibniq/nvao9L3MvZmFuenVpJue6quW9lT0vcy9qaWx1JuWPpOijhT0vcy9ndXpodWFuZyblpYflubs9L3MvcWlodWFuJuWbveivrT0vcy9ndW95dSbnu7zoibo9L3Mvem9uZ3lpJuWOhuWPsj0vcy9saXNoaSbov5Dliqg9L3MveXVuZG9uZybljp/liJvljovliLY9L3MveXVhbmNodWFuZybnvo7liac9L3MvbWVpanUm6Z+p5YmnPS9zL2hhbmp1JuWbveS6p+eUteinhuWJpz0vcy9ndW9qdSbml6Xliac9L3MvcmlqdSboi7Hliac9L3MveWluZ2p1JuW+t+WJpz0vcy9kZWp1JuS/hOWJpz0vcy9lanUm5be05YmnPS9zL2JhanUm5Yqg5YmnPS9zL2ppYWp1Juilv+WJpz0vcy9zcGFuaXNoJuaEj+Wkp+WIqeWJpz0vcy95aWRhbGlqdSbms7Dliac9L3MvdGFpanUm5riv5Y+w5YmnPS9zL2dhbmd0YWlqdSbms5Xliac9L3MvZmFqdSbmvrPliac9L3MvYW9qdQ=="))
+            Class.parseFromFormatStr(
+                Util.base64Decode("5Yqo5L2cPS9zL2Rvbmd6dW8m54ix5oOFPS9zL2FpcWluZybllpzliac9L3MveGlqdSbnp5Hlubs9L3Mva2VodWFuJuaBkOaAlj0vcy9rb25nYnUm5oiY5LqJPS9zL3poYW56aGVuZybmrabkvqA9L3Mvd3V4aWEm6a2U5bm7PS9zL21vaHVhbibliafmg4U9L3MvanVxaW5nJuWKqOeUuz0vcy9kb25naHVhJuaDiuaCmj0vcy9qaW5nc29uZyYzRD0vcy8zRCbngb7pmr49L3MvemFpbmFuJuaCrOeWkT0vcy94dWFueWkm6K2m5YyqPS9zL2ppbmdmZWkm5paH6Im6PS9zL3dlbnlpJumdkuaYpT0vcy9xaW5nY2h1biblhpLpmak9L3MvbWFveGlhbibniq/nvao9L3MvZmFuenVpJue6quW9lT0vcy9qaWx1JuWPpOijhT0vcy9ndXpodWFuZyblpYflubs9L3MvcWlodWFuJuWbveivrT0vcy9ndW95dSbnu7zoibo9L3Mvem9uZ3lpJuWOhuWPsj0vcy9saXNoaSbov5Dliqg9L3MveXVuZG9uZybljp/liJvljovliLY9L3MveXVhbmNodWFuZybnvo7liac9L3MvbWVpanUm6Z+p5YmnPS9zL2hhbmp1JuWbveS6p+eUteinhuWJpz0vcy9ndW9qdSbml6Xliac9L3MvcmlqdSboi7Hliac9L3MveWluZ2p1JuW+t+WJpz0vcy9kZWp1JuS/hOWJpz0vcy9lanUm5be05YmnPS9zL2JhanUm5Yqg5YmnPS9zL2ppYWp1Juilv+WJpz0vcy9zcGFuaXNoJuaEj+Wkp+WIqeWJpz0vcy95aWRhbGlqdSbms7Dliac9L3MvdGFpanUm5riv5Y+w5YmnPS9zL2dhbmd0YWlqdSbms5Xliac9L3MvZmFqdSbmvrPliac9L3MvYW9qdQ=="))
 
-        private val ad = Utils.base64Decode("enp6eno=")
+        private val ad = Util.base64Decode("enp6eno=")
 
         private var reference = host
         fun proxyLocal(params: MutableMap<String, String>): Array<Any> {
             try {
-                var url = Utils.base64Decode(params["url"] ?: "")
+                var url = Util.base64Decode(params["url"] ?: "")
                 val id = if(StringUtils.isNotBlank(params["id"])){
-                    Utils.base64Decode(params["id"] ?: "")
+                    Util.base64Decode(params["id"] ?: "")
                 }else ""
                 val cookie = if(StringUtils.isNotBlank(params["session"])){
-                    Utils.base64Decode(params["session"] ?: "")
+                    Util.base64Decode(params["session"] ?: "")
                 }else ""
 //                val ref = Utils.base64Decode(params["ref"] ?: "")
                 if (url.contains("god")) {
                     val t = Date().time
                     val p = mutableMapOf("t" to t, "sg" to getSg(id, t.toString()), "verifyCode" to "888")
-                    val body = OkHttp.post("${host}god", Json.toJson(p), Utils.webHeaders(host, cookie)).body
+                    val body = OkHttp.post("${host}god", Json.toJson(p), Util.webHeaders(host, cookie)).body
                     SpiderDebug.log("DB god req:$body")
                     url = Json.get().toJsonTree(body).asJsonObject.get("url").asString
                 }

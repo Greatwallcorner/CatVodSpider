@@ -9,7 +9,7 @@ import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,7 +35,7 @@ public class NiNi extends Spider {
 
     private HashMap<String, String> getHeaders() {
         HashMap<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", Utils.CHROME);
+        headers.put("User-Agent", Util.CHROME);
         headers.put("Referer", "https://m.nbys.tv/");
         return headers;
     }
@@ -248,7 +248,7 @@ public class NiNi extends Spider {
         }
         String _SECRET_PREFIX = "__KEY::";
         String secretKey = "2x_Give_it_a_shot";
-        String has = Utils.MD5(sign_query + sign_body.toString() + _SECRET_PREFIX + secretKey, "UTF-8");
+        String has = Util.MD5(sign_query + sign_body.toString() + _SECRET_PREFIX + secretKey, "UTF-8");
         url += "?_ts=" + params.get("_ts") + "&app_version=" + params.get("app_version") + "&platform=" + params.get("platform") + "&market_id=" + params.get("market_id") + "&device_code=" + params.get("device_code") + "&versioncode=" + params.get("versioncode") + "&oid=" + params.get("oid") + "&sign=" + has;
         return url;
     }
@@ -266,7 +266,7 @@ public class NiNi extends Spider {
     private String convert(String text) {
         StringBuilder sb = new StringBuilder();
         for (String s : text.split(",")) if (!StringUtils.isEmpty(s)) sb.append(String.format("[a=cr:{\"id\":\"%s\",\"name\":\"%s\"}/]%s[/a]", s + "/{pg}", s, s)).append(",");
-        return Utils.substring(sb.toString());
+        return Util.substring(sb.toString());
     }
 
     private String get(String url) {
