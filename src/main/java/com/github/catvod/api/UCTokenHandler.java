@@ -1,6 +1,5 @@
 package com.github.catvod.api;
 
-import cn.hutool.core.codec.Base64;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.github.catvod.bean.uc.Cache;
 import com.github.catvod.bean.uc.User;
@@ -274,11 +273,12 @@ public class UCTokenHandler {
         try {
             int size = 300;
             SwingUtilities.invokeLater(() -> {
-                BufferedImage bitmap = QRCode.getBitmap(Base64.decodeStr(base64Str), size, 2);
+                BufferedImage bitmap = QRCode.base64StringToImage(base64Str);
                 JPanel jPanel = new JPanel();
                 jPanel.setSize(Swings.dp2px(size), Swings.dp2px(size));
                 jPanel.add(new JLabel(new ImageIcon(bitmap)));
                 dialog = Util.showDialog(jPanel, "请使用uc网盘App扫描");
+//                dialog.addComponentListener();
             });
             Util.notify("请使用uc网盘App扫描二维码");
         } catch (Exception ignored) {
@@ -286,7 +286,11 @@ public class UCTokenHandler {
     }
 
     private void stopService() {
-        if (service != null) service.shutdownNow();
+        if (service != null) {
+            SpiderDebug.log("uc线程池关闭");
+            service.shutdownNow();
+            dialog.dispose();
+        }
     }
 
     public void startService() {

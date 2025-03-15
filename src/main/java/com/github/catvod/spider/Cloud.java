@@ -27,9 +27,9 @@ public class Cloud extends Spider {
         quark = new Quark();
         ali = new Ali();
         uc = new UC();
+        uc.init(ext.has("uccookie") ? ext.get("uccookie").getAsString() : "");
         quark.init(ext.has("cookie") ? ext.get("cookie").getAsString() : "");
         ali.init(ext.has("token") ? ext.get("token").getAsString() : "");
-        uc.init(ext.has("uccookie") ? ext.get("uccookie").getAsString() : "");
 
     }
 
@@ -58,9 +58,11 @@ public class Cloud extends Spider {
 
     protected String detailContentVodPlayFrom(List<String> shareLinks) {
         List<String> from = new ArrayList<>();
+        int i =0;
         for (String shareLink : shareLinks) {
+            i++;
             if (shareLink.matches(patternUC)) {
-                from.add(uc.detailContentVodPlayFrom(ImmutableList.of(shareLink)));
+                from.add(uc.detailContentVodPlayFrom(ImmutableList.of(shareLink), i));
             } else if (shareLink.matches(patternQuark)) {
                 from.add(quark.detailContentVodPlayFrom(ImmutableList.of(shareLink)));
             } else if (shareLink.matches(Ali.pattern.pattern())) {

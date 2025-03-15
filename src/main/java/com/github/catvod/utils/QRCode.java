@@ -1,12 +1,15 @@
 package com.github.catvod.utils;
 
+import cn.hutool.core.codec.Base64;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.ByteArrayInputStream;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -39,6 +42,15 @@ public class QRCode {
             return createBufferedImage(new MultiFormatWriter().encode(contents, BarcodeFormat.QR_CODE, Swings.dp2px(size), Swings.dp2px(size), hints));
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static BufferedImage base64StringToImage(String strBase64) {
+        try {
+            byte[] arr = Base64.decode(strBase64);
+            return ImageIO.read(new ByteArrayInputStream(arr));
+        } catch (Exception ex) {
             return null;
         }
     }

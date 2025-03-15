@@ -93,7 +93,6 @@ public class UCApi {
         if (StringUtils.isNoneBlank(token)) {
             this.cookie = token;
             initUserInfo();
-
         }
     }
 
