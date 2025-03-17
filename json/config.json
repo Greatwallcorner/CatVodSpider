@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;5e7af5ac55072612b1e561c90f9a73d6",
+  "spider": "../jar/spider.jar;md5;45d120e549f2859bb3112d675c4ed02c",
   "sites": [
     {
       "key": "Intruduce",
@@ -87,6 +87,15 @@
       "name": "樱花",
       "type": 3,
       "api": "csp_YHDM",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": ""
+    },
+    {
+      "key": "DM84",
+      "name": "动漫巴士",
+      "type": 3,
+      "api": "csp_Dm84",
       "searchable": 1,
       "changeable": 0,
       "ext": ""

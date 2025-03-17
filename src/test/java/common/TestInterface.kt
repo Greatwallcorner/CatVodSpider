@@ -19,6 +19,8 @@ interface TestInterface<T:Spider> {
 
     fun searchTest()
 
+//    fun playerContentTest()
+
     fun assert(s:String){
         println(s)
         AssertUtil.assertResult(s)
