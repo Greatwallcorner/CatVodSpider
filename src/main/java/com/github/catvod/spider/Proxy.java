@@ -3,11 +3,9 @@ package com.github.catvod.spider;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Json;
-import com.github.catvod.utils.MultiThread;
-import com.github.catvod.utils.ProxyVideo;
-import com.github.catvod.utils.Util;
+import com.github.catvod.utils.*;
 import org.apache.http.HttpHeaders;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -39,6 +37,8 @@ public class Proxy extends Spider {
                  return BD.Companion.proxyLocal(params);
             case "proxy":
                 return commonProxy(params);
+            case "advanceProxy":
+                return advanceProxy(params);
             default:
                 return null;
         }
@@ -48,12 +48,27 @@ public class Proxy extends Spider {
     private static Object[] commonProxy(Map<String, String> params) throws Exception {
         String url = Util.base64Decode(params.get("url"));
         Map<String,String> header = Json.parseSafe(Util.base64Decode(params.get("header")), Map.class);
+        header = getHeader(params, header);
+        return new Object[]{ProxyVideo.proxyResponse(url, header)};
+    }
+
+    private static Object[] advanceProxy(Map<String, String> params) throws Exception {
+        String url = Util.base64Decode(params.get("url"));
+        Map<String,String> header = Json.parseSafe(Util.base64Decode(params.get("header")), Map.class);
+        Map<String,String> respHeader = Json.parseSafe(Util.base64Decode(params.get("respHeader")), Map.class);
+        header = getHeader(params, header);
+        respHeader = getHeader(params, respHeader);
+        return ProxyVideo.proxy(url, header, respHeader);
+    }
+
+    private static @NotNull Map<String, String> getHeader(Map<String, String> params, Map<String, String> header) {
         if(header == null) header = new HashMap<>();
         for (Map.Entry<String, String> entry : params.entrySet()) {
             if(!keys.contains(entry.getKey())) header.put(entry.getKey(), entry.getValue());
         }
-        return new Object[]{ProxyVideo.proxyResponse(url, header)};
+        return header;
     }
+
 
     static void adjustPort() {
         if (Proxy.port > 0) return;

@@ -377,15 +377,39 @@ public class Util {
                     webHttpHeaderMap.put(HttpHeaders.CONNECTION, "keep-alive");
                     webHttpHeaderMap.put(HttpHeaders.USER_AGENT, CHROME);
                     webHttpHeaderMap.put(HttpHeaders.ACCEPT, "*/*");
+//                    webHttpHeaderMap.put(HttpHeaders.HOST, )
                 }
             }
         }
-        URI uri = URI.create(referer);
-        String u = uri.getScheme() + "://" + uri.getHost();
-        webHttpHeaderMap.put(HttpHeaders.REFERER, u);
-        webHttpHeaderMap.put(io.ktor.http.HttpHeaders.INSTANCE.getOrigin(), u);
+        if(StringUtils.isNotBlank(referer)){
+            URI uri = URI.create(referer);
+            String u = uri.getScheme() + "://" + uri.getHost();
+            webHttpHeaderMap.put(HttpHeaders.REFERER, u);
+        }
+//        webHttpHeaderMap.put(io.ktor.http.HttpHeaders.INSTANCE.getOrigin(), u);
         return webHttpHeaderMap;
     }
+
+//    public static HashMap<String, String> webHeaders(String referer) {
+//        if (webHttpHeaderMap == null || webHttpHeaderMap.isEmpty()) {
+//            synchronized (Util.class) {
+//                if (webHttpHeaderMap == null || webHttpHeaderMap.isEmpty()) {
+//                    webHttpHeaderMap = new HashMap<>();
+////                    webHttpHeaderMap.put(HttpHeaders.CONTENT_TYPE, ContentType.Application.INSTANCE.getJson().getContentType());
+//                    webHttpHeaderMap.put(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
+//                    webHttpHeaderMap.put(HttpHeaders.CONNECTION, "keep-alive");
+//                    webHttpHeaderMap.put(HttpHeaders.USER_AGENT, CHROME);
+//                    webHttpHeaderMap.put(HttpHeaders.ACCEPT, "*/*");
+//                    webHttpHeaderMap.put(HttpHeaders.HOST, )
+//                }
+//            }
+//        }
+//        URI uri = URI.create(referer);
+//        String u = uri.getScheme() + "://" + uri.getHost();
+//        webHttpHeaderMap.put(HttpHeaders.REFERER, u);
+////        webHttpHeaderMap.put(io.ktor.http.HttpHeaders.INSTANCE.getOrigin(), u);
+//        return webHttpHeaderMap;
+//    }
 
     public static String timestampToDateStr(Long timestamp) {
         return DateUtils.formatDate(new Date(timestamp));

@@ -41,7 +41,7 @@ public class ChangzhangTest {
     @Test
     public void detailTest() throws Exception {
 
-        String detail = douban.detailContent(Lists.newArrayList("https://www.czys.pro/movie/3868.html"));
+        String detail = douban.detailContent(Lists.newArrayList("https://www.czzyvideo.com/movie/20460.html"));
         System.out.println(detail);
 
     }
@@ -49,7 +49,9 @@ public class ChangzhangTest {
     @Test
     public void playerTest() throws Exception {
 
-        String palyer = douban.playerContent(null, "https://www.czys.pro/v_play/bXZfMTc1ODAtbm1fMQ==.html", null);
+        String palyer = douban.playerContent(null, "https://www.czzyvideo.com/v_play/bXZfMjAyOTQtbm1fMQ==.html", null);
+//        String palyer = douban.playerContent(null, "https://www.czzyvideo.com/v_play/bXZfMTc1ODAtbm1fMQ==.html", null);
+//        String palyer = douban.playerContent(null, "https://www.czzyvideo.com/v_play/bXZfODE1OC1ubV8x.html", null);
         System.out.println(palyer);
 
 

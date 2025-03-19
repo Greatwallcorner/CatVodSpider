@@ -21,8 +21,11 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.ProxyVideo;
 import com.github.catvod.utils.Util;
+import com.github.catvod.utils.VideoFormatConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,14 +36,14 @@ import java.util.*;
 
 public class ChangZhang extends Spider {
 
-    private final String siteUrl = "https://www.czys.pro";
+    private final String siteUrl = "https://www.czzyvideo.com/";
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
         header.put("Cookie", "myannoun=1; Hm_lvt_0653ba1ead8a9aabff96252e70492497=2718862211; Hm_lvt_06341c948291d8e90aac72f9d64905b3=2718862211; Hm_lvt_07305e6f6305a01dd93218c7fe6bc9c3=2718862211; Hm_lpvt_07305e6f6305a01dd93218c7fe6bc9c3=2718867254; Hm_lpvt_06341c948291d8e90aac72f9d64905b3=2718867254; Hm_lpvt_0653ba1ead8a9aabff96252e70492497=2718867254");
         header.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/100.0.4896.77 Mobile/15E148 Safari/604.1");
         header.put("Connection", "keep-alive");
-        header.put("Host", "www.czys.pro");
+        header.put("Host", "www.czzyvideo.com");
         return header;
     }
 
@@ -155,25 +158,38 @@ public class ChangZhang extends Spider {
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         String content = OkHttp.string(id, getHeader());
         Document document = Jsoup.parse(content);
+
         Elements iframe = document.select("iframe");
-        String videoContent = OkHttp.string(iframe.get(0).attr("src"));
-        document = Jsoup.parse(videoContent);
-        Elements script = document.select("script");
-        String rand = "";
-        String player = "";
-        for (Element element : script) {
-            if (StringUtils.isNoneBlank(element.data())) {
-                rand = Util.getVar(element.data(), "rand");
-                player = Util.getVar(element.data(), "player");
+        if(!iframe.isEmpty()){
+            String videoContent = OkHttp.string(iframe.get(0).attr("src"), Util.webHeaders(siteUrl));
+            String url = Util.findByRegex("const\\s+mysvg\\s+=\\s+'(.*)'", videoContent, 1);
+//            HashMap<String, String> headers = Util.webHeaders("");
+//            headers.put(HttpHeaders.CONTENT_TYPE, VideoFormatConstants.HLS);
+            if(url.endsWith(".png")){
+                return Result.error("无法识别的格式 png format");
+//                url = ProxyVideo.buildAdvanceCommonProxyUrl(url, Util.webHeaders(""), Map.of(HttpHeaders.CONTENT_TYPE, VideoFormatConstants.HLS));
             }
+            return Result.get().m3u8().url(url).string();
+//            document = Jsoup.parse(videoContent);
+//            Elements script = document.select("script");
+//            String rand = "";
+//            String player = "";
+//            for (Element element : script) {
+//                if (StringUtils.isNoneBlank(element.data())) {
+//                    rand = Util.getVar(element.data(), "rand");
+//                    player = Util.getVar(element.data(), "player");
+//                }
+//            }
+        }else{
+
         }
 
-        String videoInfo = cryptJs(player, "VFBTzdujpR9FWBhe", rand);
-        JSONObject jsonElement = JSONUtil.parseObj(videoInfo);
-        String realUrl = jsonElement.getStr("url");
-        SpiderDebug.log("++++++++++++厂长-playerContent" + Json.toJson(realUrl));
+//        String videoInfo = cryptJs(player, "VFBTzdujpR9FWBhe", rand);
+//        JSONObject jsonElement = JSONUtil.parseObj(videoInfo);
+//        String realUrl = jsonElement.getStr("url");
+//        SpiderDebug.log("++++++++++++厂长-playerContent" + Json.toJson(realUrl));
 
-        return Result.get().url(realUrl).header(getHeader()).string();
+        return Result.get().url("").header(getHeader()).string();
     }
 
 
