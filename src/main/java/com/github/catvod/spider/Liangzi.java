@@ -9,6 +9,8 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Util;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,21 +24,21 @@ import java.util.regex.Pattern;
 
 public class Liangzi extends Spider {
 
-    private final String siteUrl = "http://www.lzizy9.com";
+    private final String siteUrl = "https://lzi888.com";
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
-        return header;
+//        header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+        return Util.webHeaders("");
+//        return header;
     }
 
     @Override
     public String homeContent(boolean filter) throws Exception {
 
-        List<Vod> list = new ArrayList<>();
         List<Class> classes = new ArrayList<>();
         LinkedHashMap<String, List<Filter>> filters = new LinkedHashMap<>();
-        Document doc = Jsoup.parse(OkHttp.string(siteUrl));
+        Document doc = Jsoup.parse(OkHttp.string(siteUrl, getHeader()));
         List<String> typeNames = Arrays.asList("电影", "连续剧", "动漫", "综艺", "电影解说", "体育");
         List<String> typeIds = Arrays.asList("1", "2", "3", "4", "39", "40");
         for (int i = 0; i < typeIds.size(); i++) {
@@ -44,37 +46,32 @@ public class Liangzi extends Spider {
             //  filters.put(typeIds.get(i), Arrays.asList(new Filter("filters", "過濾", Arrays.asList(new Filter.Value("全部", ""), new Filter.Value("單人作品", "individual"), new Filter.Value("中文字幕", "chinese-subtitle")))));
 
         }
-        for (Element div : doc.select(".module-item")) {
-            String id = siteUrl + div.select(".module-item-pic > a").attr("href");
-            String name = div.select(".module-item-pic > a").attr("title");
-            String pic = div.select("img").attr("data-src");
-            if (pic.isEmpty()) pic = div.select("img").attr("src");
-            String remark = div.select(".module-item-caption > span").text();
-
-            list.add(new Vod(id, name, pic, remark));
-        }
+        List<Vod> list = getVodList(doc);
         SpiderDebug.log("++++++++++++量子-homeContent" + Json.toJson(list));
         return Result.string(classes, list);
     }
 
+    private @NotNull List<Vod> getVodList(Document doc) {
+        List<Vod> list = new ArrayList<>();
+        for (Element div : doc.select(".module-item")) {
+            String id = siteUrl + div.attr("href");
+            String name = div.select(".module-item-pic > img").attr("alt");
+            String pic = div.select(".module-item-pic > img").attr("src");
+            if (pic.isEmpty()) pic = div.select("img").attr("src");
+            String remark = div.select(".module-item-note").text();
+
+            list.add(new Vod(id, name, pic, remark));
+        }
+        return list;
+    }
+
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
-        List<Vod> list = new ArrayList<>();
         String target = siteUrl + "/index.php/vod/show/id/" + tid + "/page/" + pg + ".html";
         //String filters = extend.get("filters");
         String html = OkHttp.string(target);
         Document doc = Jsoup.parse(html);
-        for (Element div : doc.select(".module-item")) {
-            String id = siteUrl + div.select(".module-item-pic > a").attr("href");
-            String name = div.select(".module-item-pic > a").attr("title");
-            String pic = div.select("img").attr("data-src");
-            if (pic.isEmpty()) {
-                pic = div.select("img").attr("src");
-            }
-            String remark = div.select(".module-item-caption > span").text();
-
-            list.add(new Vod(id, name, pic, remark));
-        }
+        List<Vod> list = getVodList(doc);
         String total = "" + Integer.MAX_VALUE;
         for (Element element : doc.select("script")) {
             if (element.data().contains("mac_total")) {
@@ -159,10 +156,12 @@ public class Liangzi extends Spider {
                 vod_play_url.append(notLastEpisode ? "#" : "$$$");
             }
         }
-        String title = doc.select("h1.page-title").text();
-        String classifyName = doc.select("div.tag-link a").text();
-        String year = doc.select("a.tag-link").eq(1).text();
-        String area = doc.select("a.tag-link").eq(2).text();
+        String title = doc.select(".module-info-heading h1").text();
+//        String classifyName = doc.select("div.tag-link a").text();
+        String year = doc.select(".module-info-tag-link").eq(1).text();
+        String area = doc.select(".module-info-tag-link").eq(2).text();
+        Elements select = doc.select(".module-info-item");
+
         String remark = doc.select("div.title-info span").text();
         String vodPic = doc.select("#main > div > div.box.view-heading > div.video-cover > div > div > img").attr("data-src");
 
@@ -181,7 +180,7 @@ public class Liangzi extends Spider {
         vod.setVodRemarks(remark);
         vod.setVodContent(brief);
         vod.setVodDirector(director);
-        vod.setTypeName(classifyName);
+//        vod.setTypeName(classifyName);
         vod.setVodPlayFrom(vod_play_from.toString());
         vod.setVodPlayUrl(vod_play_url.toString());
         SpiderDebug.log("++++++++++++量子-detailContent" + Json.toJson(vod));

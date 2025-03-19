@@ -1,4 +1,6 @@
-import com.github.catvod.spider.QxiTv
+package unavaliable
+
+import com.github.catvod.spider.unavailable.QxiTv
 import common.AssertUtil
 import common.TestInterface
 import org.junit.jupiter.api.Test

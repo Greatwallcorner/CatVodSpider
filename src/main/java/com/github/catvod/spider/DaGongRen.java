@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class DaGongRen extends Spider {
 
-    private static final String siteUrl = "https://dagongren1.com";
+    private static final String siteUrl = "https://dagongrenyy.com";
     private static final String cateUrl = siteUrl + "/list/";
     private static final String detailUrl = siteUrl + "/play/";
     private static final String playUrl = siteUrl + "/play/";
@@ -43,7 +43,7 @@ public class DaGongRen extends Spider {
         for (int i = 0; i < typeNameList.length; i++) {
             classes.add(new Class(typeIdList[i], typeNameList[i]));
         }
-        Document doc = Jsoup.parse(OkHttp.string(siteUrl, getHeaders()));
+        Document doc = Jsoup.parse(OkHttp.string(siteUrl, Util.webHeaders("")));
         for (Element element : doc.select("a.vodlist_thumb")) {
             try {
                 String pic = element.attr("data-original");

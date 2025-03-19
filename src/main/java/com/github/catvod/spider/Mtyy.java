@@ -30,6 +30,8 @@ public class Mtyy extends Spider {
 
     private static final String siteUrl = "https://mtyy2.com";
 
+    private static final String playUrl = siteUrl + "/static/player/art.php?url=%s&thumb=%s";
+
 
 
 
@@ -192,7 +194,11 @@ public class Mtyy extends Spider {
         String json = matcher.find() ? matcher.group(1) : "";
         JSONObject player = new JSONObject(json);
         String url = player.getString("url");
+        String thumb = player.getString("vod_pic_thumb");
         String urlNext = player.getString("url_next");
+        String playerContent = OkHttp.string(String.format(playUrl, url, thumb), getHeader());
+        url = Util.findByRegex("(https?:\\/\\/[\\w\\.-]+(?:\\/[\\w\\.-]*)*\\.m3u8(?:\\?[^\\s]*)?)", playerContent, 0);
+
         SpiderDebug.log("++++++++++++麦田-playerContent" + Json.toJson(url));
 //        if (player.getInt("encrypt") == 1) {
 //            url = URLDecoder.decode(url);

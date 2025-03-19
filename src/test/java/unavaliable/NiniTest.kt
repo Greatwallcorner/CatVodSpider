@@ -1,9 +1,11 @@
-import com.github.catvod.spider.NiNi
+package unavaliable
+
+import com.github.catvod.spider.unavailable.NiNi
 import common.AssertUtil
 import org.junit.jupiter.api.Test
 
 class NiniTest {
-    private val nini:NiNi = NiNi()
+    private val nini: NiNi = NiNi()
 
     init {
         nini.init()

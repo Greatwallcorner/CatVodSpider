@@ -1,4 +1,6 @@
-import com.github.catvod.spider.NG
+package unavaliable
+
+import com.github.catvod.spider.unavailable.NG
 import common.AssertUtil
 import common.TestInterface
 import org.junit.jupiter.api.Test

@@ -1,5 +1,6 @@
 package com.github.catvod.utils;
 
+import cn.hutool.core.util.URLUtil;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.spider.Init;
@@ -9,8 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 
-import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.IOException;
@@ -18,8 +19,8 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -244,7 +245,7 @@ public class Util {
     }
 
     public static void notify(String msg) {
-        Init.execute(()->{
+        Init.execute(() -> {
             try {
                 postHttpMsg(msg);
             } catch (IOException e) {
@@ -358,34 +359,36 @@ public class Util {
 
     /**
      * @param referer
-     * @param cookie 多个cookie name=value;name2=value2
+     * @param cookie  多个cookie name=value;name2=value2
      * @return
      */
-    public static HashMap<String, String> webHeaders(String referer, String cookie){
-        HashMap<String, String> map = webHeaders(referer);
-        map.put(com.google.common.net.HttpHeaders.COOKIE, cookie);
-        return map;
+    public static HashMap<String, String> webHeaders(String referer, String cookie) {
+        return webHeaders(referer, "", cookie);
     }
 
     public static HashMap<String, String> webHeaders(String referer) {
-        if (webHttpHeaderMap == null || webHttpHeaderMap.isEmpty()) {
-            synchronized (Util.class) {
-                if (webHttpHeaderMap == null || webHttpHeaderMap.isEmpty()) {
-                    webHttpHeaderMap = new HashMap<>();
+        return webHeaders(referer, "");
+    }
+
+    public static HashMap<String, String> webHeaders(String referer, String url, String cookie) {
+        webHttpHeaderMap = new HashMap<>();
 //                    webHttpHeaderMap.put(HttpHeaders.CONTENT_TYPE, ContentType.Application.INSTANCE.getJson().getContentType());
-//                    webHttpHeaderMap.put(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
-                    webHttpHeaderMap.put(HttpHeaders.CONNECTION, "keep-alive");
-                    webHttpHeaderMap.put(HttpHeaders.USER_AGENT, CHROME);
-                    webHttpHeaderMap.put(HttpHeaders.ACCEPT, "*/*");
-//                    webHttpHeaderMap.put(HttpHeaders.HOST, )
-                }
-            }
+        webHttpHeaderMap.put(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
+        webHttpHeaderMap.put(HttpHeaders.CONNECTION, "keep-alive");
+        webHttpHeaderMap.put(HttpHeaders.USER_AGENT, CHROME);
+        webHttpHeaderMap.put(HttpHeaders.ACCEPT, "*/*");
+//        webHttpHeaderMap.put(HttpHeaders.ACCEPT_ENCODING, "br, deflate, gzip, x-gzip");
+        if (StringUtils.isNotBlank(referer)) {
+            webHttpHeaderMap.put(HttpHeaders.REFERER, referer);
         }
-        if(StringUtils.isNotBlank(referer)){
-            URI uri = URI.create(referer);
-            String u = uri.getScheme() + "://" + uri.getHost();
-            webHttpHeaderMap.put(HttpHeaders.REFERER, u);
+        if (StringUtils.isNotBlank(url)) {
+            URI host = URLUtil.getHost(URLUtil.url(url));
+            webHttpHeaderMap.put(HttpHeaders.HOST, host.getHost());
         }
+        if (StringUtils.isNotBlank(cookie)) {
+            webHttpHeaderMap.put(com.google.common.net.HttpHeaders.COOKIE, cookie);
+        }
+
 //        webHttpHeaderMap.put(io.ktor.http.HttpHeaders.INSTANCE.getOrigin(), u);
         return webHttpHeaderMap;
     }
@@ -407,10 +410,10 @@ public class Util {
 //        URI uri = URI.create(referer);
 //        String u = uri.getScheme() + "://" + uri.getHost();
 //        webHttpHeaderMap.put(HttpHeaders.REFERER, u);
-////        webHttpHeaderMap.put(io.ktor.http.HttpHeaders.INSTANCE.getOrigin(), u);
+
+    /// /        webHttpHeaderMap.put(io.ktor.http.HttpHeaders.INSTANCE.getOrigin(), u);
 //        return webHttpHeaderMap;
 //    }
-
     public static String timestampToDateStr(Long timestamp) {
         return DateUtils.formatDate(new Date(timestamp));
     }
@@ -424,7 +427,7 @@ public class Util {
     }
 
     public static String base64Decode(String str) {
-        if(StringUtils.isBlank(str)) return "";
+        if (StringUtils.isBlank(str)) return "";
         return new String(Base64.getDecoder().decode(str));
     }
 

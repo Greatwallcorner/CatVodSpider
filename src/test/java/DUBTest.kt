@@ -29,7 +29,7 @@ class DUBTest:TestInterface<DUB> {
 
     @Test
     override fun detailTest() {
-        val detailContent = t.detailContent(mutableListOf("/voddetail/5075.html"))
+        val detailContent = t.detailContent(mutableListOf("/voddetail/5276.html"))
         assert(detailContent)
     }
 

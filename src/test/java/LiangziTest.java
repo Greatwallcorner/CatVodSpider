@@ -41,7 +41,7 @@ public class LiangziTest {
     @Test
     public void detailTest() throws Exception {
 
-        String detail = douban.detailContent(Lists.newArrayList("http://www.lzizy9.com/index.php/vod/detail/id/79936.html"));
+        String detail = douban.detailContent(Lists.newArrayList("https://lzi888.com/index.php/vod/detail/id/136385.html"));
         System.out.println(detail);
 
     }

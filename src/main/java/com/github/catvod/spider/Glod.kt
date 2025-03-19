@@ -104,7 +104,7 @@ class Glod:Spider() {
         }
         val url = parse.get("data").asJsonObject.get("playUrl").asString
         val content = OkHttp.string(url, webHeaders)
-        return Result.get().url(url).string()
+        return Result.get().url(url/*ProxyVideo.buildCommonProxyUrl(url, webHeaders)*/).string()
     }
 
     private fun genHeaders(signKey:String, time:String = Date().time.toString()): HashMap<String, String>? {

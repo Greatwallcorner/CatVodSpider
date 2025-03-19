@@ -1,4 +1,4 @@
-package com.github.catvod.spider;
+package com.github.catvod.spider.unavailable;
 
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;

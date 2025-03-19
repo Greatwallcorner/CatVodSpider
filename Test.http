@@ -38,3 +38,8 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 GET http://www.饭太硬.com/tv/
 User-Agent: OkHttp/3.12.0
 Content-Type: application/json
+
+###
+# @no-cookie-jar
+# @no-redirect
+GET https://t20m.nboku.com//20250303/1D2BEWbF/hls/index.m3u8?sign=ytYOaqqzPx8EMsesRyH7VwT5roAx51XcQxB9oXUz9Js%3D

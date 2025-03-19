@@ -26,7 +26,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("com.googlecode.juniversalchardet:juniversalchardet:1.0.3")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.12")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("com.github.lookfirst:sardine:5.10")
     implementation("cn.wanghaomiao:JsoupXpath:2.5.1")

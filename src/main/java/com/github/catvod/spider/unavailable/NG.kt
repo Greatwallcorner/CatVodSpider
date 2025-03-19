@@ -1,4 +1,4 @@
-package com.github.catvod.spider
+package com.github.catvod.spider.unavailable
 
 import cn.hutool.core.net.URLEncodeUtil
 import cn.hutool.crypto.digest.DigestUtil

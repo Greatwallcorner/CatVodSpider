@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class HkTv extends Spider {
 
-    private static String siteUrl = "http://www.tvyb03.com";
+    private static String siteUrl = "http://www.tvyb07.com";
     private static String cateUrl = siteUrl + "/vod/type/id/";
     private static String detailUrl = siteUrl + "/vod/detail/id/";
     private static String playUrl = siteUrl + "/vod/play/id/";

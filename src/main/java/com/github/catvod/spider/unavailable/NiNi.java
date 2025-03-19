@@ -1,4 +1,4 @@
-package com.github.catvod.spider;
+package com.github.catvod.spider.unavailable;
 
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.DES;

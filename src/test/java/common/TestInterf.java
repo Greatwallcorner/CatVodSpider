@@ -1,6 +1,7 @@
 package common;
 
 public interface TestInterf<T> {
+
     public static void init() throws Exception {
 
     }
