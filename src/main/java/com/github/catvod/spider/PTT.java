@@ -44,7 +44,8 @@ public class PTT extends Spider {
     public String homeContent(boolean filter) throws Exception {
         Document doc = Jsoup.parse(OkHttp.string(url, getHeader()));
         List<Class> classes = new ArrayList<>();
-        for (Element a : doc.select("li > a.px-2.px-sm-3.py-2.nav-link")) classes.add(new Class(a.attr("href").replace("/p/", ""), a.text()));
+        for (Element a : doc.select("li > a.px-2.px-sm-3.py-2.nav-link"))
+            classes.add(new Class(a.attr("href").replace("/p/", ""), a.text()));
         return Result.string(classes, StringUtils.isEmpty(extend) ? Json.parse("{}") : Json.parse(OkHttp.string(extend)));
     }
 
@@ -52,7 +53,7 @@ public class PTT extends Spider {
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
         UrlBuilder builder = UrlBuilder.of(url + "p/" + tid);
 //        Uri.Builder builder = Uri.parse(url + "p/" + tid).buildUpon();
-            if (!StringUtils.isEmpty(extend.get("c"))) builder.addPathSegment("c/" + extend.get("c"));
+        if (!StringUtils.isEmpty(extend.get("c"))) builder.addPathSegment("c/" + extend.get("c"));
         if (!StringUtils.isEmpty(extend.get("area"))) builder.addQuery("area_id", extend.get("area"));
         if (!StringUtils.isEmpty(extend.get("year"))) builder.addQuery("year", extend.get("year"));
         if (!StringUtils.isEmpty(extend.get("sort"))) builder.addQuery("sort", extend.get("sort"));
@@ -65,7 +66,7 @@ public class PTT extends Spider {
             String remark = div.select("span.badge.badge-success").get(0).text();
             String vodPic = img.attr("src").startsWith("http") ? img.attr("src") : url + img.attr("src");
             String name = img.attr("alt");
-            if (!StringUtils.isEmpty(name)) list.add(new Vod(a.attr("href").substring(1), name, vodPic, remark));
+            if (!StringUtils.isEmpty(name)) list.add(new Vod(a.attr("href").substring(3), name, vodPic, remark));
         }
         return Result.string(list);
     }
@@ -81,13 +82,14 @@ public class PTT extends Spider {
         Elements items = doc.select("div > a.seq.border");
         for (String flag : flags.keySet()) {
             List<String> urls = new ArrayList<>();
-            for (Element e : items) urls.add(e.text() + "$" + ids.get(0) + "/" + e.attr("href").split("/")[2] + "/" + flag);
+            for (Element e : items)
+                urls.add(e.text() + "$" + ids.get(0) + "/" + e.attr("href").split("/")[2] + "/" + flag);
             if (urls.isEmpty()) urls.add("1$" + ids.get(0) + "/1/" + flag);
-            playUrls.add(StringUtils.join("#", urls));
+            playUrls.add(Util.stringJoin("#", urls));
         }
         Vod vod = new Vod();
-        vod.setVodPlayFrom(StringUtils.join("$$$", flags.values()));
-        vod.setVodPlayUrl(StringUtils.join("$$$", playUrls));
+        vod.setVodPlayFrom(Util.stringJoin("$$$", flags.values()));
+        vod.setVodPlayUrl(Util.stringJoin("$$$", playUrls));
         return Result.string(vod);
     }
 

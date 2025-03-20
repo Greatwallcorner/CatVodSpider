@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  */
 public class Mogg extends Cloud {
 
-    private final String siteUrl = "https://www.mogg.top";
+    private final String siteUrl = "https://woog.nxog.eu.org";
     private final Pattern regexCategory = Pattern.compile("index.php/vod/type/id/(\\w+).html");
     private final Pattern regexPageTotal = Pattern.compile("\\$\\(\"\\.mac_total\"\\)\\.text\\('(\\d+)'\\);");
     private JsonObject extend;

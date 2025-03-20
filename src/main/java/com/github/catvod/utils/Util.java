@@ -431,11 +431,11 @@ public class Util {
         return new String(Base64.getDecoder().decode(str));
     }
 
-    public static String stringJoin(String separate, List<String> list) {
+    public static String stringJoin(String separate, Collection<String> list) {
         return StringUtils.join(list, separate);
     }
 
-    public static String stringJoin(List<String> list, String separate) {
+    public static String stringJoin(Collection<String> list, String separate) {
         return StringUtils.join(list, separate);
     }
 

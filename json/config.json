@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;d373685cf40a16b315dd2797b7824aad",
+  "spider": "../jar/spider.jar;md5;be55a51eedb60692f739e0e8da3c34e8",
   "sites": [
     {
       "key": "Intruduce",
@@ -16,24 +16,6 @@
       "api": "csp_Douban",
       "searchable": 0,
       "changeable": 0,
-      "ext": {}
-    },
-    {
-      "key": "KuaKeBa",
-      "name": "夸克吧",
-      "type": 3,
-      "api": "csp_KuaKeBa",
-      "searchable": 1,
-      "changeable": 1,
-      "ext": {}
-    },
-    {
-      "key": "DianYingYunJi",
-      "name": "电影云集",
-      "type": 3,
-      "api": "csp_DianYingYunJi",
-      "searchable": 1,
-      "changeable": 1,
       "ext": {}
     },
     {
@@ -146,6 +128,16 @@
       "searchable": "1",
       "filterable": "0",
       "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "PTT",
+      "name": "PTT|广告",
+      "type": 3,
+      "api": "csp_PTT",
+      "searchable": 1,
+      "filterable": "0",
+      "changeable": 1,
       "ext": {}
     },
     {
@@ -323,6 +315,24 @@
       "api": "csp_YpPan",
       "searchable": 1,
       "changeable": 0
+    },
+    {
+      "key": "KuaKeBa",
+      "name": "夸克吧",
+      "type": 3,
+      "api": "csp_KuaKeBa",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
+    },
+    {
+      "key": "DianYingYunJi",
+      "name": "电影云集",
+      "type": 3,
+      "api": "csp_DianYingYunJi",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
     }
   ]
 }
