@@ -10,6 +10,7 @@ import com.github.catvod.crawler.Spider
 import com.github.catvod.crawler.SpiderDebug
 import com.github.catvod.net.OkHttp
 import com.github.catvod.utils.Json
+import com.github.catvod.utils.ProxyVideo
 import com.github.catvod.utils.Util
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -104,7 +105,7 @@ class Glod:Spider() {
         }
         val url = parse.get("data").asJsonObject.get("playUrl").asString
         val content = OkHttp.string(url, webHeaders)
-        return Result.get().url(url/*ProxyVideo.buildCommonProxyUrl(url, webHeaders)*/).string()
+        return Result.get().url(ProxyVideo.buildCommonProxyUrl(url, webHeaders)).string()
     }
 
     private fun genHeaders(signKey:String, time:String = Date().time.toString()): HashMap<String, String>? {

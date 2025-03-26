@@ -61,7 +61,7 @@ public class QuarkApi {
         if (Util.getExt(url).contains("m3u8")) {
             return getM3u8(url, header);
         }
-        return new Object[]{ProxyVideo.proxy(url, header)};
+        return ProxyVideo.proxy(url, header);
     }
 
 
@@ -718,7 +718,7 @@ public class QuarkApi {
             SpiderDebug.log("----scheduleAtFixedRate" + new Date());
             String result = OkHttp.string("https://uop.quark.cn/cas/ajax/getServiceTicketByQrcodeToken", params, getWebHeaders());
             Map<String, Object> json = Json.parseSafe(result, Map.class);
-            if (json.get("status").equals(new Double(2000000))) {
+            if (json.get("status").equals(Double.valueOf(2000000))) {
                 setToken((String) ((Map<String, Object>) ((Map<String, Object>) json.get("data")).get("members")).get("service_ticket"));
 
             }

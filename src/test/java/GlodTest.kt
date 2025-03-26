@@ -28,7 +28,7 @@ class GlodTest() :TestInterface<Glod> {
 
     @Test
     override fun playTest() {
-        val playerContent = t.playerContent("", "134340/1165560", mutableListOf())
+        val playerContent = t.playerContent("", "135328/1176989", mutableListOf())
         println(playerContent)
         AssertUtil.assertResult(playerContent)
     }
